@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<bean id="userTask" class="com.liaoliao.quartz.TimerTask">
+	</bean>
+	<!-- 每天定时清理todayMoney开始 -->
+	<!-- 定义调用对象和调用对象的方法 -->
+	<bean id="userTaskDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<!-- 调用的类 -->
+		<property name="targetObject" ref="userTask" />
+		<!-- 调用类中的方法 -->
+		<property name="targetMethod" value="clearUserDayMoney" />
+		<property name="concurrent" value="false" />
+	</bean>
+
+	<!-- 定义触发时间 -->
+	<bean id="userTaskTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="userTaskDetail" />
+		<!-- cron表达式 -->
+		<property name="cronExpression">
+			<value>0 0 0 * * ? </value><!-- 每天零点触发 -->
+		</property>
+	</bean>
+	
+	<!-- 每天定时清理todayMoney结束 -->
+	
+	
+	
+	<!-- 每天定时结算开始 -->
+	<!-- 定义调用对象和调用对象的方法 -->
+	<bean id="jiesuanDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<!-- 调用的类 -->
+		<property name="targetObject" ref="userTask" />
+		<!-- 调用类中的方法 -->
+		<property name="targetMethod" value="jiesuan" />
+		<property name="concurrent" value="false" />
+	</bean>
+
+	<!-- 定义触发时间 -->
+	<bean id="jiesuanTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="jiesuanDetail" />
+		<!-- cron表达式 -->
+		<property name="cronExpression">
+			<value>0 0 2 * * ? </value><!-- 每天两点触发 -->
+		</property>
+	</bean>
+	<!-- 每天定时结算结束 -->
+
+
+	<!-- 定义调用对象和调用对象的方法 -->
+	<bean id="originalLogDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+	<!-- 	调用的类 -->
+		<property name="targetObject" ref="userTask" />
+		<!-- 调用类中的方法 -->
+		<property name="targetMethod" value="originalLog" />
+		<property name="concurrent" value="false" />
+	</bean>
+
+	<!-- 定义触发时间 -->
+	<bean id="originalLogTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="originalLogDetail" />
+		<!-- cron表达式 -->
+		<property name="cronExpression">
+			<value>0 0/10 * * * ? </value><!-- 每隔十分钟调用一次 -->
+		</property>
+	</bean>
+
+
+
+	<!-- 定义调用对象和调用对象的方法 -->
+	<bean id="clearOnlineDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+	<!-- 	调用的类 -->
+		<property name="targetObject" ref="userTask" />
+		<!-- 调用类中的方法 -->
+		<property name="targetMethod" value="clearOnline" />
+		<property name="concurrent" value="false" />
+	</bean>
+
+	<!-- 定义触发时间 -->
+	<bean id="clearOnlineTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="clearOnlineDetail" />
+		<!-- cron表达式 -->
+		<property name="cronExpression">
+			<value>0 0/15 * * * ? </value><!-- 每隔十五分钟调用一次 -->
+		</property>
+	</bean>
+
+
+	<bean id="dealwithRedPackageDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+	<!-- 	调用的类 -->
+		<property name="targetObject" ref="userTask" />
+		<!-- 调用类中的方法 -->
+		<property name="targetMethod" value="dealwithRedPackage" />
+		<property name="concurrent" value="false" />
+	</bean>
+
+	<!-- 定义触发时间 -->
+	<bean id="dealwithRedPackageTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="dealwithRedPackageDetail" />
+		<!-- cron表达式 -->
+		<property name="cronExpression">
+			<value>0 0/10 * * * ? </value><!-- 每隔十五分钟调用一次 -->
+		</property>
+	</bean>
+
+
+
+	<bean id="JobSchedule" lazy-init="false" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" destroy-method="destroy">
+		<property name="triggers">
+			<list>
+				<ref bean="userTaskTrigger" />
+				<ref bean="jiesuanTrigger" />
+				<ref bean="originalLogTrigger" />
+				<ref bean="clearOnlineTrigger" />
+				<ref bean="dealwithRedPackageTrigger" />
+			</list>
+		</property>
+	<!-- 	<property name="autoStartup" value="true">
+		</property> -->
+	</bean>
+</beans>
