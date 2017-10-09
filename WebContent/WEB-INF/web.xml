@@ -14,9 +14,10 @@
 		<welcome-file>default.jsp</welcome-file>
 	</welcome-file-list>
 	
-	
-	
-	
+	<!-- 解决获取手机验证码和找回密码,注册的session不一致问题 -->
+	<!-- <listener>
+		<listener-class>com.liaoliao.listener.MySessionListener</listener-class>
+	</listener> -->
 	
 	<!-- 异常处理 -->
 	<error-page>
@@ -124,8 +125,5 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
-	<!-- 解决获取手机验证码和找回密码,注册的session不一致问题 -->
-	<listener>
-		<listener-class>com.liaoliao.listener.MySessionListener</listener-class>
-	</listener>
+	
 </web-app>

@@ -11,6 +11,7 @@ public class MySessionListener implements HttpSessionListener {
     public void sessionCreated(HttpSessionEvent httpSessionEvent) {
     MySessionContext.AddSession(httpSessionEvent.getSession());
     }
+	
 	@Autowired
     public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
         HttpSession session = httpSessionEvent.getSession();

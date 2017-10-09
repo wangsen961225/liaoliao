@@ -71,4 +71,5 @@
     </bean>
     
     <bean id="SpringApplicationContext" class="com.liaoliao.util.ApplicationContextHelper"></bean>
+    <bean id="myadsfsSessionListener" class="com.liaoliao.listener.MySessionListener"></bean>
 </beans>
