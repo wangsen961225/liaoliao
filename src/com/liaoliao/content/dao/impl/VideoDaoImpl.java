@@ -18,7 +18,7 @@ public class VideoDaoImpl extends BaseDaoImpl<Video, Integer>  implements VideoD
 		String hql="from Video where 1 = 1 ";
 		String countHql="select count(v) from Video v where 1 = 1";
 		
-		if(map.get("searchType")!=null&& !("".equals(map.get("searchType")))){
+		if(map !=null && map.get("searchType")!=null&& !("".equals(map.get("searchType")))){
 			Integer searchType = (Integer) map.get("searchType");
 			hql+= " and status="+searchType;
 			hql += "order by id desc";

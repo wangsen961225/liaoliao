@@ -7,12 +7,13 @@ import javax.servlet.http.HttpSessionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class MySessionListener implements HttpSessionListener {
-	@Autowired
+	
+	@Override
     public void sessionCreated(HttpSessionEvent httpSessionEvent) {
     MySessionContext.AddSession(httpSessionEvent.getSession());
     }
 	
-	@Autowired
+	@Override
     public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
         HttpSession session = httpSessionEvent.getSession();
         MySessionContext.DelSession(session);

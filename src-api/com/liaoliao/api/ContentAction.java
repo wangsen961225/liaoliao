@@ -121,9 +121,11 @@ public class ContentAction {
 			pageNo=pageNo>1?pageNo:page;
 		}
 		List<Video> list = null;
+		Map<String,Object> hashMap = new HashMap<String,Object>();
 		if(flushType==1){
 			
-			list = videoService.findAll(pageNo,null);
+			hashMap.put("flushType", flushType);
+			list = videoService.findAll(pageNo,hashMap);
 		}
 		if(flushType==0){
 			list = videoService.findByRand(8);
@@ -142,6 +144,9 @@ public class ContentAction {
 			item.put("id", video.getId());
 			item.put("title", video.getTitle());
 			item.put("description", video.getDescription());
+			if(video.getImgUrl()==null){
+				video.setImgUrl("http://appliaoliao.oss-cn-hangzhou.aliyuncs.com/sys_imgs/video_default2.jpg?x-oss-process=style/blank_style");
+			}
 			item.put("imgUrl", video.getImgUrl());
 			item.put("videoUrl", video.getVideoUrl());
 			item.put("duration", video.getDuration());
