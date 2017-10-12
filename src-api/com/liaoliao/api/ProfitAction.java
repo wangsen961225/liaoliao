@@ -1083,6 +1083,7 @@ public class ProfitAction {
 			pageNo=pageNo>1?pageNo:page;
 		}
 		List<FenrunLog> list=fenrunLogService.findOriginalLogByUserId(userId,pageNo);
+		//System.out.println(userId);
 		List<Map<String,Object>> datas=new ArrayList<>();
 		Map<String, Object> item = null;
 		for(FenrunLog fl:list){

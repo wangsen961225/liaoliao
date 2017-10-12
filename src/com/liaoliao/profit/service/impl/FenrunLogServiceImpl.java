@@ -41,6 +41,11 @@ public class FenrunLogServiceImpl implements FenrunLogService {
 	public List<FenrunLog> findRedPackageLog( Integer redPackageId) {
 		return fenrunLogDao.findRedPackageLog( redPackageId);
 	}
+
+	@Override
+	public List<FenrunLog> expenditureDetails(Integer userId) {
+		return fenrunLogDao.expenditureDetails(userId);
+	}
 	
 	
 

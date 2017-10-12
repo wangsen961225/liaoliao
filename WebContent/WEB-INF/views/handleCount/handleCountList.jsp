@@ -34,7 +34,7 @@ font-family:'STKaiti'
 <body>
 	<div class="data_list">
 		<div class="data_list_title">数据统计</div>
-		<form name="myForm" class="form-inline" method="post" action="${ctx}/sys/handleCountByDay">
+		<form name="myForm" class="form-inline" method="post" action="${ctx}/sys/handleCountList">
 			<div class="form-group">
                 <label for="dtp_input2" class="control-label">日期</label>
                 <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">

@@ -31,7 +31,7 @@ public class HandleCountController {
 	 * 统计列表by日期
 	 * 
 	 */
-	@RequestMapping("/handleCountByDay")
+	@RequestMapping("/handleCountList")
 	public String handleCountByDay(HttpServletRequest request,String datTimeStr){
 		Date datTime = TimeKit.todayStart();
 		if(datTimeStr!=null&&!("".equals(datTimeStr))){

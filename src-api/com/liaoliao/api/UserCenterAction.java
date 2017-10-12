@@ -592,8 +592,14 @@ public class UserCenterAction {
 	 */
 	@RequestMapping(value="/getInviteUrl")
 	@ResponseBody
-	public Map<String,Object> getInviteUrl(HttpServletRequest request,Integer userId) {
+	public Map<String,Object> getInviteUrl(HttpServletRequest request,Integer userId,Integer getTask) {
 		Map<String,Object> map=new HashMap<String,Object>();
+		if(null==getTask || getTask==0){
+			map.put("msg", "该用户未领取任务");
+			map.put("code", StaticKey.NotReceiveTask);
+			return map;
+		}
+		
 		if(userId==null){
 			map.put("code", StaticKey.ReturnClientNullError);
 			map.put("msg", "参数异常");
@@ -970,8 +976,14 @@ public class UserCenterAction {
 	@RequestMapping(value="/perfectUserInfo")
 	public Map<String,Object> perfectUserInfo (HttpServletRequest request,Integer userId,Integer age,
 			String avatar,Integer sex,String province,String city,String district,
-			String birthdate,String qq,String wechat){
+			String birthdate,String qq,String wechat,Integer getTask){
 		Map<String,Object> map = new HashMap<>();
+		if(getTask==null || getTask==0){
+			map.put("msg", "该用户未领取任务");
+			map.put("code", StaticKey.NotReceiveTask);
+			return map;
+		}
+		
 		if(userId==null||
 				StringKit.isNotEmpty(avatar)||
 				StringKit.isNotEmpty(province)||
@@ -993,6 +1005,7 @@ public class UserCenterAction {
 			map.put("code", StaticKey.ReturnClientTokenError);
 			return map;
 		}
+		
 		Users user = userService.findById(userId);
 		if(qq!=null||!("".equals(qq))){
 			user.setQq(qq);
@@ -1043,14 +1056,14 @@ public class UserCenterAction {
 		if(taskLog==null){
 			taskLog = new TaskLog();
 			taskLog.setFinishTime(new Date());
-			taskLog.setStatus(1);
+			taskLog.setStatus(2);
 			taskLog.setUser(user);
 			taskLog.setObtain(0);//未领取奖励
 			UserTask ut = userTaskService.findById(5);
 			taskLog.setUserTask(ut);//查询出用户完善资料这条记录
 			taskLogService.savaTaskLog(taskLog);
-		}else if(taskLog.getStatus()==0){
-			taskLog.setStatus(1);
+		}else if(taskLog.getStatus()==1){
+			taskLog.setStatus(2);
 			taskLog.setFinishTime(new Date());
 			taskLogService.updateTaskLog(taskLog);
 		}

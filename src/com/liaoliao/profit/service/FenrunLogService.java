@@ -16,4 +16,6 @@ public interface FenrunLogService {
 
 	List<FenrunLog> findRedPackageLog( Integer redPackageId);
 
+	List<FenrunLog> expenditureDetails(Integer userId);
+
 }

@@ -632,12 +632,20 @@ public class ContentAction {
 	 * @param request
 	 * @param id
 	 * @param type :0:文章   1：视频
+	 * 
 	 * @return
 	 */
 	@RequestMapping(value="/sendCount")
 	@ResponseBody
-	public Map<String,Object> sendCount(HttpServletRequest request,Integer contentId,Integer type,Integer userId){
+	public Map<String,Object> sendCount(HttpServletRequest request,Integer contentId,Integer type,Integer userId,Integer getTask){
 		Map<String,Object> map=new HashMap<String,Object>();
+		
+		//判断用户是否领取任务
+		if(1==getTask){
+			map.put("msg", "该用户未领取任务");
+			map.put("code", StaticKey.NotReceiveTask);
+		}
+		
 		if(contentId==null||type==null){
 			map.put("msg", "参数异常！");
 			map.put("code", StaticKey.ReturnClientNullError);
@@ -753,7 +761,7 @@ public class ContentAction {
 			return map;
 		}
 		
-		//如果已经登录，并且转发文章，那么就是完成了任务
+		//如果已经登录，并且转发文章，并且已经领取任务，那么就是完成了任务
 		if(userId!=null&&!("".equals(userId))){
 			if(!redisService.getValidate(request,userId)){
 				map.put("msg", "token失效或错误");
@@ -766,21 +774,18 @@ public class ContentAction {
 			if(taskLog==null){
 				taskLog = new TaskLog();
 				taskLog.setFinishTime(new Date());
-				taskLog.setStatus(1);
+				taskLog.setStatus(2);
 				taskLog.setUser(user);
 				taskLog.setObtain(0);
 				UserTask ut = userTaskService.findById(3);
 				taskLog.setUserTask(ut);//查询出用户完成修改昵称这条记录
 				taskLogService.savaTaskLog(taskLog);
-			}else if(taskLog.getStatus()==0){
-				taskLog.setStatus(1);
+			}else if(taskLog.getStatus()==1){
+				taskLog.setStatus(2);
 				taskLog.setFinishTime(new Date());
 				taskLogService.updateTaskLog(taskLog);
 			}
 		}
-		
-		
-		
 		
 		map.put("msg", "success！");
 		map.put("code", StaticKey.ReturnServerTrue);

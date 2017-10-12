@@ -42,7 +42,40 @@ public class FenrunLogDaoImpl extends BaseDaoImpl<FenrunLog, Integer> implements
 
 	@Override
 	public List<FenrunLog> findRedPackageLog(Integer redPackageId) {
-		String hql="from FenrunLog where type = 0? and contentId = ?1";
-		return this.getListByHQL(hql, StaticKey.FenrunGrabUser,redPackageId);
+//		String hql="from FenrunLog where type =?0 and contentId = ?1 ";
+		String hql1 = "from FenrunLog where id=" + redPackageId;
+		List<FenrunLog> listByHQL2 = this.getListByHQL(hql1);
+		FenrunLog fenrunLog = listByHQL2.get(0);
+		redPackageId = fenrunLog.getContentId();
+		String hql="from FenrunLog where type =?0 and contentId = ?1 ";
+		System.out.println(redPackageId);
+		List<FenrunLog> listByHQL = this.getListByHQL(hql, StaticKey.FenrunGrabUser,redPackageId);
+		//System.out.println(listByHQL);
+		return listByHQL;
+//		return this.getListByHQL(hql, StaticKey.FenrunGrabUser,redPackageId);
+	}
+
+
+	@Override
+	public List<FenrunLog> expenditureDetails(Integer userId) {
+		String hql="from FenrunLog where user.id =?0";
+		List<FenrunLog> listByHQL = this.getListByHQL(hql,userId);
+		return listByHQL;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

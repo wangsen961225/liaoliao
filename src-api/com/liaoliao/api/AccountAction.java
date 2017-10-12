@@ -370,7 +370,7 @@ public class AccountAction {
 	 */
 	@RequestMapping(value="/changeNickName")
 	@ResponseBody
-	public Map<String,Object> changeNickName(HttpServletRequest request,Integer userId,String newNickName){
+	public Map<String,Object> changeNickName(HttpServletRequest request,Integer userId,String newNickName,Integer getTask){
 		Map<String,Object> map=new HashMap<String,Object>();
 		if(userId==null||"".equals(userId)||StringUtils.isBlank(newNickName)){
 			map.put("msg", "参数异常!");
@@ -389,6 +389,13 @@ public class AccountAction {
 			map.put("code", StaticKey.ReturnUserAccountNotExist);
 			return map;
 		}
+		
+		if(getTask == null || 0==getTask){
+			map.put("msg", "该用户未领取任务");
+			map.put("code", StaticKey.NotReceiveTask);
+			return map;
+		}
+		
 		newNickName = CommonUtil.emojiFilter(newNickName);
 		
 		Users u = userService.findByNiceName(newNickName);
@@ -405,14 +412,14 @@ public class AccountAction {
 		if(taskLog==null){
 			taskLog = new TaskLog();
 			taskLog.setFinishTime(new Date());
-			taskLog.setStatus(1);
+			taskLog.setStatus(2);
 			taskLog.setUser(user);
 			taskLog.setObtain(0);//未领取奖励
 			UserTask ut = userTaskService.findById(1);
 			taskLog.setUserTask(ut);//查询出用户完成修改昵称这条记录
 			taskLogService.savaTaskLog(taskLog);
-		}else if(taskLog.getStatus()==0){
-			taskLog.setStatus(1);
+		}else if(taskLog.getStatus()==1){
+			taskLog.setStatus(2);
 			taskLog.setFinishTime(new Date());
 			taskLogService.updateTaskLog(taskLog);
 		}

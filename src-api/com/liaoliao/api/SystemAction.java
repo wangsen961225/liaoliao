@@ -457,7 +457,7 @@ public class SystemAction {
 				return map;
 			}
 			
-			//查询日志表里面有没有日志,有日志,修改; 无日志,提示查询为空
+			//查询日志表里面有没有日志,有日志,修改; 无日志,添加
 			TaskLog taskLog = null;
 			if(userTask.getType()==0){
 				taskLog = taskLogService.findExist(taskId,userId);

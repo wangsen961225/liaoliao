@@ -23,6 +23,7 @@ import com.liaoliao.content.service.FeedbackService;
 import com.liaoliao.content.service.OriginalArticleInfoService;
 import com.liaoliao.content.service.OriginalVideoInfoService;
 import com.liaoliao.content.service.VideoService;
+import com.liaoliao.profit.entity.FenrunLog;
 import com.liaoliao.profit.entity.ToBank;
 import com.liaoliao.profit.entity.WeixinPayLog;
 import com.liaoliao.profit.service.FenrunLogService;
@@ -86,7 +87,7 @@ public class UserController {
 	 * 
 	 */
 	@RequestMapping("/userList")
-	public String userList(HttpServletRequest request,Integer pageNo,Integer vipStatus,String mobile,String userName){
+	public String userList(HttpServletRequest request,Integer pageNo,Integer vipStatus,String mobile,String userName,Integer isActive){
 		Map<String,Object> map = new HashMap<>();
 		String condition="";
 		if(vipStatus!=null&&!("".equals(vipStatus))){
@@ -100,6 +101,18 @@ public class UserController {
 		if(userName!=null&&!("".equals(userName))){
 			map.put("userName", userName);
 			condition+="&userName="+userName;
+		}
+		
+		if(isActive!=null&&!("".equals(isActive))){
+			if(isActive==1){//活跃用户
+				map.put("isActive", isActive);
+				condition+="&isActive="+isActive;
+			}
+			
+			if(isActive==0){//非活跃用户
+				map.put("isActive", isActive);
+				condition+="&isActive="+isActive;
+			}
 		}
 		if(pageNo==null){
 			pageNo=page;
@@ -123,6 +136,7 @@ public class UserController {
 		request.setAttribute("vipStatus", vipStatus);
 		request.setAttribute("userName", userName);	
 		request.setAttribute("mobile", mobile);	
+		request.setAttribute("isActive", isActive);	
 		
 		List<Users> list=userService.findAll(pageNo,map);
 		request.setAttribute("list", list);
@@ -858,5 +872,31 @@ public class UserController {
 	}
 	
 	
-	
+	/**
+	 * 料币收支明细
+	 */
+	@ResponseBody
+	@RequestMapping(value="/expenditureDetails")
+	public Map<String,Object> expenditureDetails(HttpServletRequest request,Integer userId){
+		Map<String,Object> data = new HashMap<>();
+		List<FenrunLog> expenditureDetailsList = null;
+		if(userId != null){
+			expenditureDetailsList = fenrunLogService.expenditureDetails(userId);
+		}
+		
+		if(expenditureDetailsList != null){
+			data.put("expenditureDetailsList",expenditureDetailsList);
+			data.put("code", 200);
+			data.put("msg", "成功获得料币明细！");
+		}else{
+			data.put("code", -1);
+			data.put("msg","该用户没有获得过料币！" );
+		}
+		request.getSession().setAttribute("expenditureDetailsList", expenditureDetailsList);
+		//request.setAttribute("expenditureDetailsList", expenditureDetailsList);
+		//return "userPage/userList";
+		//return expenditureDetailsList;
+		return data;
+		
+	}
 }

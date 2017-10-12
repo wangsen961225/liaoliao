@@ -61,6 +61,19 @@ public class UserDaoImpl extends BaseDaoImpl<Users,Integer> implements UserDao {
 			hql+=" and  nickName like  '%"+userName+"%'";
 			countHql+="and  nickName like  '%"+userName+"%'";
 		}
+		
+		
+		if(map.get("isActive")!=null && (Integer)map.get("isActive")==0){//非活跃用户
+			hql+=" and dayMoney<=0";
+			countHql+="and dayMoney<=0";
+		}
+		if(map.get("isActive")!=null && (Integer)map.get("isActive")==1){ //活跃用户
+			hql+=" and dayMoney > 0";
+			countHql+="and dayMoney > 0";
+		}
+		
+		
+		
 		hql+= " and id>10000 order by id desc";
 		countHql+= " and id > 10000 ";
 	  //String countHql="select count(a) from Users a";
@@ -286,6 +299,16 @@ public class UserDaoImpl extends BaseDaoImpl<Users,Integer> implements UserDao {
 			String userName = (String) map.get("userName");
 			countHql+="and  nickName like  '%"+userName+"%'";
 		}
+		
+		
+		if(map.get("isActive")!=null&&(Integer)map.get("isActive")==1){
+			countHql+=" and dayMoney > 0";
+		}
+		if(map.get("isActive")!=null&&(Integer)map.get("isActive")==0){
+			countHql+=" and dayMoney <= 0";
+		}
+		
+		
 		countHql+=" and id >10000";
 		return Integer.valueOf(this.countByHql(countHql).toString());
 	}

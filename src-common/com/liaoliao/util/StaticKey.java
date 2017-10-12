@@ -270,7 +270,11 @@ public abstract class StaticKey {
 	public static final Integer liaoliaoArticleId = 67;
 	
 	
-	
+	/**
+	 * 任务状态
+	 */
+	public static final Integer NotReceiveTask = 10;	//未领取任务
+	public static final Integer ReceiveTask = 11;		//已领取任务
 	
 	
 
