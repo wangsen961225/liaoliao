@@ -129,4 +129,14 @@ public class AdvertServiceImpl implements AdvertService {
 		return advertDao.findCount();
 	}
 
+	@Override
+	public String findDirectInvest() {
+		List<Advert> list = advertDao.findDirectInvest();
+		StringBuilder advertStr = new StringBuilder();
+		for (int i = 0; i < list.size(); i++) {
+			advertStr.append(list.get(i).getContent());
+		}
+		return advertStr.toString();
+	}
+
 }

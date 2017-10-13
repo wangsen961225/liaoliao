@@ -113,7 +113,7 @@
 		<property name="jobDetail" ref="dealwithRedPackageDetail" />
 		<!-- cron表达式 -->
 		<property name="cronExpression">
-			<value>0 0/10 * * * ? </value><!-- 每隔十五分钟调用一次 -->
+			<value>0 0/1 * * * ? </value><!-- 每隔十分钟调用一次 -->
 		</property>
 	</bean>
 

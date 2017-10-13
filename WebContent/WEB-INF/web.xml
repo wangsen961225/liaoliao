@@ -66,7 +66,7 @@
 	<!-- 加载所有的配置文件 -->
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:applicationContext.xml,classpath:redis.xml,classpath:shiro.xml <!--,classpath:quartz.xml --></param-value>
+		<param-value>classpath:applicationContext.xml,classpath:redis.xml,classpath:shiro.xml,classpath:applicationContext-quartz.xml <!--,classpath:quartz.xml --></param-value>
 	</context-param>
 	<!-- 配置Spring监听 -->
 	<listener>

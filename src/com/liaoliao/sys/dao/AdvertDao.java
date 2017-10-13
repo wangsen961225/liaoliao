@@ -34,6 +34,8 @@ public interface AdvertDao {
 
 	Integer findCount();
 
+	List<Advert> findDirectInvest();
+
 
 
 

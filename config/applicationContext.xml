@@ -65,11 +65,11 @@
 	<tx:annotation-driven transaction-manager="transactionManager"/>
 	
 	<!-- 定时任务的factorybean,配置其他config -->
-   <bean id="jobFactory" class="com.liaoliao.quartz.JobFactory"></bean>
+   <!-- <bean id="jobFactory" class="com.liaoliao.quartz.JobFactory"></bean>
     <bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean" destroy-method="destroy">
         <property name="jobFactory" ref="jobFactory"></property>
-    </bean>
+    </bean> -->
     
     <bean id="SpringApplicationContext" class="com.liaoliao.util.ApplicationContextHelper"></bean>
-    <bean id="myadsfsSessionListener" class="com.liaoliao.listener.MySessionListener"></bean>
+    <!-- <bean id="mySessionListener" class="com.liaoliao.listener.MySessionListener"></bean> -->
 </beans>

@@ -92,5 +92,11 @@ public class AdvertDaoImpl extends BaseDaoImpl<Advert,Integer> implements Advert
 		String countHql="select count(a) from Advert a";
 		return Integer.valueOf(this.countByHql(countHql).toString());
 	}
+
+	@Override
+	public List<Advert> findDirectInvest(){
+		String hql="from Advert where type = 1 and position = 'directInvest' and status = 1 order by sort";
+		return this.getListByHQL(hql);
+	}
 	
 }

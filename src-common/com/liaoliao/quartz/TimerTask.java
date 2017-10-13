@@ -168,9 +168,12 @@ public class TimerTask {
 		FenrunLogService fenrunLogService = (FenrunLogService)ctx.getBean("fenrunLogService");
 		UserService userService = (UserService)ctx.getBean("userService");
 		List<RedPackage> list = redPackageService.findUnDeal();
+		
 		Date date =null;
 		for(RedPackage rp:list){
-			date = new Date(new Date().getTime()-11*60*1000);//十分钟之前的数据
+//			date = new Date(new Date().getTime()-11*60*1000);//十分钟之前的数据
+			date = new Date(new Date().getTime()-11*60*1000);//十分钟之前的数据24*60
+			System.out.println("退红包时间"+date);
 			if(rp.getAddTime().getTime()<= date.getTime()){
 				if(rp.getBalance()>0){
 					System.out.println("红包退回："+rp.getBalance());

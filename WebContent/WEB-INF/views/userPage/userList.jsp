@@ -125,7 +125,7 @@
 	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 	        <h4 class="modal-title" id="myModalLabel">料&nbsp;币&nbsp;明&nbsp;细</h4>
 	      </div>
-	      <div class="modal-body">
+	      <<%-- div class="modal-body">
 	        <table class="table table-hover table-striped table-bordered">
 					<tbody>
 					<tr>
@@ -137,24 +137,24 @@
 				
 				<c:forEach var="lis" items="${expenditureDetailsList }" >
 					<tr>
-						<%-- <td>${status.index}</td> --%>
+						<td>${status.index}</td>
 						<td>${lis.money}</td>
 						<td>${lis.type}</td>
-						<%-- <td>
+						<td>
 						了解type，修改
 							<c:if test="${li.type==0 }"></c:if>
 							<c:if test="${li.type==0 }"></c:if>
 							<c:if test="${li.type==0 }"></c:if>
 							<c:if test="${li.type==0 }"></c:if>
 							<c:if test="${li.type==0 }"></c:if>
-						</td> --%>
+						</td>
 						<td><fmt:formatDate value="${lis.addTime}" type="both"/></td>
 					</tr>
 				</c:forEach>
 				</tbody>
 				</table>
 			
-	      </div>
+	      </div> --%>
 	      
 	      <!-- <div class="modal-footer">
 	        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>

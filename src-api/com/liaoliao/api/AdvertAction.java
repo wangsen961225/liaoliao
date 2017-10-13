@@ -21,6 +21,7 @@ import com.liaoliao.content.entity.Video;
 import com.liaoliao.content.service.ArticleService;
 import com.liaoliao.content.service.VideoService;
 import com.liaoliao.redisclient.RedisService;
+import com.liaoliao.sys.entity.Advert;
 import com.liaoliao.sys.service.AdvertService;
 import com.liaoliao.user.entity.FocusLog;
 import com.liaoliao.user.entity.Users;
@@ -75,8 +76,24 @@ public class AdvertAction {
 		String signAdvert = advertService.findSignAdvert();
 		map.put("signAdvert", signAdvert);
 		request.setAttribute("map", map);
+		System.out.println(signAdvert);
 		return "share/signAdvert";
 	}
+	
+	/**
+	 * 直投广告页：
+	 * @return
+	 */
+	@RequestMapping(value="/directInvest")
+	public String getDirectInvest(HttpServletRequest request) {
+		Map<String,Object> map=new HashMap<String,Object>();
+		String directInvest = advertService.findDirectInvest();
+		map.put("directInvest", directInvest);
+		request.setAttribute("map", map);
+		return "share/directInvest";
+	}
+	
+	
 	
 	/**
 	 * top广告页：
@@ -114,6 +131,7 @@ public class AdvertAction {
 		Map<String,Object> map=new HashMap<String,Object>();
 		String bottomAdvert = advertService.findArticleBottomAdvert();
 		map.put("advert", bottomAdvert);
+		System.out.println(bottomAdvert+"adf");
 		request.setAttribute("map", map);
 		return "share/bottomAdvert";
 	}

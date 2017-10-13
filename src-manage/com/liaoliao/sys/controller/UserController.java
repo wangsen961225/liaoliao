@@ -875,9 +875,9 @@ public class UserController {
 	/**
 	 * 料币收支明细
 	 */
-	@ResponseBody
+	//@ResponseBody
 	@RequestMapping(value="/expenditureDetails")
-	public Map<String,Object> expenditureDetails(HttpServletRequest request,Integer userId){
+	public String expenditureDetails(HttpServletRequest request,Integer userId){
 		Map<String,Object> data = new HashMap<>();
 		List<FenrunLog> expenditureDetailsList = null;
 		if(userId != null){
@@ -892,11 +892,12 @@ public class UserController {
 			data.put("code", -1);
 			data.put("msg","该用户没有获得过料币！" );
 		}
-		request.getSession().setAttribute("expenditureDetailsList", expenditureDetailsList);
-		//request.setAttribute("expenditureDetailsList", expenditureDetailsList);
+//		request.getSession().setAttribute("expenditureDetailsList", expenditureDetailsList);
+		request.setAttribute("expenditureDetailsList", expenditureDetailsList);
+//		request.setAttribute("data", data);
 		//return "userPage/userList";
 		//return expenditureDetailsList;
-		return data;
+		return "userPage/expenditureDetailsList";
 		
 	}
 }
