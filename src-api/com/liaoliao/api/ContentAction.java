@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.liaoliao.common.service.CommonService;
 import com.liaoliao.content.entity.Article;
 import com.liaoliao.content.entity.ArticleComment;
+import com.liaoliao.content.entity.Likes;
 import com.liaoliao.content.entity.OriginalArticleInfo;
 import com.liaoliao.content.entity.OriginalVideoInfo;
 import com.liaoliao.content.entity.Video;
@@ -431,9 +432,9 @@ public class ContentAction {
 	 */
 	@RequestMapping(value="/likeCount")
 	@ResponseBody
-	public Map<String,Object> likeCount(HttpServletRequest request,Integer contentId,Integer type){
+	public Map<String,Object> likeCount(HttpServletRequest request,Integer userId,Integer contentId,Integer type){
 		Map<String,Object> map=new HashMap<String,Object>();
-		if(contentId==null||type==null){
+		if(contentId==null||type==null || userId==null){
 			map.put("msg", "id为空！");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
@@ -448,6 +449,8 @@ public class ContentAction {
 			}
 			article.setLikingCount(article.getLikingCount()+1);
 			articleService.updateArticle(article);
+			Likes likes = new Likes();
+			//articleService.save
 		}else
 		//1:表示视频
 		if(type==1){

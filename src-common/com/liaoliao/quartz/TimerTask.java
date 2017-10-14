@@ -172,7 +172,7 @@ public class TimerTask {
 		Date date =null;
 		for(RedPackage rp:list){
 //			date = new Date(new Date().getTime()-11*60*1000);//十分钟之前的数据
-			date = new Date(new Date().getTime()-11*60*1000);//十分钟之前的数据24*60
+			date = new Date(new Date().getTime()-24*60*60*1000);//24小时之前的数据24*60*60*1000
 			System.out.println("退红包时间"+date);
 			if(rp.getAddTime().getTime()<= date.getTime()){
 				if(rp.getBalance()>0){
