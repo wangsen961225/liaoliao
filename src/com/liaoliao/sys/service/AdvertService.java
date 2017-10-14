@@ -34,7 +34,7 @@ public interface AdvertService {
 
 	Integer findCount();
 
-	String findDirectInvest();
+	List<Advert> findDirectInvest();
 
 
 

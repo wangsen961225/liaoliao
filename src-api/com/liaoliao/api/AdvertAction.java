@@ -87,8 +87,12 @@ public class AdvertAction {
 	@RequestMapping(value="/directInvest")
 	public String getDirectInvest(HttpServletRequest request) {
 		Map<String,Object> map=new HashMap<String,Object>();
-		String directInvest = advertService.findDirectInvest();
-		map.put("directInvest", directInvest);
+		List<Advert> directInvest = advertService.findDirectInvest();
+		int random = (int)Math.floor(Math.random()*directInvest.size());
+		StringBuilder advertStr = new StringBuilder();
+		advertStr.append(directInvest.get(random).getContent());
+		String directInvestStr = advertStr.toString();
+		map.put("directInvest", directInvestStr);
 		request.setAttribute("map", map);
 		return "share/directInvest";
 	}
