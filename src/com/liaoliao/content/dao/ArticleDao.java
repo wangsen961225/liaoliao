@@ -52,6 +52,8 @@ public interface ArticleDao {
 	 */
 	void delOriginalArticle(Integer id);
 
+	List<Article> findPassedBySourceId(Integer userId);
+
 
 
 }

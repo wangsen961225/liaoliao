@@ -81,7 +81,7 @@ public class AdvertAction {
 	}
 	
 	/**
-	 * 直投广告页：
+	 * 直投广告页(随机获取一个未被禁用的广告页)：
 	 * @return
 	 */
 	@RequestMapping(value="/directInvest")

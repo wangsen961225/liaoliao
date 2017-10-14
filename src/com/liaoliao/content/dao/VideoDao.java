@@ -36,5 +36,12 @@ public interface VideoDao {
 	 */
 	void delOriginalVideo(Integer id);
 
+	/**
+	 * 查询最近5分钟通过审核的原创视频
+	 * @param userId
+	 * @return
+	 */
+	List<Video> findPassedBySourceId(Integer userId);
+
 	
 }

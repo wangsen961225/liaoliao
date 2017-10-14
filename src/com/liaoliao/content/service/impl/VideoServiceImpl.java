@@ -95,6 +95,11 @@ public class VideoServiceImpl  implements VideoService{
 		return flag;
 	}
 
+	@Override
+	public List<Video> findPassedBySourceId(Integer userId) {
+		return videoDao.findPassedBySourceId(userId);
+	}
+
 
 	
 	

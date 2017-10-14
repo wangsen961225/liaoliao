@@ -1268,6 +1268,68 @@ public class UserCenterAction {
 	}
 	
 	
+	////////////////////////////////////////////////////////////////
+	/**
+	 * 用户原创作品审核通过列表：
+	 * @param request
+	 * @param userId
+	 */
+	@ResponseBody
+	@RequestMapping(value="/originalPassedList")
+	public Map<String,Object> originalPassedList(HttpServletRequest request,Integer userId){
+		Map<String,Object> map = new HashMap<>();
+	
+		List<Map<String,Object>>  list = new ArrayList<>();
+		Map<String,Object> itemMap =null;
+		List<Article> artilceList = articleService.findPassedBySourceId(userId);
+		for(Article a:artilceList){
+			if(a!=null){
+				itemMap = new HashMap<>();
+				itemMap.put("id", a.getId());
+				itemMap.put("img", a.getImgUrl());
+				itemMap.put("title", a.getTitle());
+				itemMap.put("status", a.getStatus());
+				itemMap.put("data", a.getAddTime());
+				itemMap.put("type", 0);
+				list.add(itemMap);
+			}
+		 }
+			List<Video> videoList = videoService.findPassedBySourceId(userId);
+			for(Video a:videoList){
+				if(a!=null){
+					itemMap = new HashMap<>();
+					itemMap.put("id", a.getId());
+					itemMap.put("videoUrl", a.getVideoUrl());
+					itemMap.put("title", a.getTitle());
+					//itemMap.put("status", a.getStatus());
+					itemMap.put("data", a.getAddTime());
+					itemMap.put("type", 1);
+					list.add(itemMap);
+				}
+			}
+		Integer count = null;
+		if(list.size()>0){
+			count = list.size();
+		}	
+		map.put("count", count);
+		map.put("code", StaticKey.ReturnServerTrue);
+		map.put("msg", "success");
+		return map;
+	}
+	
+	
+	
+	
+	////////////////////////////////////////////////////////////////////
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 }

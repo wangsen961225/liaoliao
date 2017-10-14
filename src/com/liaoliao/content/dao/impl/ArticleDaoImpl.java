@@ -1,5 +1,9 @@
 package com.liaoliao.content.dao.impl;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -181,6 +185,19 @@ public class ArticleDaoImpl extends BaseDaoImpl<Article,Integer> implements Arti
 			articleQuery.executeUpdate();
 		}
 		
+	}
+
+	@Override
+	public List<Article> findPassedBySourceId(Integer userId) {
+		//String hql="from Article where sourceId = ?0 and status=1 and addTime>(new Date()-5*60*1000) order by id desc";
+		String hql="from Article where sourceId = ?0 and status=1 and addTime between ?1 and ?2 order by id desc";
+		Date now = new Date();
+		Date old = new Date(now.getTime() - 5*60*1000);
+		
+        Timestamp nowT = new Timestamp(now.getTime());
+        Timestamp oldT = new Timestamp(old.getTime());
+        
+		return this.getListByHQL(hql, userId,oldT,nowT);
 	}
 
 

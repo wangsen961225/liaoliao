@@ -106,6 +106,11 @@ public class ArticleServiceImpl  implements ArticleService{
 		return flag;
 	}
 
+	@Override
+	public List<Article> findPassedBySourceId(Integer userId) {
+		return articleDao.findPassedBySourceId(userId);
+	}
+
 	
 	
 

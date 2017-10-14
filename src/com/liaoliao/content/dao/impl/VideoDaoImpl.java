@@ -1,5 +1,7 @@
 package com.liaoliao.content.dao.impl;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -135,5 +137,17 @@ public class VideoDaoImpl extends BaseDaoImpl<Video, Integer>  implements VideoD
 			videoQuery.setInteger(0,id);
 			videoQuery.executeUpdate();
 		}
+	}
+
+	@Override
+	public List<Video> findPassedBySourceId(Integer userId) {
+		String hql="from Video where sourceId = ?0 and status=1 and addTime between ?1 and ?2 order by id";
+		Date now = new Date();
+		Date old = new Date(now.getTime() - 5*60*1000);
+		
+        Timestamp nowT = new Timestamp(now.getTime());
+        Timestamp oldT = new Timestamp(old.getTime());
+		
+		return this.getListByHQL(hql, userId,oldT,nowT);
 	}
 }

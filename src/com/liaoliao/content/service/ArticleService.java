@@ -38,4 +38,11 @@ public interface ArticleService {
 	 */
 	Integer delOriginalArticle(Integer id);
 
+	/**
+	 * 查找最近5分钟内通过审核的文章
+	 * @param userId
+	 * @return
+	 */
+	List<Article> findPassedBySourceId(Integer userId);
+
 }

@@ -34,4 +34,11 @@ public interface VideoService {
 	 */
 	Integer delOriginalVideo(Integer id);
 
+	/**
+	 * 查找最近5分钟内通过审核的视频
+	 * @param userId
+	 * @return
+	 */
+	List<Video> findPassedBySourceId(Integer userId);
+
 }
