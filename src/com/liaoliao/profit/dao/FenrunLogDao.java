@@ -18,4 +18,8 @@ public interface FenrunLogDao {
 
 	List<FenrunLog> expenditureDetails(Integer userId);
 
+	Integer countSignProfit(Integer userId);
+
+	Integer countSignNum(Integer userId);
+
 }

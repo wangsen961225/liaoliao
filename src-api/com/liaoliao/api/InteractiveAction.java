@@ -412,7 +412,7 @@ public class InteractiveAction {
     	   unknownAccount = ranAccount.nextInt(account0 - 40);
        }
        
-		List<Users> boyList = userService.findBySex(1,6,boyAccount);
+		List<Users> boyList = userService.findBySex(1,6,boyAccount);  //性别,数量,开始位置
 		for (Users users : boyList) {
 			list.add(users);
 		}
@@ -560,6 +560,92 @@ public class InteractiveAction {
 		return mm;
 	}
 	*/
+	
+	@RequestMapping("/getFocusUser")
+	@ResponseBody
+	Map<String,Object> getFocusUser(HttpServletRequest request,Integer sex, Integer userId){
+		Map<String,Object> data = new HashMap<String,Object>();
+		//查询出总数
+		Long acc = userService.accountBySex(sex);
+		int account = 0;
+       if(acc!=null&&!("".equals(acc))){
+    	   account = new Long(acc).intValue();
+       }
+       if(account==0){
+			data.put("msg", "服务器查询为空或错误");
+			data.put("code", StaticKey.ReturnServerNullError);
+			return data;
+		}
+       //获取一个
+       Random ran = new Random();
+       int ranAccount =0;
+       if((account)>0){
+    	   ranAccount = ran.nextInt(account);
+       }
+       
+       List<Users> list =null;
+       if((account)>0){
+    	   list = userService.findBySex(1,1,ranAccount);
+       }
+       
+       
+       /////
+       List<Map<String,Object>> userList = new ArrayList<Map<String,Object>>();
+		Map<String,Object> item = new HashMap<String,Object>();
+		
+		FocusLog fl = null;
+		Users user =null;
+		if(list!=null){
+			user = list.get(0);
+		}
+		
+		if(user!=null){
+			item.put("id", user.getId());
+			
+			String avatar = null;
+			if(user.getAvatar()==null){
+				avatar = "";
+			}else{
+				avatar = user.getAvatar();
+			}
+			item.put("avatar",avatar );
+			
+			String nickName = null;
+			if(user.getNickName()==null){
+				nickName = "";
+			}else{
+				nickName = user.getNickName();
+			}
+			item.put("sex",user.getSex());
+			item.put("nickName",nickName );
+			if(userId!=null&&redisService.getValidate(request,userId)){
+					fl = focusLogService.findByFocusId(userId, user.getId());
+					if(fl!=null&&fl.getStatus()==1){
+						item.put("focusStatus", StaticKey.FocusTrue);
+					}else{
+						item.put("focusStatus", StaticKey.FocusFlase);
+					}
+			}else{
+				item.put("focusStatus", StaticKey.FocusFlase);
+			}
+			//判断是否是关注的
+			///到此
+			List<FocusLog> flList = focusLogService.findByUserId(userId);
+			for (FocusLog focusLog : flList) {
+				focusLog.getId();
+			}
+			
+			userList.add(item);
+		}
+		data.put("user", userList);
+		return data;
+	}	
+	
+	
+	
+	
+	
+	
 	
 }
 

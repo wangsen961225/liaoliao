@@ -1316,14 +1316,40 @@ public class UserCenterAction {
 		map.put("msg", "success");
 		return map;
 	}
+
 	
-	
-	
-	
-	////////////////////////////////////////////////////////////////////
-	
-	
-	
+	@ResponseBody
+	@RequestMapping(value="/countSignNumProfit")
+	public Map<String,Object> countSignNumProfit(HttpServletRequest request,Integer userId){
+		Map<String,Object> map = new HashMap<>();
+		if(userId==null){
+			map.put("code", StaticKey.ReturnClientNullError);
+			map.put("msg", "参数为空!");
+			return map;
+		}
+		Users user = userService.findById(userId);
+		if(user==null||"".equals(user)){
+			map.put("code",StaticKey.ReturnServerNullError);
+			map.put("msg", "账号不存在!");
+			return map;
+		}
+		
+		Integer totalProfit = fenrunLogService.countSignProfit(userId);
+		Integer totalSign = fenrunLogService.countSignNum(userId);
+		
+		if(totalProfit==null){
+			totalProfit=0;
+		}
+		if(totalSign==null){
+			totalSign=0;
+		}
+		map.put("totalProfit", totalProfit);
+		map.put("totalSign", totalSign);
+		
+		map.put("code", StaticKey.ReturnServerTrue);
+		map.put("msg", "success");
+		return map;
+	}
 	
 	
 	

@@ -46,6 +46,16 @@ public class FenrunLogServiceImpl implements FenrunLogService {
 	public List<FenrunLog> expenditureDetails(Integer userId) {
 		return fenrunLogDao.expenditureDetails(userId);
 	}
+
+	@Override
+	public Integer countSignProfit(Integer userId) {
+		return fenrunLogDao.countSignProfit(userId);
+	}
+
+	@Override
+	public Integer countSignNum(Integer userId) {
+		return fenrunLogDao.countSignNum(userId);
+	}
 	
 	
 

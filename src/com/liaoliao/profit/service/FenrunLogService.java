@@ -18,4 +18,8 @@ public interface FenrunLogService {
 
 	List<FenrunLog> expenditureDetails(Integer userId);
 
+	Integer countSignProfit(Integer userId);
+
+	Integer countSignNum(Integer userId);
+
 }

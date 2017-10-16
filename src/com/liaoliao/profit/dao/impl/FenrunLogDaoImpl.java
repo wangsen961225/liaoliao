@@ -1,6 +1,9 @@
 package com.liaoliao.profit.dao.impl;
 
 import java.util.List;
+
+import org.hibernate.Query;
+
 import com.liaoliao.basedao.BaseDaoImpl;
 import com.liaoliao.basedao.PageResults;
 import com.liaoliao.profit.dao.FenrunLogDao;
@@ -61,6 +64,31 @@ public class FenrunLogDaoImpl extends BaseDaoImpl<FenrunLog, Integer> implements
 		String hql="from FenrunLog where user.id =?0";
 		List<FenrunLog> listByHQL = this.getListByHQL(hql,userId);
 		return listByHQL;
+	}
+
+
+	@Override
+	public Integer countSignProfit(Integer userId) {
+		String hql = "from FenrunLog f where user.id=?0 and type=?1";
+		List<FenrunLog> list = this.getListByHQL(hql, userId,5);
+		Integer totalProfit = 0;
+		if(list!=null)
+		{
+			for (FenrunLog fenrunLog : list) 
+			{
+				totalProfit += fenrunLog.getMoney();
+			}
+		}
+		
+		return totalProfit;
+	}
+
+
+	@Override
+	public Integer countSignNum(Integer userId) {
+		String hql = "from FenrunLog f where user.id=?0 and type=?1";
+		List<FenrunLog> list = this.getListByHQL(hql, userId,5);
+		return list.size();
 	}
 }
 
