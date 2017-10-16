@@ -42,7 +42,7 @@ public class Likes implements Serializable{
 	/**
 	 * 文章id
 	 */
-	private String contentId;
+	private Integer contentId;
 	
 	
 	/**
@@ -71,11 +71,11 @@ public class Likes implements Serializable{
 		this.user = user;
 	}
 
-	public String getContentId() {
+	public Integer getContentId() {
 		return contentId;
 	}
 
-	public void setContentId(String contentId) {
+	public void setContentId(Integer contentId) {
 		this.contentId = contentId;
 	}
 
@@ -99,7 +99,7 @@ public class Likes implements Serializable{
 		super();
 	}
 
-	public Likes(Integer id, Users user, String contentId, Integer type, Date addTime) {
+	public Likes(Integer id, Users user, Integer contentId, Integer type, Date addTime) {
 		super();
 		this.id = id;
 		this.user = user;

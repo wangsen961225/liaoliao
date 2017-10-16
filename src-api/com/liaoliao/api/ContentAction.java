@@ -12,6 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jasper.tagplugins.jstl.core.ForEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,7 @@ import com.liaoliao.content.entity.Video;
 import com.liaoliao.content.entity.VideoComment;
 import com.liaoliao.content.service.ArticleCommentService;
 import com.liaoliao.content.service.ArticleService;
+import com.liaoliao.content.service.LikesService;
 import com.liaoliao.content.service.OriginalArticleInfoService;
 import com.liaoliao.content.service.OriginalVideoInfoService;
 import com.liaoliao.content.service.VideoCommentService;
@@ -100,6 +102,9 @@ public class ContentAction {
 	@Autowired
 	private CommonService commonService;
 	
+	@Autowired
+	private LikesService likesService;
+	
 	
 	private Integer page = 1;
 
@@ -137,9 +142,24 @@ public class ContentAction {
 		Users luser = userService.findById(StaticKey.liaoliaoVideoId);
 		Long luserFl = focusLogService.countNum(StaticKey.liaoliaoVideoId);
 		int luserCount=0;
-		if(luserFl!=null){
+		if(luserFl != null){
 			luserCount= luserFl.intValue();
 		}
+		
+		
+		List<Likes> likes = null;
+		if(userId!=null){
+			likes = likesService.findLikesById(userId,1);
+		}
+		Map<Integer,Object> likesMap = new HashMap<Integer,Object>();
+		Integer likeType = 0;
+		if(likes!=null){
+			for (Likes li : likes) {
+				likesMap.put(li.getContentId(), 1);//1:视频
+			}
+		}
+		
+		
 		for(Video video : list){
 			item = new LinkedHashMap<>();
 			item.put("id", video.getId());
@@ -203,6 +223,14 @@ public class ContentAction {
 						item.put("focusStatus", StaticKey.FocusFlase);
 			}
 			
+			
+			if(likesMap!=null&&likesMap.containsKey(video.getId())){
+				likeType = 1;
+			}
+			
+			
+			item.put("likeType",likeType);
+			
 			datas.add(item);
 		}
 //		统计每日videoList点击量
@@ -221,7 +249,7 @@ public class ContentAction {
 	 */
 	@RequestMapping(value="/getArticle")
 	@ResponseBody
-	public Map<String,Object> getArticle(HttpServletRequest request,Integer kindId,Integer pageNo,Integer flushType) {
+	public Map<String,Object> getArticle(HttpServletRequest request,Integer kindId,Integer pageNo,Integer flushType,Integer userId) {
 		Map<String,Object> map = new HashMap<String,Object>();
 		if(flushType==null||(flushType!=0&&flushType!=1)){
 			map.put("msg", "参数为空或异常");
@@ -242,6 +270,21 @@ public class ContentAction {
 		if(flushType==0){
 			list = articleService.findByRand(kindId, 8);
 		}
+		
+		//获取用户点赞文章记录
+		List<Likes> likes = null;
+		if(userId!=null){
+			likes = likesService.findLikesById(userId,0);//0:文章 
+		}
+		
+		Map<Integer,Object> likesMap = new HashMap<Integer,Object>();
+		Integer likeType = 0;
+		if(likes!=null){
+			for (Likes li : likes) {
+				likesMap.put(li.getContentId(), 1);
+			}
+		}
+		
 		
 		List imgListObj = new ArrayList();
 		// Map-->List-->Map 三层转换(保留)
@@ -276,6 +319,12 @@ public class ContentAction {
 				item.put("sendingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 				item.put("commentCount", ThreadLocalRandom.current().nextInt(100, 1000));
 			}
+			
+			if(likesMap!=null&&likesMap.containsKey(article.getId())){
+				likeType = 1;
+			}
+			item.put("likeType",likeType);
+			
 			
 			datas.add(item);
 		}
@@ -386,6 +435,24 @@ public class ContentAction {
 //		统计每日articleContent点击量
 		handleCountService.handleCountPlusOne("articleContent");
 		
+		//获取用户点赞文章记录
+		List<Likes> likes = null;
+		if(userId!=null){
+			likes = likesService.findLikesById(userId,0);//0:文章 
+		}
+		
+		Map<Integer,Object> likesMap = new HashMap<Integer,Object>();
+		Integer likeType = 0;
+		if(likes!=null){
+			for (Likes li : likes) {
+				likesMap.put(li.getContentId(), 1);
+			}
+		}
+		
+		if(likesMap!=null&&likesMap.containsKey(article.getId())){
+			likeType = 1;
+		}
+		map.put("likeType",likeType);
 		
 		//写在阅读分润里面
 	/*	if(article.getType()==1){//原创作品被阅读，作者获得1料币
@@ -439,6 +506,12 @@ public class ContentAction {
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
+		Users user = userService.findById(userId);
+		if(user==null){
+			map.put("msg", "查询用户未空!");
+			map.put("code", StaticKey.ReturnServerNullError);
+			return map;
+		}
 		//0:表示文章
 		if(type==0){
 			Article article=articleService.findById(contentId);
@@ -450,6 +523,10 @@ public class ContentAction {
 			article.setLikingCount(article.getLikingCount()+1);
 			articleService.updateArticle(article);
 			Likes likes = new Likes();
+			likes.setUser(user);
+			likes.setContentId(contentId);
+			likes.setType(type);
+			likes.setAddTime(new Date());
 			//articleService.save
 		}else
 		//1:表示视频
@@ -462,6 +539,11 @@ public class ContentAction {
 			}
 			video.setLikingCount(video.getLikingCount()+1);
 			videoService.updateVideo(video);
+			Likes likes = new Likes();
+			likes.setUser(user);
+			likes.setContentId(contentId);
+			likes.setType(type);
+			likes.setAddTime(new Date());
 		}else{
 			map.put("msg", "类型错误");
 			map.put("code", StaticKey.ReturnServerNullError);
