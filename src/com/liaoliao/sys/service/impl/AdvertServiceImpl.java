@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.liaoliao.sys.dao.AdvertDao;
 import com.liaoliao.sys.entity.Advert;
+import com.liaoliao.sys.entity.AdvertClicks;
 import com.liaoliao.sys.service.AdvertService;
 
 @Service
@@ -139,5 +140,6 @@ public class AdvertServiceImpl implements AdvertService {
 		return advertStr.toString();*/
 		return list;
 	}
+
 
 }

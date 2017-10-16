@@ -3,6 +3,7 @@ package com.liaoliao.sys.service;
 import java.util.List;
 
 import com.liaoliao.sys.entity.Advert;
+import com.liaoliao.sys.entity.AdvertClicks;
 
 public interface AdvertService {
 
@@ -35,6 +36,7 @@ public interface AdvertService {
 	Integer findCount();
 
 	List<Advert> findDirectInvest();
+
 
 
 

@@ -9,9 +9,10 @@ import com.liaoliao.content.entity.Likes;
 public class LikesDaoImpl extends BaseDaoImpl<Likes,Integer> implements LikesDao {
 
 	@Override
-	public void save(Likes li) {
+	public void saveLikes(Likes li) {
 		this.save(li);
 	}
+	
 
 	@Override
 	public List<Likes> findLikesById(Integer userId, Integer type) {

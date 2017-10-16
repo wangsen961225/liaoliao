@@ -3,6 +3,7 @@ package com.liaoliao.sys.dao;
 import java.util.List;
 
 import com.liaoliao.sys.entity.Advert;
+import com.liaoliao.sys.entity.AdvertClicks;
 
 public interface AdvertDao {
 	
@@ -35,6 +36,7 @@ public interface AdvertDao {
 	Integer findCount();
 
 	List<Advert> findDirectInvest();
+
 
 
 

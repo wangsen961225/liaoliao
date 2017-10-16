@@ -10,7 +10,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.catalina.core.ApplicationContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,11 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.liaoliao.listener.MySessionContext;
-import com.liaoliao.profit.entity.FenrunLog;
 import com.liaoliao.profit.service.FenrunLogService;
 import com.liaoliao.redisclient.RedisService;
+import com.liaoliao.sys.entity.AdvertClicks;
 import com.liaoliao.sys.entity.TaskLog;
 import com.liaoliao.sys.entity.UserTask;
+import com.liaoliao.sys.service.AdvertClicksService;
+import com.liaoliao.sys.service.AdvertService;
 import com.liaoliao.sys.service.HandleCountService;
 import com.liaoliao.sys.service.TaskLogService;
 import com.liaoliao.sys.service.UserTaskService;
@@ -69,6 +70,12 @@ public class AccountAction {
 	
 	@Autowired
 	private FenrunLogService fenrunLogService;
+	
+	@Autowired
+	AdvertService advertService;
+	
+	@Autowired
+	AdvertClicksService advertClicksService;
 	
 	
 	/**
@@ -674,5 +681,73 @@ public class AccountAction {
 	public void accountOnline(HttpServletRequest request){
 		handleCountService.handleCountPlusOne("accountOnline");
 	}
+	
+	/**
+	 * 保存用户点击广告信息
+	 * @param request
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value="/countAdvertClicks")
+	@ResponseBody
+	public Map<String,Object> countAdvertClicks(HttpServletRequest request,Integer userId) {
+		Map<String,Object> map = new HashMap<>();
+		if(userId==null){
+			map.put("code", StaticKey.ReturnClientNullError);
+			map.put("msg", "参数为空!");
+			return map;
+		}
+		Users user = userService.findById(userId);
+		if(user==null||"".equals(user)){
+			map.put("code",StaticKey.ReturnServerNullError);
+			map.put("msg", "账号不存在!");
+			return map;
+		}
+		
+		AdvertClicks ac = new AdvertClicks();
+		ac.setUser(user);
+		ac.setAddTime(new Date());
+		
+		advertClicksService.countAdvertClicks(ac);
+		map.put("code", StaticKey.ReturnServerTrue);
+		map.put("msg", "保存成功");
+		return map;
+	}
+	
+	/**
+	 * 获取用户当日和总共点击广告的次数
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/findAdvertClicks")
+	public Map<String,Object> findAdvertClicks(HttpServletRequest request,Integer userId){
+		Map<String,Object> map = new HashMap<String,Object>();
+		if(userId==null){
+			map.put("code", StaticKey.ReturnClientNullError);
+			map.put("msg", "参数为空!");
+			return map;
+		}
+		Users user = userService.findById(userId);
+		if(user==null||"".equals(user)){
+			map.put("code",StaticKey.ReturnServerNullError);
+			map.put("msg", "账号不存在!");
+			return map;
+		}
+		
+		Integer dayCount = advertClicksService.findDayCountAdvertClicksById(userId);
+		Integer totalCount = advertClicksService.findTotalCountAdvertClicksById(userId);
+		
+		map.put("dayCount", dayCount);
+		map.put("totalCount", totalCount);
+		map.put("code", StaticKey.ReturnServerTrue);
+		map.put("msg", "成功");
+		
+		return map;
+		
+	}
+	
+	
+	
+	
 }
 

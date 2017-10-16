@@ -20,7 +20,7 @@ public class LikesServiceImpl implements LikesService {
 
 	@Override
 	public void saveLikes(Likes li) {
-		likesDao.save(li);
+		likesDao.saveLikes(li);
 	}
 
 	@Override

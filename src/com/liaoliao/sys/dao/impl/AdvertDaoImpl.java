@@ -7,6 +7,7 @@ import com.liaoliao.basedao.PageResults;
 import com.liaoliao.content.entity.Article;
 import com.liaoliao.sys.dao.AdvertDao;
 import com.liaoliao.sys.entity.Advert;
+import com.liaoliao.sys.entity.AdvertClicks;
 import com.liaoliao.util.StaticKey;
 
 public class AdvertDaoImpl extends BaseDaoImpl<Advert,Integer> implements AdvertDao {
@@ -98,5 +99,7 @@ public class AdvertDaoImpl extends BaseDaoImpl<Advert,Integer> implements Advert
 		String hql="from Advert where type = 1 and position = 'directInvest' and status = 1 order by sort";
 		return this.getListByHQL(hql);
 	}
+
+	
 	
 }

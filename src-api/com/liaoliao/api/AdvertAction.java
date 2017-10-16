@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
 import com.liaoliao.content.entity.Article;
+import com.liaoliao.content.entity.Likes;
 import com.liaoliao.content.entity.Video;
 import com.liaoliao.content.service.ArticleService;
+import com.liaoliao.content.service.LikesService;
 import com.liaoliao.content.service.VideoService;
 import com.liaoliao.redisclient.RedisService;
 import com.liaoliao.sys.entity.Advert;
@@ -52,6 +54,9 @@ public class AdvertAction {
 	
 	@Autowired
 	private RedisService redisService;
+	
+	@Autowired
+	LikesService likesService;
 	
 	/**
 	 * list广告页：
@@ -191,6 +196,33 @@ public class AdvertAction {
 		
 		Video video = null;
 		Article article = null;
+		
+		
+		List<Likes> likes = new ArrayList<Likes>();
+		List<Likes> articleLikes = null;
+		List<Likes> videoLikes = null;
+		
+		if(userId!=null){
+			articleLikes = likesService.findLikesById(userId,0);
+			videoLikes = likesService.findLikesById(userId,1);
+		}
+		if(articleLikes!=null){
+			
+			likes.addAll(articleLikes);
+		}
+		
+		if(videoLikes!=null){
+			likes.addAll(videoLikes);
+			
+		}
+		Map<Integer,Object> likesMap = new HashMap<Integer,Object>();
+		Integer likeType = 0;
+		if(likes!=null){
+			for (Likes li : likes) {
+				likesMap.put(li.getContentId(), 1);//1:视频
+			}
+		}
+		
 		
 		List imgListObj = new ArrayList();
 		// Map-->List-->Map 三层转换
@@ -335,6 +367,13 @@ public class AdvertAction {
 				}else{
 					item.put("focusStatus_article", StaticKey.FocusFlase);
 				}
+			
+			
+			if(likesMap!=null&&likesMap.containsKey(video.getId())){
+				likeType = 1;
+			}
+			item.put("likeType",likeType);
+			
 			datas.add(item);
 		}
 		map.put("list", datas);

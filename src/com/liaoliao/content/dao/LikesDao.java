@@ -6,7 +6,7 @@ import com.liaoliao.content.entity.Likes;
 
 public interface LikesDao {
 
-	void save(Likes li);
+	void saveLikes(Likes li);
 
 	/**
 	 * 根据用户id和type(0:文章,1:视频)查询

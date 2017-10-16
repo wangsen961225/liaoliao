@@ -160,6 +160,7 @@ public class ContentAction {
 		}
 		
 		
+		
 		for(Video video : list){
 			item = new LinkedHashMap<>();
 			item.put("id", video.getId());
@@ -527,7 +528,7 @@ public class ContentAction {
 			likes.setContentId(contentId);
 			likes.setType(type);
 			likes.setAddTime(new Date());
-			//articleService.save
+			likesService.saveLikes(likes);
 		}else
 		//1:表示视频
 		if(type==1){
@@ -544,6 +545,7 @@ public class ContentAction {
 			likes.setContentId(contentId);
 			likes.setType(type);
 			likes.setAddTime(new Date());
+			likesService.saveLikes(likes);
 		}else{
 			map.put("msg", "类型错误");
 			map.put("code", StaticKey.ReturnServerNullError);
