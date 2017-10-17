@@ -25,15 +25,33 @@
 					<tr>
 						<td>${status.count}</td> 
 						<td>${lis.money}</td>
-						<td>${lis.type}</td>
-						<%-- <td>
-						了解type，修改
-							<c:if test="${li.type==0 }"></c:if>
-							<c:if test="${li.type==0 }"></c:if>
-							<c:if test="${li.type==0 }"></c:if>
-							<c:if test="${li.type==0 }"></c:if>
-							<c:if test="${li.type==0 }"></c:if>
-						</td> --%>
+						<%-- <td>${lis.type}</td> --%>
+						<td>
+						
+							<%-- <c:if test="${li.type==-1 }">提现</c:if>
+							<c:if test="${lis.type==0 }">签到</c:if>
+							<c:if test="${lis.type==1 }">原创分润总结</c:if>
+							<c:if test="${lis.type==4 }">新用户红包</c:if> --%>
+							<c:if test="${lis.type==0 }">文章</c:if>
+							<c:if test="${lis.type==1 }">视频</c:if>
+							<c:if test="${lis.type==2 }">提现</c:if>
+							<c:if test="${lis.type==3 }">发广播</c:if>
+							<c:if test="${lis.type==4 }">新用户红包</c:if>
+							<c:if test="${lis.type==5 }">签到</c:if>
+							<c:if test="${lis.type==6 }">vip被抢红包</c:if>
+							<c:if test="${lis.type==7 }">普通用户抢红包</c:if>
+							<c:if test="${lis.type==8 }">邀请注册</c:if>
+							<c:if test="${lis.type==9 }">每日下级分润</c:if>
+							<c:if test="${lis.type==10 }">原创video通过审核</c:if>
+							<c:if test="${lis.type==11 }">原创Article通过审核</c:if>
+							<c:if test="${lis.type==12 }">原创文章</c:if>
+							<c:if test="${lis.type==13 }">原创视频</c:if>
+							<c:if test="${lis.type==14 }">每日任务</c:if>
+							<c:if test="${lis.type==15 }">原创作品十分钟统计</c:if>
+							<c:if test="${lis.type==16 }">土豪世界发红包</c:if>
+							<c:if test="${lis.type==17 }">查看用户详情(约她)</c:if>
+							<c:if test="${lis.type==18 }">退款</c:if>
+						</td>
 						<td><fmt:formatDate value="${lis.addTime}" type="both"/></td>
 					</tr>
 				</c:forEach>

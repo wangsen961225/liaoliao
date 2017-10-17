@@ -132,7 +132,7 @@ public class JPushUtil {
 							.setAlert(message)
 							.build())
 					// 发送消息
-					.setOptions(Options.newBuilder().setApnsProduction(true).build()).build();
+					.setOptions(Options.newBuilder().setApnsProduction(false).build()).build();
 					//设置ios平台环境  True 表示推送生产环境，False 表示要推送开发环境   默认是开发  
 		try {
 			PushResult result = jpushClient.sendPush(payload);
@@ -281,7 +281,7 @@ public class JPushUtil {
 	public static void main(String[] args)
 	{
 		new JPushUtil();
-		JPushUtil.sendAllsetNotification("小钱钱，这是java后台发送的一个通知。。。。");
+		JPushUtil.sendAllsetNotification("ll，这是java后台发送的一个通知。。。。");
 		
 //		JPushUtil.sendAllMessage("小猪，这是后台发送的透传消息");
 		

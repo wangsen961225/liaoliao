@@ -288,6 +288,21 @@ public class InteractiveAction {
 			map.put("code", StaticKey.ReturnUserAccountNotExist);
 			return map;
 		}
+		
+		//如果是系统红包,发送通知
+		if(user.getNickName()=="料料官方活动"){
+			JPushUtil.sendAllsetNotification("通知: 天降红包~~ 金额:"+money+"~ 剩余数量:"+number);
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		int userMoney=(int) (user.getTotalMoney()-user.getFreezeMoney()-user.getPayMoney()-user.getToBankMoney());
 		if(userMoney<money){
 			map.put("msg", "余额不足!");
@@ -367,8 +382,41 @@ public class InteractiveAction {
 	@RequestMapping("/focusUserSquare")
 	@ResponseBody
 	public Map<String,Object> focusUserSquare(HttpServletRequest request,Integer userId){
-		
 		Map<String,Object> data = new HashMap<String,Object>();
+		List<Map<String,Object>> userList = new ArrayList<Map<String,Object>>();
+		for(int i=0;i<34;i++){
+			Map<String, Object> map = this.getFocusUser(request, 1, userId);
+			if(map.get("item")!=null){
+				userList.add((Map<String, Object>) map.get("item"));
+			}
+		}
+		
+		for(int i=0;i<6;i++){
+			Map<String, Object> map = this.getFocusUser(request, 2, userId);
+			if(map.get("item")!=null){
+				userList.add((Map<String, Object>) map.get("item"));
+			}
+		}
+		
+		
+		if((userList.size()-40)<0){
+			for(int i=0;i<(40-userList.size());i++){
+				Map<String, Object> map = this.getFocusUser(request, 0, userId);
+				if(map.get("item")!=null){
+					userList.add((Map<String, Object>) map.get("item"));
+				}
+			}
+		}
+		
+		System.out.println(userList.size()+"///////////////////////////////////////////////////////////////////////");
+		
+		
+		data.put("list", userList);
+		data.put("msg", "正确");
+		data.put("code",StaticKey.ReturnServerTrue);
+		return data;
+		
+		/*Map<String,Object> data = new HashMap<String,Object>();
        List<Users> list = new ArrayList<Users>();
        //0:性别待确认   1:性别男     2:性别女
        Long acc0 = userService.accountBySex(0);
@@ -431,6 +479,7 @@ public class InteractiveAction {
 			}
 		}
 		
+		
 		Random ran = new Random();
 		List<Map<String,Object>> userList = new ArrayList<Map<String,Object>>();
 		Map<String,Object> item = null;
@@ -475,7 +524,7 @@ public class InteractiveAction {
 			randomList.add(list.get(nextInt));
 			//item.put(String.valueOf(j), list.get(nextInt));
 			list.remove(nextInt);
-		}
+		}*/
 	
 		
 		/*List<Map<String,Object>> userList1 = new ArrayList<>();
@@ -488,12 +537,12 @@ public class InteractiveAction {
 			ma.put("sex", u.getSex());
 			userList.add(ma);
 		}*/
-		data.put("data", userList);
+		/*data.put("data", userList);
 		
 		data.put("list", userList);
 		data.put("msg", "正确");
 		data.put("code",StaticKey.ReturnServerTrue);
-		return data;
+		return data;*/
 	}
 	
 	/**
@@ -550,56 +599,46 @@ public class InteractiveAction {
 		
 	}
 	
-/*	
-	@RequestMapping("/aaaa")
-	@ResponseBody
-	public Map<String,Object> aaaa(){
-		//Map map = new HashMap();
-		MyMap  mm = new MyMap();
-		mm.put("aa", null);
-		return mm;
-	}
-	*/
 	
 	@RequestMapping("/getFocusUser")
 	@ResponseBody
-	Map<String,Object> getFocusUser(HttpServletRequest request,Integer sex, Integer userId){
+	Map<String,Object> getFocusUser(HttpServletRequest request,Integer sex, Integer userId){   //0:保密  1: 女   2: 男
 		Map<String,Object> data = new HashMap<String,Object>();
-		//查询出总数
-		Long acc = userService.accountBySex(sex);
-		int account = 0;
-       if(acc!=null&&!("".equals(acc))){
-    	   account = new Long(acc).intValue();
-       }
-       if(account==0){
-			data.put("msg", "服务器查询为空或错误");
-			data.put("code", StaticKey.ReturnServerNullError);
+		//随机获取一条
+		Users user = userService.findByRand(sex);
+		
+		//查找用户关注的料友并判断随机出来的料友是否已关注
+		List<FocusLog> list = list = focusLogService.findByUserId(userId);
+		
+		boolean b = true;
+		if(list!=null&&user!=null&&list.size()>0){
+		int i=34; //防止死循环
+		while(b&&i>0){
+				for (FocusLog focusLog : list) {
+					if(user.getId()==focusLog.getFocusUser().getId()){
+						b=true;
+						i--;
+						break;
+					}else{
+						b=false;
+						
+					}
+					
+				}
+			}
+		}else{
+			b=false;
+		}
+		if(b){
+			data.put("msg", "查询为空");
+			data.put("code",StaticKey.ReturnServerNullError);
 			return data;
 		}
-       //获取一个
-       Random ran = new Random();
-       int ranAccount =0;
-       if((account)>0){
-    	   ranAccount = ran.nextInt(account);
-       }
-       
-       List<Users> list =null;
-       if((account)>0){
-    	   list = userService.findBySex(1,1,ranAccount);
-       }
-       
-       
-       /////
-       List<Map<String,Object>> userList = new ArrayList<Map<String,Object>>();
+	
+		
 		Map<String,Object> item = new HashMap<String,Object>();
 		
 		FocusLog fl = null;
-		Users user =null;
-		if(list!=null){
-			user = list.get(0);
-		}
-		
-		if(user!=null){
 			item.put("id", user.getId());
 			
 			String avatar = null;
@@ -628,45 +667,18 @@ public class InteractiveAction {
 			}else{
 				item.put("focusStatus", StaticKey.FocusFlase);
 			}
-			//判断是否是关注的
-			///到此
-			List<FocusLog> flList = focusLogService.findByUserId(userId);
-			for (FocusLog focusLog : flList) {
-				focusLog.getId();
-			}
-			
-			userList.add(item);
-		}
-		data.put("user", userList);
+
+		data.put("item", item);
+		
+		data.put("msg", "正确");
+		data.put("code",StaticKey.ReturnServerTrue);
+		
 		return data;
 	}	
 	
 	
 	
 	
-	
-	
-	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

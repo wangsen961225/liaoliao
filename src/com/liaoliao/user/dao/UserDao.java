@@ -81,4 +81,6 @@ public interface UserDao {
 	 * 根据性别统计总条数
 	 */
 	Long accountBySex(Integer sex);
+
+	Users findByRand(Integer sex);
 }

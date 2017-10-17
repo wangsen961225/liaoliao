@@ -68,44 +68,53 @@
 					<th>今日总额</th>
 					<th>状态</th>
 					<th>vip</th>
+					<th>今日点击</th>
+					<th>总共点击</th>
+					<th>签到次数</th>
+					<th>签到收益</th>
 					<th>登录时间</th>
 					<th>操作</th>
 				</tr>
 				<c:forEach var="li" items="${list}">
 					<tr>
-						<td>${li.id}</td>
+						<td>${li.user.id}</td>
 						<td>
-							<c:if test="${li.sourceType==0 }">微信用户</c:if>
-							<c:if test="${li.sourceType==1 }">QQ用户</c:if>
-							<c:if test="${li.sourceType==2 }">微博用户</c:if>
-							<c:if test="${li.sourceType==3 }">${li.mobile }</c:if>
+							<c:if test="${li.user.sourceType==0 }">微信用户</c:if>
+							<c:if test="${li.user.sourceType==1 }">QQ用户</c:if>
+							<c:if test="${li.user.sourceType==2 }">微博用户</c:if>
+							<c:if test="${li.user.sourceType==3 }">${li.user.mobile }</c:if>
 						</td>
 						<td>
-						    <c:if test="${not empty li.avatar}"><img src="${li.avatar}" width="50px"/></c:if>
-						    <c:if test="${empty li.avatar}"></c:if>
+						    <c:if test="${not empty li.user.avatar}"><img src="${li.user.avatar}" width="50px"/></c:if>
+						    <c:if test="${empty li.user.avatar}"></c:if>
 						</td>
 						<td>
-						    <c:if test="${not empty li.nickName}">${li.nickName}</c:if>
-						    <c:if test="${empty li.nickName}">----</c:if>
+						    <c:if test="${not empty li.user.nickName}">${li.user.nickName}</c:if>
+						    <c:if test="${empty li.user.nickName}">----</c:if>
 						</td>
-						<td>${li.totalMoney}</td>
-						<td>${li.payMoney}</td>
-						<td>${li.dayMoney}</td>
+						<td>${li.user.totalMoney}</td>
+						<td>${li.user.payMoney}</td>
+						<td>${li.user.dayMoney}</td>
 						<td>
-						  <c:if test="${li.status==1}">正常</c:if>
-						  <c:if test="${li.status==0}"><p style="color:red">封禁</p></c:if>
+						  <c:if test="${li.user.status==1}">正常</c:if>
+						  <c:if test="${li.user.status==0}"><p style="color:red">封禁</p></c:if>
 						</td>
 						<td>
-						  <c:if test="${li.vipStatus==1}">会员</c:if>
-						  <c:if test="${li.vipStatus==0}">非会员</c:if>
+						  <c:if test="${li.user.vipStatus==1}">会员</c:if>
+						  <c:if test="${li.user.vipStatus==0}">非会员</c:if>
 						</td>
-						<td><fmt:formatDate value="${li.loginTime}" type="both"/></td>
+						<td>${li.dayCount }</td>
+						<td>${li.totalCount }</td>
+						<td>${li.totalSign }</td>
+						<td>${li.totalProfit }</td>
+						
+						<td><fmt:formatDate value="${li.user.loginTime}" type="both"/></td>
 						<td>
-						  <button class="btn btn-info" type="button" onclick="#">修改</button>&nbsp;&nbsp;&nbsp;&nbsp;
-						  <c:if test="${li.status==1}"><button class="btn btn-danger" type="button" onclick="banArticle(${li.id})">封禁</button>&nbsp;&nbsp;&nbsp;&nbsp;</c:if>
-						  <c:if test="${li.status==0}"><button class="btn btn-danger" type="button" onclick="banArticle(${li.id})">解禁</button>&nbsp;&nbsp;&nbsp;&nbsp;</c:if>
+						  <button class="btn btn-info" type="button" onclick="#">修改</button>
+						  <c:if test="${li.user.status==1}"><button class="btn btn-danger" type="button" onclick="banArticle(${li.user.id})">封禁</button></c:if>
+						  <c:if test="${li.user.status==0}"><button class="btn btn-danger" type="button" onclick="banArticle(${li.user.id})">解禁</button></c:if>
 						  <!-- <button class="btn btn-info" type="button" onclick="#">料币收入支出明细</button> -->
-						  <button type="button" class="btn btn-primary"  href="${ctx}/sys/expenditureDetails?userId=${li.id}"  data-toggle="modal" data-target="#expenditureDetails" > 料币收入支出明细</button>
+						  <button type="button" class="btn btn-primary"  href="${ctx}/sys/expenditureDetails?userId=${li.user.id}"  data-toggle="modal" data-target="#expenditureDetails" > 料币明细</button>
 						</td>
 					</tr>
 				</c:forEach>
@@ -178,9 +187,6 @@
 </body>
 
 <script type="text/javascript">
-
-
-
 
 function modifyArticle(id){
 	alert("感觉没啥可修改的,别点了,还没写~");

@@ -184,6 +184,11 @@ public class UserServiceImpl implements UserService {
 		return userDao.accountBySex(sex);
 	}
 
+	@Override
+	public Users findByRand(Integer sex) {
+		return userDao.findByRand(sex);
+	}
+
 
 
 

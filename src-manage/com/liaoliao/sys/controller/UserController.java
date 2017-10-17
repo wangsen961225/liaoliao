@@ -1,5 +1,6 @@
 package com.liaoliao.sys.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ import com.liaoliao.profit.service.ToBankService;
 import com.liaoliao.profit.service.WeixinPayLogService;
 import com.liaoliao.redisclient.RedisService;
 import com.liaoliao.sys.entity.BroadcastLog;
+import com.liaoliao.sys.service.AdvertClicksService;
 import com.liaoliao.sys.service.BroadcastLogService;
 import com.liaoliao.sys.service.HandleCountService;
 import com.liaoliao.user.entity.Users;
@@ -78,6 +80,9 @@ public class UserController {
 	
 	@Autowired
 	private BroadcastLogService broadcastLogService;
+	
+	@Autowired
+	AdvertClicksService advertClicksService;
 	
 	private Integer page=1;
 	
@@ -138,7 +143,24 @@ public class UserController {
 		request.setAttribute("mobile", mobile);	
 		request.setAttribute("isActive", isActive);	
 		
-		List<Users> list=userService.findAll(pageNo,map);
+		List<Users> uList=userService.findAll(pageNo,map);
+		
+		ArrayList<Map<String,Object>> list = new ArrayList<>();
+		
+		for (Users user : uList) {
+			Map<String,Object> item = new HashMap<String,Object>();
+			Integer dayCount = advertClicksService.findDayCountAdvertClicksById(user.getId());
+			Integer totalCount = advertClicksService.findTotalCountAdvertClicksById(user.getId());
+			item.put("user", user);
+			item.put("dayCount", dayCount);
+			item.put("totalCount", totalCount);
+			
+			Integer totalProfit = fenrunLogService.countSignProfit(user.getId());
+			Integer totalSign = fenrunLogService.countSignNum(user.getId());
+			item.put("totalProfit",totalProfit);
+			item.put("totalSign",totalSign );
+			list.add(item);
+		}
 		request.setAttribute("list", list);
 		return "userPage/userList";
 	}

@@ -76,4 +76,6 @@ public interface UserService {
 	
 	Long accountBySex(Integer sex);
 
+	Users findByRand(Integer sex);
+
 }

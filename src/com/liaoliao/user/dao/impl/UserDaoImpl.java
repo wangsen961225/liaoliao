@@ -442,6 +442,13 @@ public class UserDaoImpl extends BaseDaoImpl<Users,Integer> implements UserDao {
 		return countByHql;
 	}
 
+	@Override
+	public Users findByRand(Integer sex) {
+	//	String sql ="SELECT * from ll_user_info where `id`>2000 and sex=?0 ORDER BY RAND() LIMIT 1";
+			String sql ="SELECT * from ll_user_info where sex=?0 ORDER BY RAND() LIMIT 1";
+		return this.getBySQL(sql,sex);
+	}
+
 
 	
 
