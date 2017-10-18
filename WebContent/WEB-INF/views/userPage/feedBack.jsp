@@ -125,7 +125,8 @@
 	 	$.ajax({
 			type:"POST",
 			url: "${ctx}/sys/feedBackGrant",
-		    data:{"id":id}, success: function(data){
+		    data:{"id":id},
+		    success: function(data){
 	        	if(data.code==0){
 	        		alert(data.msg);
 	        	}else{

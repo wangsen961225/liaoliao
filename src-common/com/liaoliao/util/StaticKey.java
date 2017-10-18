@@ -252,6 +252,9 @@ public abstract class StaticKey {
 	public static final String JPushSendBroadcast = "1";//极光推送额外透传类型-发送广播
 	
 	public static final String JPushSendRedPackage = "2";//极光推送额外透传类型-全服红包
+	
+	public static final String JPushSendFeedback = "3";//极光推送额外透传类型-问题反馈处理结果
+	
 
 	public static final Integer ReturnBindPayFalse = 0;
 	

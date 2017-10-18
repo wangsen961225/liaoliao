@@ -329,6 +329,7 @@ public class UserController {
 		request.setAttribute("condition", "&status="+status);	
 		
 		List<Feedback> list = feedbackService.findAllByStatus(pageNo,status);
+		
 		request.setAttribute("list", list);
 		return "userPage/feedBack";
 	}
@@ -363,6 +364,7 @@ public class UserController {
 		map.put("id", fd.getId());
 		map.put("code", 1);
 		map.put("msg", "success");
+		map.put("userId", fd.getUser().getId());
 		return map;
 	}
 	
@@ -379,7 +381,7 @@ public class UserController {
 		Map<String,Object> map = new HashMap<>();
 		if(id==null||"".equals(id)){
 			map.put("code", 0);
-			map.put("msg", "id错误!");
+			map.put("msg", "id错误!useId错误");
 			return map;
 		}
 		Feedback fd = feedbackService.findById(id);
@@ -391,6 +393,22 @@ public class UserController {
 		fd.setDealTime(new Date());
 		fd.setStatus(2);
 		feedbackService.updateFB(fd);
+		
+		Feedback feedback = feedbackService.findById(id);
+		
+		if(feedback!=null){
+			Map<String, String> extras = new HashMap<String,String>();
+			//状态,用户id
+			
+			extras.put("type", StaticKey.JPushSendFeedback);
+			extras.put("userId", String.valueOf(feedback.getUser().getId()));
+			extras.put("status", "2");
+			//发送通知
+			JPushUtil.sendAllMessage("用户反馈留言结果通知", extras,1800 );
+		}
+		
+		
+		
 		map.put("code", 1);
 		map.put("msg", "success");
 		return map;
@@ -421,6 +439,21 @@ public class UserController {
 		fd.setDealTime(new Date());
 		fd.setStatus(3);
 		feedbackService.updateFB(fd);
+		
+		Feedback feedback = feedbackService.findById(id);
+		
+		if(feedback!=null){
+			Map<String, String> extras = new HashMap<String,String>();
+			//状态,用户id
+			
+			extras.put("type", StaticKey.JPushSendFeedback);
+			extras.put("userId", String.valueOf(feedback.getUser().getId()));
+			extras.put("status", "3");
+			//发送通知
+			JPushUtil.sendAllMessage("用户反馈留言结果通知", extras,1800 );
+		}
+		
+		
 		map.put("code", 1);
 		map.put("msg", "success");
 		return map;

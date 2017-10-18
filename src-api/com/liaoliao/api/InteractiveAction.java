@@ -400,6 +400,7 @@ public class InteractiveAction {
 		
 		
 		if((userList.size()-40)<0){
+
 			for(int i=0;i<(40-userList.size());i++){
 				Map<String, Object> map = this.getFocusUser(request, 0, userId);
 				if(map.get("item")!=null){
