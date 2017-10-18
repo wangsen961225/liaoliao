@@ -23,40 +23,63 @@
 <input class="btn btn-info" type="button" id="openVipLogin" onclick="startQuartz('霸屏')" value="开启会员霸屏"/>
 <input class="btn btn-info" type="button" id="closeVipLogin" onclick="removeQuartz('霸屏')" value="关闭会员霸屏"/>   <hr/>
 
-</div><hr/>
 
-<div>
-	<div class="data_list">
-		<div class="data_list_title">开启阅读翻倍:</div>
-		<form name="myForm" class="form-inline" method="post" action="${ctx}/sys/handle2CountList">
-			<div class="form-group">
-                <label for="dtp_input2" class="control-label">开始时间</label>
-                <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
-                    <input name="datTimeStr" id="datTimeStr" class="form-control" size="16" type="text" value="${time}" readonly>
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-					<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-                </div>
-            </div>
-            
-			<button class="btn btn-info" type="button" onclick="javascript:submitForm()">提交</button>
-		</form>
-		<script>
-		//检测时间输入框是否为空
-		function submitForm(){
-			if(document.getElementById("datTimeStr").value==""){
-				return;
-			}
-			else{
-				myForm.submit();
-			}
-		}
-		</script>
-	</div>
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+<form name="myForm" class="form-inline" method="post" action="${ctx}/sys0000/handleCountList">
+<div class="form-group">
+<label for="dtp_input2" class="control-label">开始时间设定:</label>
+ <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
+<input name="datTimeStr" id="datTimeStr" class="form-control" size="16" type="text" value="${time}" readonly>
+<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
 </div>
+</div>
+</form>
+<br/><br/>
+<form name="myForm" class="form-inline" method="post" action="${ctx}/sys0000/handleCountList">
+<div class="form-group">
+<label for="dtp_input2" class="control-label">结束时间设定:</label>
+ <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
+<input name="datTimeStr" id="datTimeStr" class="form-control" size="16" type="text" value="${time}" readonly>
+<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+</div>
+</div>
+</form>
+
+<input class="btn btn-info" type="button" id="openDouble" onclick="" value="开启阅读翻倍"/>
+<input class="btn btn-info" type="button" id="closeDouble" onclick="" value="关闭阅读翻倍"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ <hr/>
+
+
+
+
+
+</div>
+
+
 
 
 </body>

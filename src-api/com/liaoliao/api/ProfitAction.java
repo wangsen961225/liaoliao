@@ -591,7 +591,7 @@ public class ProfitAction {
 			return map;
 		}*/
 		List<Integer> list = StaticKey.redPackagelist;
-		if(list.size()<=0){
+		if(list==null||list.size()<=0){
 			map.put("msg", "好可惜，红包飞走了~");
 			map.put("code", StaticKey.ReturnCoinRunAway);
 			return map;

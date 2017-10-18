@@ -483,6 +483,21 @@ public class UserController {
 		fd.setDealTime(new Date());
 		fd.setStatus(4);
 		feedbackService.updateFB(fd);
+		
+		
+		Feedback feedback = feedbackService.findById(id);
+		
+		if(feedback!=null){
+			Map<String, String> extras = new HashMap<String,String>();
+			//状态,用户id
+			
+			extras.put("type", StaticKey.JPushSendFeedback);
+			extras.put("userId", String.valueOf(feedback.getUser().getId()));
+			extras.put("status", "4");
+			//发送通知
+			JPushUtil.sendAllMessage("用户反馈留言结果通知", extras,1800 );
+		}
+		
 		map.put("code", 1);
 		map.put("msg", "success");
 		return map;
