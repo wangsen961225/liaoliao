@@ -266,6 +266,7 @@ public class InteractiveAction {
 	@ResponseBody
 	@RequestMapping(value="/sendReadPackage")
 	public Map<String,Object> sendReadPackage(HttpServletRequest request,Integer userId,Integer money,Integer number){
+		System.out.println(userId);
 		Map<String,Object> map = new HashMap<>();
 		if(userId==null||"".equals(userId)||money==null||"".equals(money)||number==null||"".equals(number)){
 			map.put("msg", "有参数为空!");
@@ -290,16 +291,9 @@ public class InteractiveAction {
 		}
 		
 		//如果是系统红包,发送通知
-		if(user.getNickName()=="料料官方活动"){
-			JPushUtil.sendAllsetNotification("通知: 天降红包~~ 金额:"+money+"~ 剩余数量:"+number);
+		if(user.getId()==10029){
+		JPushUtil.sendAllsetNotification("通知: 天降红包~~ 金额:"+money+"~ 剩余数量:"+number);
 		}
-		
-		
-		
-		
-		
-		
-		
 		
 		
 		

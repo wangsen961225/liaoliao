@@ -592,13 +592,14 @@ public class UserCenterAction {
 	 */
 	@RequestMapping(value="/getInviteUrl")
 	@ResponseBody
-	public Map<String,Object> getInviteUrl(HttpServletRequest request,Integer userId,Integer getTask) {
+	public Map<String,Object> getInviteUrl(HttpServletRequest request,Integer userId) {//,Integer getTask
 		Map<String,Object> map=new HashMap<String,Object>();
-		if(null==getTask || getTask==0){
+		//System.out.println(getTask);
+		/*if(null==getTask || getTask==0){
 			map.put("msg", "该用户未领取任务");
 			map.put("code", StaticKey.NotReceiveTask);
 			return map;
-		}
+		}*/
 		
 		if(userId==null){
 			map.put("code", StaticKey.ReturnClientNullError);

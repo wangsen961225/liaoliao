@@ -132,6 +132,7 @@ public class ContentAction {
 			
 			hashMap.put("flushType", flushType);
 			list = videoService.findAll(pageNo,hashMap);
+			
 		}
 		if(flushType==0){
 			list = videoService.findByRand(8);
@@ -141,6 +142,9 @@ public class ContentAction {
 		Map<String, Object> item = null;
 		Users luser = userService.findById(StaticKey.liaoliaoVideoId);
 		Long luserFl = focusLogService.countNum(StaticKey.liaoliaoVideoId);
+		
+		
+				
 		int luserCount=0;
 		if(luserFl != null){
 			luserCount= luserFl.intValue();
@@ -162,6 +166,12 @@ public class ContentAction {
 		
 		
 		for(Video video : list){
+			//随机出虚拟用户替换官方用户(User,关注人数)
+			luser=userService.findInventUserByRand();
+			if(luser!=null){
+				luserFl = focusLogService.countNum(luser.getId());
+			}
+			
 			item = new LinkedHashMap<>();
 			item.put("id", video.getId());
 			item.put("title", video.getTitle());
@@ -382,6 +392,15 @@ public class ContentAction {
 		
 		Users luser = userService.findById(StaticKey.liaoliaoArticleId);
 		Long luserFl = focusLogService.countNum(StaticKey.liaoliaoArticleId);
+		
+		//随机出虚拟用户替换官方用户(User,关注人数)
+		luser=userService.findInventUserByRand();
+		if(luser!=null){
+			luserFl = focusLogService.countNum(luser.getId());
+		}
+		luserFl = focusLogService.countNum(luser.getId());
+		
+		
 		int luserCount=0;
 		if(luserFl!=null){
 			luserCount= luserFl.intValue();
@@ -1090,6 +1109,14 @@ public class ContentAction {
 		
 		Users luser = userService.findById(StaticKey.liaoliaoArticleId);
 		Long luserFl = focusLogService.countNum(StaticKey.liaoliaoArticleId);
+		
+		//随机出虚拟用户替换官方用户(User,关注人数)
+		luser=userService.findInventUserByRand();
+		if(luser!=null){
+			luserFl = focusLogService.countNum(luser.getId());
+		}
+		luserFl = focusLogService.countNum(luser.getId());
+		
 		int luserCount=0;
 		if(luserFl!=null){
 			luserCount= luserFl.intValue();
@@ -1145,5 +1172,8 @@ public class ContentAction {
 		handleCountService.handleCountPlusOne("articleNext");
 		return map;
 	}
+	
+	
+	
 	
 }

@@ -15,14 +15,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.liaoliao.content.entity.Article;
+import com.liaoliao.content.entity.ArticleComment;
 import com.liaoliao.content.entity.Feedback;
 import com.liaoliao.content.entity.OriginalArticleInfo;
 import com.liaoliao.content.entity.OriginalVideoInfo;
 import com.liaoliao.content.entity.Video;
+import com.liaoliao.content.entity.VideoComment;
+import com.liaoliao.content.service.ArticleCommentService;
 import com.liaoliao.content.service.ArticleService;
 import com.liaoliao.content.service.FeedbackService;
 import com.liaoliao.content.service.OriginalArticleInfoService;
 import com.liaoliao.content.service.OriginalVideoInfoService;
+import com.liaoliao.content.service.VideoCommentService;
 import com.liaoliao.content.service.VideoService;
 import com.liaoliao.profit.entity.FenrunLog;
 import com.liaoliao.profit.entity.ToBank;
@@ -45,6 +49,7 @@ import com.liaoliao.util.StaticKey;
 public class UserController {
 	
 	
+
 	@Autowired
 	private UserService userService;
 	
@@ -83,6 +88,12 @@ public class UserController {
 	
 	@Autowired
 	AdvertClicksService advertClicksService;
+	
+	@Autowired
+	ArticleCommentService articleCommentService;
+	
+	@Autowired
+	VideoCommentService videoCommentService;
 	
 	private Integer page=1;
 	
@@ -441,7 +452,6 @@ public class UserController {
 		feedbackService.updateFB(fd);
 		
 		Feedback feedback = feedbackService.findById(id);
-		
 		if(feedback!=null){
 			Map<String, String> extras = new HashMap<String,String>();
 			//状态,用户id
@@ -739,6 +749,24 @@ public class UserController {
         }
         articleService.updateArticle(article);
         originalArticleInfoService.updateOAI(oai);
+        
+        
+       Article findById = articleService.findById(id);
+        System.err.println("tongguo le ");
+        System.out.println(findById);
+		if(findById!=null){
+			Map<String, String> extras = new HashMap<String,String>();
+			//状态,用户id
+			
+			extras.put("type", StaticKey.JPushSendOriginal);
+			extras.put("userId", String.valueOf(findById.getSourceId()));
+			extras.put("status", "1");
+			//发送通知
+			JPushUtil.sendAllMessage("用户原创审核结果通知", extras,1800 );
+		}
+        
+        
+        
 //		统计每日分润料币总金额
 		handleCountService.handleCountTotalMoney("totalProfitMoney",StaticKey.passArticleMoney);
 		map.put("code", 1);
@@ -847,6 +875,26 @@ public class UserController {
         }
         videoService.updateVideo(video);
         originalVideoInfoService.updateOrSaveOVI(ovi);
+        
+        
+        Video findById = videoService.findById(id);
+		if(findById!=null){
+			Map<String, String> extras = new HashMap<String,String>();
+			//状态,用户id
+			
+			extras.put("type", StaticKey.JPushSendOriginal);
+			extras.put("userId", String.valueOf(findById.getSourceId()));
+			extras.put("status", "1");
+			//发送通知
+			JPushUtil.sendAllMessage("用户原创审核结果通知", extras,1800 );
+		}
+		
+        
+        
+        
+        
+        
+        
 //		统计每日分润料币总金额
 		handleCountService.handleCountTotalMoney("totalProfitMoney",StaticKey.passVideoMoney);
 		map.put("code", 1);

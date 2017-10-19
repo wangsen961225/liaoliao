@@ -113,6 +113,7 @@ public class AdvertAction {
 		Map<String,Object> map=new HashMap<String,Object>();
 		String topAdvert = advertService.findArticleTopAdvert();
 		map.put("topAdvert", topAdvert);
+		System.out.println(topAdvert);
 		request.setAttribute("map", map);
 		return "share/topAdvert";
 	}

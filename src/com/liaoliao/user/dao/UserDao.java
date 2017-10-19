@@ -83,4 +83,10 @@ public interface UserDao {
 	Long accountBySex(Integer sex);
 
 	Users findByRand(Integer sex);
+
+	/**
+	 * 随机获取一名虚拟用户(id:2000-2246)
+	 * @return
+	 */
+	Users findInventUserByRand();
 }

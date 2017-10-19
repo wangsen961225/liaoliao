@@ -60,6 +60,12 @@ public class FeedbackServiceImpl implements FeedbackService {
 		feedbackDao.updateFB(fd);
 		
 	}
+
+
+	@Override
+	public List<Feedback> findByUserId(Integer userId) {
+		return feedbackDao.findByUserId(userId);
+	}
 	
 
 }

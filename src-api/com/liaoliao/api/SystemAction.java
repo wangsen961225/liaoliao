@@ -100,6 +100,8 @@ public class SystemAction {
 		feedback.setWord(content);
 		feedback.setAddTime(new Date());
 		feedback.setStatus(1);
+		String url = "http://appliaoliao.oss-cn-hangzhou.aliyuncs.com/images/"+imgs[0]+"?x-oss-process=style/liaoliao_icon";
+		feedback.setUrl(url);
 		feedbackService.saveFeedback(feedback);
 //		统计每日userFeedback用户反馈次数
 //		handleCountService.handleCountPlusOne("userFeedback");
@@ -487,6 +489,60 @@ public class SystemAction {
 			map.put("code", StaticKey.ReturnServerTrue);
 			map.put("msg", "正确");
 				
+			return map;
+		}
+		
+		
+		@RequestMapping(value="/findFeedbackByUser")
+		@ResponseBody 
+		public Map<String,Object> findFeedbackByUser(HttpServletRequest request,Integer userId){
+			Map<String,Object> map=new HashMap<String,Object>();
+			
+			if(userId==null||"".equals(userId)){
+				map.put("msg", "有参数为空!");
+				map.put("code", StaticKey.ReturnClientNullError);
+				return map;
+			}
+			
+			Users users = userService.findById(userId);
+			if(users==null){
+				map.put("msg", "用户不存在!");
+				map.put("code", StaticKey.ReturnUserAccountNotExist);
+				return map;
+			}
+			
+			if(!redisService.getValidate(request,userId)){
+				map.put("msg", "token失效或错误!");
+				map.put("code", StaticKey.ReturnClientTokenError);
+				return map;
+			}
+			
+			
+			List<Feedback> list = feedbackService.findByUserId(userId);
+			if(list==null||list.size()==0){
+				map.put("code",StaticKey.ReturnServerNullError );
+				map.put("msg", "服务器查询为空或错误");
+				return map;
+			}
+			
+			Map<String,Object> item =null;
+			List<Map<String, Object>> itemList = new ArrayList<>();
+			for (Feedback feedback : list) {
+				if(feedback!=null){
+					item =new HashMap<String,Object>();
+					item.put("url",feedback.getUrl() );
+					item.put("addTime",feedback.getAddTime() );
+					item.put("status",feedback.getStatus() );
+					item.put("word",feedback.getWord() );
+					item.put("dealTime",feedback.getDealTime() );
+					itemList.add(item);
+					
+				}
+			}
+
+			map.put("data", itemList);
+			map.put("code",StaticKey.ReturnServerTrue );
+			map.put("msg","成功" );
 			return map;
 		}
 		

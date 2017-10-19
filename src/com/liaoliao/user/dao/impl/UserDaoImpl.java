@@ -8,7 +8,6 @@ import org.hibernate.Query;
 
 import com.liaoliao.basedao.BaseDaoImpl;
 import com.liaoliao.basedao.PageResults;
-import com.liaoliao.sys.entity.BroadcastLog;
 import com.liaoliao.user.dao.UserDao;
 import com.liaoliao.user.entity.Users;
 import com.liaoliao.util.StaticKey;
@@ -447,6 +446,12 @@ public class UserDaoImpl extends BaseDaoImpl<Users,Integer> implements UserDao {
 	//	String sql ="SELECT * from ll_user_info where `id`>2000 and sex=?0 ORDER BY RAND() LIMIT 1";
 			String sql ="SELECT * from ll_user_info where sex=?0 ORDER BY RAND() LIMIT 1";
 		return this.getBySQL(sql,sex);
+	}
+
+	@Override
+	public Users findInventUserByRand() {
+		String sql ="SELECT * from ll_user_info where id between 2000 and 2246 ORDER BY RAND() LIMIT 1";
+		return this.getBySQL(sql);
 	}
 
 

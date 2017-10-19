@@ -201,10 +201,18 @@ public abstract class StaticKey {
 	 */
 	
 //	全局接口
+	/**
+	 * 正确
+	 * @return 0
+	 */
 	public static final Integer ReturnServerTrue=0;//正确
 	
 	public static final Integer ReturnClientNullError=400;//客户端传值字段为空
 	
+	/**
+	 * 服务器查询为空或错误
+	 * @return 500
+	 */
 	public static final Integer ReturnServerNullError=500;//服务器查询为空或错误
 	
 	public static final Integer ReturnClientTokenError=666;//客户端传值token错误
@@ -254,6 +262,7 @@ public abstract class StaticKey {
 	public static final String JPushSendRedPackage = "2";//极光推送额外透传类型-全服红包
 	
 	public static final String JPushSendFeedback = "3";//极光推送额外透传类型-问题反馈处理结果
+	public static final String JPushSendOriginal = "4";//极光推送额外透传类型-原创文章或视频处理结果
 	
 
 	public static final Integer ReturnBindPayFalse = 0;

@@ -1,11 +1,8 @@
 package com.liaoliao.user.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -187,6 +184,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Users findByRand(Integer sex) {
 		return userDao.findByRand(sex);
+	}
+
+	@Override
+	public Users findInventUserByRand() {
+		return userDao.findInventUserByRand();
 	}
 
 

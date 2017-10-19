@@ -71,6 +71,10 @@ public class Likes implements Serializable{
 		this.user = user;
 	}
 
+	/**
+	 * 15465465
+	 * @return abd
+	 */
 	public Integer getContentId() {
 		return contentId;
 	}

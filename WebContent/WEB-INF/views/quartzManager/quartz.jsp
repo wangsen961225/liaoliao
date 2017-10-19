@@ -5,6 +5,7 @@
 <head>
 <%@ include file="/style/public/meta.jsp"%>
 <link href="${ctx}/style/css/form.css" rel="stylesheet">
+<link href="${ctx}/style/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
 <script type="text/javascript" src="${ctx}/style/public/multiselect.min.js"></script>
 <title>${sys_title}</title>
 </head>
@@ -43,8 +44,8 @@
 </div>
 </div>
 </form>
-<br/><br/>
-<form name="myForm" class="form-inline" method="post" action="${ctx}/sys0000/handleCountList">
+<br/>
+<form name="myForm" class="form-inline" method="post" action="${ctx}/sys/">
 <div class="form-group">
 <label for="dtp_input2" class="control-label">结束时间设定:</label>
  <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
@@ -53,7 +54,7 @@
 <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
 </div>
 </div>
-</form>
+</form><br/>
 
 <input class="btn btn-info" type="button" id="openDouble" onclick="" value="开启阅读翻倍"/>
 <input class="btn btn-info" type="button" id="closeDouble" onclick="" value="关闭阅读翻倍"/>

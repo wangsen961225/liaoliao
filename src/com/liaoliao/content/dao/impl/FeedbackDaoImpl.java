@@ -67,4 +67,10 @@ public class FeedbackDaoImpl extends BaseDaoImpl<Feedback,Integer> implements Fe
 		this.update(fd);
 	}
 
+	@Override
+	public List<Feedback> findByUserId(Integer userId) {
+		String hql = "from Feedback where user.id=?0";
+		return this.getListByHQL(hql, userId);
+	}
+
 }

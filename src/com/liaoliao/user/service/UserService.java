@@ -72,10 +72,18 @@ public interface UserService {
 
 	Users findByNiceName(String nickName);
 
-	List<Users> findBySex(Integer sex,Integer number,Integer start); //参数i:性别 0:待确认 1:男 2:女  	参数j:查询条数
+	List<Users> findBySex(Integer sex,Integer number,Integer start); //参数i:性别 0:待确认 1:男 2:女  	//参数j:查询条数
 	
 	Long accountBySex(Integer sex);
 
 	Users findByRand(Integer sex);
 
+	/**
+	 * 随机从数据库中获取一名虚拟用户(id:2000-2246)
+	 * @return
+	 */
+	Users findInventUserByRand();
+	
+	
+	
 }

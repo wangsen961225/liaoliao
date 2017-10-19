@@ -54,6 +54,10 @@ public class Feedback implements Serializable{
 	private Integer status;//1、沟通中   2、未采纳  3、采纳奖励未发放   4、采纳并已发放奖励
 	
 	private Date dealTime;
+	
+	private String url;
+	
+	
 
 	public Integer getId() {
 		return id;
@@ -127,6 +131,14 @@ public class Feedback implements Serializable{
 
 	public void setWord(String word) {
 		this.word = word;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 	
 }

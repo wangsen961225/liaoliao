@@ -4,11 +4,8 @@ import java.util.List;
 
 import com.liaoliao.basedao.BaseDaoImpl;
 import com.liaoliao.basedao.PageResults;
-import com.liaoliao.content.entity.Article;
 import com.liaoliao.sys.dao.AdvertDao;
 import com.liaoliao.sys.entity.Advert;
-import com.liaoliao.sys.entity.AdvertClicks;
-import com.liaoliao.util.StaticKey;
 
 public class AdvertDaoImpl extends BaseDaoImpl<Advert,Integer> implements AdvertDao {
 

@@ -397,11 +397,7 @@ public class AccountAction {
 			return map;
 		}
 		
-		if(getTask == null || 0==getTask){
-			map.put("msg", "该用户未领取任务");
-			map.put("code", StaticKey.NotReceiveTask);
-			return map;
-		}
+		
 		
 		newNickName = CommonUtil.emojiFilter(newNickName);
 		
@@ -414,21 +410,24 @@ public class AccountAction {
 		
 		user.setNickName(newNickName);
 		userService.updateUser(user);
-		//判断修改昵称任务
-		TaskLog taskLog = taskLogService.findTask(userId,1);
-		if(taskLog==null){
-			taskLog = new TaskLog();
-			taskLog.setFinishTime(new Date());
-			taskLog.setStatus(2);
-			taskLog.setUser(user);
-			taskLog.setObtain(0);//未领取奖励
-			UserTask ut = userTaskService.findById(1);
-			taskLog.setUserTask(ut);//查询出用户完成修改昵称这条记录
-			taskLogService.savaTaskLog(taskLog);
-		}else if(taskLog.getStatus()==1){
-			taskLog.setStatus(2);
-			taskLog.setFinishTime(new Date());
-			taskLogService.updateTaskLog(taskLog);
+		
+		if(getTask != null || 0!=getTask){
+			//判断修改昵称任务
+			TaskLog taskLog = taskLogService.findTask(userId,1);
+			if(taskLog==null){
+				taskLog = new TaskLog();
+				taskLog.setFinishTime(new Date());
+				taskLog.setStatus(2);
+				taskLog.setUser(user);
+				taskLog.setObtain(0);//未领取奖励
+				UserTask ut = userTaskService.findById(1);
+				taskLog.setUserTask(ut);//查询出用户完成修改昵称这条记录
+				taskLogService.savaTaskLog(taskLog);
+			}else if(taskLog.getStatus()==1){
+				taskLog.setStatus(2);
+				taskLog.setFinishTime(new Date());
+				taskLogService.updateTaskLog(taskLog);
+			}
 		}
 //		统计每日changeNickname修改量
 //		handleCountService.handleCountPlusOne("changeNickname");

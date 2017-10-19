@@ -20,6 +20,13 @@ public interface FeedbackDao {
 
 	void updateFB(Feedback fd);
 
+	/**
+	 * 根据用户id查询反馈信息
+	 * @param userId
+	 * @return
+	 */
+	List<Feedback> findByUserId(Integer userId);
+
 //	UserToken findById(Integer id);
 	
 }
