@@ -12,8 +12,6 @@
 </head>
 <body>
 ${map.signAdvert}
-
-
 <!-- <style type="text/css">
 img{width:100%;text-align:center;/* margin:10px 0px; */}
 /* body{font-size:15px}

@@ -81,7 +81,7 @@ public class AdvertAction {
 		String signAdvert = advertService.findSignAdvert();
 		map.put("signAdvert", signAdvert);
 		request.setAttribute("map", map);
-		System.out.println(signAdvert);
+		//System.out.println(signAdvert);
 		return "share/signAdvert";
 	}
 	
