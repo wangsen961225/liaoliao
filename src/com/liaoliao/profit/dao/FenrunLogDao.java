@@ -22,4 +22,6 @@ public interface FenrunLogDao {
 
 	Integer countSignNum(Integer userId);
 
+	Integer todayTotal(Integer userId);
+
 }

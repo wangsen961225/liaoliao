@@ -56,6 +56,11 @@ public class FenrunLogServiceImpl implements FenrunLogService {
 	public Integer countSignNum(Integer userId) {
 		return fenrunLogDao.countSignNum(userId);
 	}
+
+	@Override
+	public Integer todayTotal(Integer userId) {
+		return fenrunLogDao.todayTotal(userId);
+	}
 	
 	
 

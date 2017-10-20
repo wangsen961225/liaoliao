@@ -13,7 +13,7 @@ public class MessageKit {
 //		String  username = "2210009625@qq.com";//申请的用户名
 //		String  password = "y7626272";// 任意字符
 		String  username = "sjcmll";//申请的用户名
-		String  password = "lintao888";// 任意字符
+		String  password = "LintaoShijie880.8";// 任意字符
 //		
 //		String msgCode = "您好，你的验证码是：56953【赚赚】";
 //		String mobile = "17090317208";

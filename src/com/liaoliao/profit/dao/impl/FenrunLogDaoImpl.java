@@ -1,5 +1,6 @@
 package com.liaoliao.profit.dao.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -9,6 +10,7 @@ import com.liaoliao.basedao.PageResults;
 import com.liaoliao.profit.dao.FenrunLogDao;
 import com.liaoliao.profit.entity.FenrunLog;
 import com.liaoliao.util.StaticKey;
+import com.liaoliao.util.TimeKit;
 
 public class FenrunLogDaoImpl extends BaseDaoImpl<FenrunLog, Integer> implements FenrunLogDao {
 
@@ -89,6 +91,14 @@ public class FenrunLogDaoImpl extends BaseDaoImpl<FenrunLog, Integer> implements
 		String hql = "from FenrunLog f where user.id=?0 and type=?1";
 		List<FenrunLog> list = this.getListByHQL(hql, userId,5);
 		return list.size();
+	}
+
+
+	@Override
+	public Integer todayTotal(Integer userId) {
+		//String sql = "SELECT sum(money) from ll_fenrun_log where TO_DAYS(add_time) = TO_DAYS(now()) and user_id=?0";
+		String countHql="select count(a) from FenrunLog a where addTime between ?0 and ?1";
+		return Integer.valueOf(this.countByHql(countHql,TimeKit.todayStart(),new Date()).toString());
 	}
 }
 

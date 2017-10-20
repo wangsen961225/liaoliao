@@ -170,6 +170,9 @@ public class UserController {
 			Integer totalSign = fenrunLogService.countSignNum(user.getId());
 			item.put("totalProfit",totalProfit);
 			item.put("totalSign",totalSign );
+			
+			Integer todayTotal = fenrunLogService.todayTotal(user.getId());
+			item.put("todayTotal", todayTotal);
 			list.add(item);
 		}
 		request.setAttribute("list", list);

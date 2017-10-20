@@ -142,7 +142,13 @@ public class ContentAction {
 		Map<String, Object> item = null;
 		Users luser = userService.findById(StaticKey.liaoliaoVideoId);
 		Long luserFl = focusLogService.countNum(StaticKey.liaoliaoVideoId);
+		luserFl = focusLogService.countNum(luser.getId());
 		
+		/*//随机出虚拟用户替换官方用户(User,关注人数)
+		luser=userService.findInventUserByRand();
+		if(luser!=null){
+			luserFl = focusLogService.countNum(luser.getId());
+		}*/
 		
 				
 		int luserCount=0;
@@ -170,6 +176,10 @@ public class ContentAction {
 			luser=userService.findInventUserByRand();
 			if(luser!=null){
 				luserFl = focusLogService.countNum(luser.getId());
+			}
+			
+			if(luserFl != null){
+				luserCount= luserFl.intValue();
 			}
 			
 			item = new LinkedHashMap<>();
@@ -224,6 +234,7 @@ public class ContentAction {
 					}
 				}else{
 					FocusLog fl = focusLogService.findByFocusId(userId, StaticKey.liaoliaoVideoId);
+					fl = focusLogService.findByFocusId(userId, luser.getId());
 					if(fl!=null&&fl.getStatus()==1){
 						item.put("focusStatus", StaticKey.FocusTrue);
 					}else{
@@ -392,14 +403,13 @@ public class ContentAction {
 		
 		Users luser = userService.findById(StaticKey.liaoliaoArticleId);
 		Long luserFl = focusLogService.countNum(StaticKey.liaoliaoArticleId);
+		luserFl = focusLogService.countNum(luser.getId());
 		
 		//随机出虚拟用户替换官方用户(User,关注人数)
 		luser=userService.findInventUserByRand();
 		if(luser!=null){
 			luserFl = focusLogService.countNum(luser.getId());
 		}
-		luserFl = focusLogService.countNum(luser.getId());
-		
 		
 		int luserCount=0;
 		if(luserFl!=null){
@@ -407,6 +417,8 @@ public class ContentAction {
 		}
 		if(article.getType()==1){
 			Users user = userService.findById(article.getSourceId());
+			user=userService.findById(luser.getId());//使用随机的虚拟用户替换官方用户
+			System.out.println("我是原创的 line 421 ContentAction.java /getContent");
 			if(user==null){
 				map.put("name", luser.getNickName());//料料头条
 				map.put("userId",luser.getId());
@@ -429,6 +441,7 @@ public class ContentAction {
 		if(userId!=null&&redisService.getValidate(request,userId)){
 			if(article.getType()==1){
 				FocusLog fl = focusLogService.findByFocusId(userId, article.getSourceId());
+			//	fl = focusLogService.findByFocusId(userId, luser.getId()); 如果是原创的视频或文章,保持真是数据
 				if(fl!=null&&fl.getStatus()==1){
 					map.put("focusStatus", StaticKey.FocusTrue);
 				}else{
@@ -436,6 +449,7 @@ public class ContentAction {
 				}
 			}else{
 				FocusLog fl = focusLogService.findByFocusId(userId, StaticKey.liaoliaoArticleId);
+				fl = focusLogService.findByFocusId(userId, luser.getId());//如果文章不是原创的,使用虚拟用户替代官方用户
 				if(fl!=null&&fl.getStatus()==1){
 					map.put("focusStatus", StaticKey.FocusTrue);
 				}else{

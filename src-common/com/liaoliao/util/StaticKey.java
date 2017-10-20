@@ -115,9 +115,12 @@ public abstract class StaticKey {
 	
 	
 	/**
-	 * 关注
+	 * 未关注 0
 	 */
 	public static final Integer FocusFlase=0;//未关注
+	/**
+	 *已关注  1
+	 */
 	public static final Integer FocusTrue=1;//已关注
 	
 	

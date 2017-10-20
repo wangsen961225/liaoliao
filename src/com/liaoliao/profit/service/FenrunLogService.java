@@ -22,4 +22,6 @@ public interface FenrunLogService {
 
 	Integer countSignNum(Integer userId);
 
+	Integer todayTotal(Integer userId);
+
 }

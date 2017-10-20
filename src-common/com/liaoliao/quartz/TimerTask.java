@@ -170,7 +170,7 @@ public class TimerTask {
 		List<RedPackage> list = redPackageService.findUnDeal();
 		
 		Date date =null;
-		System.err.println("调用退红包方法次数"+"+1   时间:"+new Date() );
+		//System.err.println("调用退红包方法次数"+"+1   时间:"+new Date() );
 		for(RedPackage rp:list){
 //			date = new Date(new Date().getTime()-11*60*1000);//十分钟之前的数据
 			date = new Date(new Date().getTime()-24*60*60*1000);//24小时之前的数据24*60*60*1000

@@ -94,7 +94,8 @@
 						</td>
 						<td>${li.user.totalMoney}</td>
 						<td>${li.user.payMoney}</td>
-						<td>${li.user.dayMoney}</td>
+						<%-- <td>${li.user.dayMoney}</td> --%>
+						<td>${li.todayTotal}</td>
 						<td>
 						  <c:if test="${li.user.status==1}">正常</c:if>
 						  <c:if test="${li.user.status==0}"><p style="color:red">封禁</p></c:if>
