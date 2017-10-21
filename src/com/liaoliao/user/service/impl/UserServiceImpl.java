@@ -191,6 +191,11 @@ public class UserServiceImpl implements UserService {
 		return userDao.findInventUserByRand();
 	}
 
+	@Override
+	public List<Users> findAll() {
+		return userDao.findAll();
+	}
+
 
 
 

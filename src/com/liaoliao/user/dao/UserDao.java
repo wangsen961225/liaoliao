@@ -89,4 +89,6 @@ public interface UserDao {
 	 * @return
 	 */
 	Users findInventUserByRand();
+
+	List<Users> findAll();
 }

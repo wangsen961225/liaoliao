@@ -454,6 +454,12 @@ public class UserDaoImpl extends BaseDaoImpl<Users,Integer> implements UserDao {
 		return this.getBySQL(sql);
 	}
 
+	@Override
+	public List<Users> findAll() {
+		String hqlString = "from Users";
+		return this.getListByHQL(hqlString);
+	}
+
 
 	
 

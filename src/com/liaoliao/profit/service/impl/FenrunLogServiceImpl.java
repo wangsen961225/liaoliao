@@ -58,7 +58,7 @@ public class FenrunLogServiceImpl implements FenrunLogService {
 	}
 
 	@Override
-	public Integer todayTotal(Integer userId) {
+	public Double todayTotal(Integer userId) {
 		return fenrunLogDao.todayTotal(userId);
 	}
 	

@@ -144,11 +144,11 @@ public class ContentAction {
 		Long luserFl = focusLogService.countNum(StaticKey.liaoliaoVideoId);
 		luserFl = focusLogService.countNum(luser.getId());
 		
-		/*//随机出虚拟用户替换官方用户(User,关注人数)
+		//随机出虚拟用户替换官方用户(User,关注人数)
 		luser=userService.findInventUserByRand();
 		if(luser!=null){
 			luserFl = focusLogService.countNum(luser.getId());
-		}*/
+		}
 		
 				
 		int luserCount=0;
@@ -210,9 +210,87 @@ public class ContentAction {
 					item.put("userId",luser.getId());
 					item.put("avatar",luser.getAvatar());
 					item.put("focusCount", luserCount);
+			
+					//虚拟用户的关注数(非数据库中数据)开始
+					if(luser.getId()>=2000&&luser.getId()<=2009){
+						item.put("focusCount", 20138);
+					}
+					if(luser.getId()>=2010 &&luser.getId()<=2019 ){
+						item.put("focusCount",10026 );
+					}
+					if(luser.getId()>=2020 &&luser.getId()<=2039 ){
+						item.put("focusCount",5386 );
+					}
+					if(luser.getId()>=2040 &&luser.getId()<=2059 ){
+						item.put("focusCount",2563 );
+					}
+					if(luser.getId()>=2060 &&luser.getId()<=2079 ){
+						item.put("focusCount",1257 );
+					}
+					if(luser.getId()>=2080 &&luser.getId()<=2099 ){
+						item.put("focusCount",625 );
+					}
+					if(luser.getId()>=2100 &&luser.getId()<=2119 ){
+						item.put("focusCount",319 );
+					}
+					if(luser.getId()>=2120 &&luser.getId()<=2139 ){
+						item.put("focusCount",151 );
+					}
+					if(luser.getId()>=2140 &&luser.getId()<=2159 ){
+						item.put("focusCount",86 );
+					}
+					if(luser.getId()>=2160 &&luser.getId()<=2179 ){
+						item.put("focusCount",43 );
+					}
+					if(luser.getId()>=2180 &&luser.getId()<=2199 ){
+						item.put("focusCount",28 );
+					}
+					//虚拟用户的关注数结束
+					
+					
+					
+					
 				}else{
 					Long number = focusLogService.countNum(user.getId());
 					item.put("focusCount", number!=null?number:0);
+					
+					//虚拟用户的关注数(非数据库中数据)开始
+					if(luser.getId()>=2000&&luser.getId()<=2009){
+						item.put("focusCount", 20138);
+					}
+					if(luser.getId()>=2010 &&luser.getId()<=2019 ){
+						item.put("focusCount",10026 );
+					}
+					if(luser.getId()>=2020 &&luser.getId()<=2039 ){
+						item.put("focusCount",5386 );
+					}
+					if(luser.getId()>=2040 &&luser.getId()<=2059 ){
+						item.put("focusCount",2563 );
+					}
+					if(luser.getId()>=2060 &&luser.getId()<=2079 ){
+						item.put("focusCount",1257 );
+					}
+					if(luser.getId()>=2080 &&luser.getId()<=2099 ){
+						item.put("focusCount",625 );
+					}
+					if(luser.getId()>=2100 &&luser.getId()<=2119 ){
+						item.put("focusCount",319 );
+					}
+					if(luser.getId()>=2120 &&luser.getId()<=2139 ){
+						item.put("focusCount",151 );
+					}
+					if(luser.getId()>=2140 &&luser.getId()<=2159 ){
+						item.put("focusCount",86 );
+					}
+					if(luser.getId()>=2160 &&luser.getId()<=2179 ){
+						item.put("focusCount",43 );
+					}
+					if(luser.getId()>=2180 &&luser.getId()<=2199 ){
+						item.put("focusCount",28 );
+					}
+					//虚拟用户的关注数结束
+					
+					
 					item.put("name", user.getNickName());
 					item.put("userId", user.getId());
 					item.put("avatar", user.getAvatar());
@@ -222,6 +300,43 @@ public class ContentAction {
 				item.put("userId",luser.getId());
 				item.put("avatar",luser.getAvatar());
 				item.put("focusCount", luserCount);
+				
+				//虚拟用户的关注数(非数据库中数据)开始
+				if(luser.getId()>=2000&&luser.getId()<=2009){
+					item.put("focusCount", 20138);
+				}
+				if(luser.getId()>=2010 &&luser.getId()<=2019 ){
+					item.put("focusCount",10026 );
+				}
+				if(luser.getId()>=2020 &&luser.getId()<=2039 ){
+					item.put("focusCount",5386 );
+				}
+				if(luser.getId()>=2040 &&luser.getId()<=2059 ){
+					item.put("focusCount",2563 );
+				}
+				if(luser.getId()>=2060 &&luser.getId()<=2079 ){
+					item.put("focusCount",1257 );
+				}
+				if(luser.getId()>=2080 &&luser.getId()<=2099 ){
+					item.put("focusCount",625 );
+				}
+				if(luser.getId()>=2100 &&luser.getId()<=2119 ){
+					item.put("focusCount",319 );
+				}
+				if(luser.getId()>=2120 &&luser.getId()<=2139 ){
+					item.put("focusCount",151 );
+				}
+				if(luser.getId()>=2140 &&luser.getId()<=2159 ){
+					item.put("focusCount",86 );
+				}
+				if(luser.getId()>=2160 &&luser.getId()<=2179 ){
+					item.put("focusCount",43 );
+				}
+				if(luser.getId()>=2180 &&luser.getId()<=2199 ){
+					item.put("focusCount",28 );
+				}
+				//虚拟用户的关注数结束
+				
 			}
 			
 			if(userId!=null&&redisService.getValidate(request,userId)){
@@ -427,6 +542,44 @@ public class ContentAction {
 			}else{
 				Long number = focusLogService.countNum(user.getId());
 				map.put("focusCount", number!=null?number:0);
+				
+				
+				//虚拟用户的关注数(非数据库中数据)开始
+				if(user.getId()>=2000&&user.getId()<=2009){
+					map.put("focusCount", 20356);
+				}
+				if(user.getId()>=2010 &&user.getId()<=2019 ){
+					map.put("focusCount",10253 );
+				}
+				if(user.getId()>=2020 &&user.getId()<=2039 ){
+					map.put("focusCount",5023 );
+				}
+				if(user.getId()>=2040 &&user.getId()<=2059 ){
+					map.put("focusCount",2560 );
+				}
+				if(user.getId()>=2060 &&user.getId()<=2079 ){
+					map.put("focusCount",1251 );
+				}
+				if(user.getId()>=2080 &&user.getId()<=2099 ){
+					map.put("focusCount",625 );
+				}
+				if(user.getId()>=2100 &&user.getId()<=2119 ){
+					map.put("focusCount",385 );
+				}
+				if(user.getId()>=2120 &&user.getId()<=2139 ){
+					map.put("focusCount",154 );
+				}
+				if(user.getId()>=2140 &&user.getId()<=2159 ){
+					map.put("focusCount",81 );
+				}
+				if(user.getId()>=2160 &&user.getId()<=2179 ){
+					map.put("focusCount",47 );
+				}
+				if(user.getId()>=2180 &&user.getId()<=2199 ){
+					map.put("focusCount",27 );
+				}
+				//虚拟用户的关注数结束
+				
 				map.put("name", user.getNickName());
 				map.put("userId", user.getId());
 				map.put("avatar", user.getAvatar());
@@ -436,6 +589,45 @@ public class ContentAction {
 			map.put("userId",luser.getId());
 			map.put("avatar",luser.getAvatar());
 			map.put("focusCount", luserCount);
+			
+			//虚拟用户的关注数(非数据库中数据)开始
+			if(luser.getId()>=2000&&luser.getId()<=2009){
+				map.put("focusCount", 20138);
+			}
+			if(luser.getId()>=2010 &&luser.getId()<=2019 ){
+				map.put("focusCount",10026 );
+			}
+			if(luser.getId()>=2020 &&luser.getId()<=2039 ){
+				map.put("focusCount",5386 );
+			}
+			if(luser.getId()>=2040 &&luser.getId()<=2059 ){
+				map.put("focusCount",2563 );
+			}
+			if(luser.getId()>=2060 &&luser.getId()<=2079 ){
+				map.put("focusCount",1257 );
+			}
+			if(luser.getId()>=2080 &&luser.getId()<=2099 ){
+				map.put("focusCount",625 );
+			}
+			if(luser.getId()>=2100 &&luser.getId()<=2119 ){
+				map.put("focusCount",319 );
+			}
+			if(luser.getId()>=2120 &&luser.getId()<=2139 ){
+				map.put("focusCount",151 );
+			}
+			if(luser.getId()>=2140 &&luser.getId()<=2159 ){
+				map.put("focusCount",86 );
+			}
+			if(luser.getId()>=2160 &&luser.getId()<=2179 ){
+				map.put("focusCount",43 );
+			}
+			if(luser.getId()>=2180 &&luser.getId()<=2199 ){
+				map.put("focusCount",28 );
+			}
+			//虚拟用户的关注数结束
+			
+			
+			
 		}
 		
 		if(userId!=null&&redisService.getValidate(request,userId)){
@@ -1142,6 +1334,43 @@ public class ContentAction {
 				map.put("userId",luser.getId());
 				map.put("avatar",luser.getAvatar());
 				map.put("focusCount", luserCount);
+				
+				//虚拟用户的关注数(非数据库中数据)开始
+				if(luser.getId()>=2000&&luser.getId()<=2009){
+					map.put("focusCount", 20138);
+				}
+				if(luser.getId()>=2010 &&luser.getId()<=2019 ){
+					map.put("focusCount",10026 );
+				}
+				if(luser.getId()>=2020 &&luser.getId()<=2039 ){
+					map.put("focusCount",5386 );
+				}
+				if(luser.getId()>=2040 &&luser.getId()<=2059 ){
+					map.put("focusCount",2563 );
+				}
+				if(luser.getId()>=2060 &&luser.getId()<=2079 ){
+					map.put("focusCount",1257 );
+				}
+				if(luser.getId()>=2080 &&luser.getId()<=2099 ){
+					map.put("focusCount",625 );
+				}
+				if(luser.getId()>=2100 &&luser.getId()<=2119 ){
+					map.put("focusCount",319 );
+				}
+				if(luser.getId()>=2120 &&luser.getId()<=2139 ){
+					map.put("focusCount",151 );
+				}
+				if(luser.getId()>=2140 &&luser.getId()<=2159 ){
+					map.put("focusCount",86 );
+				}
+				if(luser.getId()>=2160 &&luser.getId()<=2179 ){
+					map.put("focusCount",43 );
+				}
+				if(luser.getId()>=2180 &&luser.getId()<=2199 ){
+					map.put("focusCount",28 );
+				}
+				//虚拟用户的关注数结束
+				
 			}else{
 				Long number = focusLogService.countNum(user.getId());
 				map.put("focusCount", number!=null?number:0);
@@ -1154,6 +1383,45 @@ public class ContentAction {
 			map.put("userId",luser.getId());
 			map.put("avatar",luser.getAvatar());
 			map.put("focusCount", luserCount);
+			
+			//虚拟用户的关注数(非数据库中数据)开始
+			if(luser.getId()>=2000&&luser.getId()<=2009){
+				map.put("focusCount", 20138);
+			}
+			if(luser.getId()>=2010 &&luser.getId()<=2019 ){
+				map.put("focusCount",10026 );
+			}
+			if(luser.getId()>=2020 &&luser.getId()<=2039 ){
+				map.put("focusCount",5386 );
+			}
+			if(luser.getId()>=2040 &&luser.getId()<=2059 ){
+				map.put("focusCount",2563 );
+			}
+			if(luser.getId()>=2060 &&luser.getId()<=2079 ){
+				map.put("focusCount",1257 );
+			}
+			if(luser.getId()>=2080 &&luser.getId()<=2099 ){
+				map.put("focusCount",625 );
+			}
+			if(luser.getId()>=2100 &&luser.getId()<=2119 ){
+				map.put("focusCount",319 );
+			}
+			if(luser.getId()>=2120 &&luser.getId()<=2139 ){
+				map.put("focusCount",151 );
+			}
+			if(luser.getId()>=2140 &&luser.getId()<=2159 ){
+				map.put("focusCount",86 );
+			}
+			if(luser.getId()>=2160 &&luser.getId()<=2179 ){
+				map.put("focusCount",43 );
+			}
+			if(luser.getId()>=2180 &&luser.getId()<=2199 ){
+				map.put("focusCount",28 );
+			}
+			//虚拟用户的关注数结束
+			
+			
+			
 		}
 		
 		if(userId!=null&&redisService.getValidate(request,userId)){

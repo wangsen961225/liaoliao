@@ -95,10 +95,14 @@ public class FenrunLogDaoImpl extends BaseDaoImpl<FenrunLog, Integer> implements
 
 
 	@Override
-	public Integer todayTotal(Integer userId) {
+	public Double todayTotal(Integer userId) {
 		//String sql = "SELECT sum(money) from ll_fenrun_log where TO_DAYS(add_time) = TO_DAYS(now()) and user_id=?0";
-		String countHql="select count(a) from FenrunLog a where addTime between ?0 and ?1";
-		return Integer.valueOf(this.countByHql(countHql,TimeKit.todayStart(),new Date()).toString());
+		String countHql="select sum(money) from FenrunLog where user.id=?0 and addTime between ?1 and ?2";
+		Long dayMoneyTotal = this.countByHql(countHql,userId,TimeKit.todayStart(),new Date());
+		if(dayMoneyTotal==null){
+			dayMoneyTotal=(long) 0;
+		}
+		return (double)dayMoneyTotal;
 	}
 }
 

@@ -83,6 +83,8 @@ public interface UserService {
 	 * @return
 	 */
 	Users findInventUserByRand();
+
+	List<Users> findAll();
 	
 	
 	

@@ -154,6 +154,21 @@ public class UserController {
 		request.setAttribute("mobile", mobile);	
 		request.setAttribute("isActive", isActive);	
 		
+		//更新今日总额开始
+		//当今日所有条件未选择时,执行
+		if(isActive==null&&vipStatus==null&&mobile==null&&userName==null){
+			//更新今日总额:从分润日志中查询当日总额,更新user
+			List<Users> updateList=userService.findAll();
+			for (Users user : updateList) {
+				Double todayTotal = fenrunLogService.todayTotal(user.getId());
+				//暂定: 每次访问列表时,从数据库中查询,当日用户所得料币数,保存至用户表中
+				Users findById = userService.findById(user.getId());
+				findById.setDayMoney(todayTotal);
+				userService.updateUser(findById);
+			}
+		}
+		//更新今日总额结束
+		
 		List<Users> uList=userService.findAll(pageNo,map);
 		
 		ArrayList<Map<String,Object>> list = new ArrayList<>();
@@ -171,8 +186,6 @@ public class UserController {
 			item.put("totalProfit",totalProfit);
 			item.put("totalSign",totalSign );
 			
-			Integer todayTotal = fenrunLogService.todayTotal(user.getId());
-			item.put("todayTotal", todayTotal);
 			list.add(item);
 		}
 		request.setAttribute("list", list);
