@@ -2,6 +2,14 @@ package com.liaoliao.util;
 
 import java.util.List;
 
+/**
+ * @author Administrator
+ *
+ */
+/**
+ * @author Administrator
+ *
+ */
 public abstract class StaticKey {
 	
 	public static final Integer ArticleStatusFalse = 0;//文章状态禁用
@@ -82,9 +90,9 @@ public abstract class StaticKey {
 	
 	public static final Integer FenrunBroadcast=3;//分润日志来源种类-发广播
 	
-	public static final Integer FenrunSign=5;//分润日志来源种类-签到
-	
 	public static final Integer FenrunNewUser=4;//分润日志来源种类-新用户红包
+	
+	public static final Integer FenrunSign=5;//分润日志来源种类-签到
 	
 	public static final Integer FenrunGrabVip=6;//分润日志来源种类-vip被抢红包
 	
@@ -109,9 +117,21 @@ public abstract class StaticKey {
 	public static final Integer FenrunWorldRedPackage=16;//分润日志来源种类-土豪世界发红包
 	
 	public static final Integer FenrunLookUser=17;//分润日志来源种类-查看用户详情(约她)
-	
+	/**
+	 * 分润日志来源种类-退款
+	 * @return 18
+	 */
 	public static final Integer FenrunRefund=18;//分润日志来源种类-退款
-	
+	/**
+	 * 阅读文章翻倍
+	 * @return 19
+	 */
+	public static final Integer FenrunReadArticleDouble=19;//分润日志来源种类-阅读文章翻倍
+	/**
+	 * 观看视频翻倍
+	 * @return 20
+	 */
+	public static final Integer FenrunReadVideoDouble=20;//分润日志来源种类-观看视频翻倍
 	
 	
 	/**
@@ -131,14 +151,30 @@ public abstract class StaticKey {
 	public static List<Integer> redPackagelist=null;
 	
 
+	/**
+	 * 广告状态禁用
+	 * @const 0
+	 */
 	public static final Integer AdvertStatusFalse = 0;//广告状态禁用
 	
+	/**
+	 * 广告状态正常
+	 */
 	public static final Integer AdvertStatusTrue = 1;//广告状态正常
 	
+	/**
+	 * 提现状态-未处理
+	 */
 	public static final Integer ToBankStatusFalse = 0;//提现状态-未处理
 	
+	/**
+	 * 提现状态-已到账
+	 */
 	public static final Integer ToBankStatusTrue = 1;//提现状态-已到账
 	
+	/**
+	 * 测试人员邀请人，获得料币最小的通过金额
+	 */
 	public static final Double MinPassMoney = 0.0;//测试人员邀请人，获得料币最小的通过金额
 	
 	public static final long MinPassTime = 3000000;//通过的最短活跃天数
@@ -241,56 +277,136 @@ public abstract class StaticKey {
 	public static final Integer ReturnSessionInvalid=222;//session失效
 	
 //	版本更新接口
-	public static final Integer ReturnVersionCodeNew = 900;//版本已是最新
-	
-	public static final Integer ReturnVersionCodeUpdate = 910;//有新版本
+	/**
+	 * 版本已是最新
+	 * @return 900
+	 */
+	public static final Integer ReturnVersionCodeNew = 900;
+	/**
+	 * 有新版本
+	 * @return 910
+	 */
+	public static final Integer ReturnVersionCodeUpdate = 910;
 
 //	分润接口 & 检测签到状态接口
-	public static final Integer ReturnUserSignError = 200;//未签到
-	
-	public static final Integer ReturnMoneyLow = 310;//余额不足
-	
-	public static final Integer ReturnBindPayError = 320;//此支付账号已被其他用户绑定
-	
-	public static final Integer ReturnCoinRunAway = 800;//红包溜走了
-	
+	/**
+	 * 未签到 
+	 * @return 200
+	 */
+	public static final Integer ReturnUserSignError = 200;
+	/**
+	 * 余额不足
+	 * @return 310
+	 */
+	public static final Integer ReturnMoneyLow = 310;
+	/**
+	 * 此支付账号已被其他用户绑定
+	 * @return 320
+	 */
+	public static final Integer ReturnBindPayError = 320;
+	/**
+	 * 红包溜走了
+	 * @return 800
+	 */
+	public static final Integer ReturnCoinRunAway = 800;
+	/**
+	 * 用户非会员
+	 * @return 190
+	 */
 	public static final Integer ReturnUserNotVip = 190;//用户非会员
+	/**
+	 * 霸屏上线未到冷却时间
+	 * @return 710
+	 */
+	public static final Integer ReturnCooldownTimeError = 710;
 	
-	public static final Integer ReturnCooldownTimeError = 710;//霸屏上线未到冷却时间
+	//极光推送额外透传类型
+	/**
+	 * 极光推送额外透传类型-霸屏登录
+	 * @return "0"
+	 */
+	public static final String JPushVipLoginEffectType = "0";
+	/**
+	 * 极光推送额外透传类型-发送广播
+	 * @return "1"
+	 */
+	public static final String JPushSendBroadcast = "1";
+	/**
+	 * 极光推送额外透传类型-全服红包
+	 * @return "2"
+	 */
+	public static final String JPushSendRedPackage = "2";
+	/**
+	 * 极光推送额外透传类型-问题反馈处理结果
+	 * @return "3"
+	 */
+	public static final String JPushSendFeedback = "3";
+	/**
+	 * 极光推送额外透传类型-原创文章或视频处理结果
+	 * @return "4"
+	 */
+	public static final String JPushSendOriginal = "4";
+	/**
+	 * 极光推送额外透传类型-后台开启阅读翻倍功能
+	 * @return "5"
+	 */
+	public static final String JPushSendOpenReadDouble = "5";
+	/**
+	 * 极光推送额外透传类型-后台关闭了阅读翻倍功能
+	 * @return "6"
+	 */
+	public static final String JPushSendCloseReadDouble = "6";
+	/**
+	 * 极光推送额外透传类型-料料官方用户发送系统红包
+	 * @return "7"
+	 */
+	public static final String JPushSendOfficialUserSendRedpackage = "7";
 	
-	public static final String JPushVipLoginEffectType = "0";//极光推送额外透传类型-霸屏登录
-	
-	public static final String JPushSendBroadcast = "1";//极光推送额外透传类型-发送广播
-	
-	public static final String JPushSendRedPackage = "2";//极光推送额外透传类型-全服红包
-	
-	public static final String JPushSendFeedback = "3";//极光推送额外透传类型-问题反馈处理结果
-	public static final String JPushSendOriginal = "4";//极光推送额外透传类型-原创文章或视频处理结果
-	
-
 	public static final Integer ReturnBindPayFalse = 0;
-	
 	public static final Integer ReturnBindPayTrue = 1;
 	
 	
-	
-	
+	// 料料官方用户：
 	/**
-	 * 
-	 * 料料官方用户：
+	 * 料料视频官方用户
+	 * @return 66
 	 */
-	
 	public static final Integer liaoliaoVideoId = 66;
-	
+	/**
+	 * 料料文章官方用户
+	 * @return 67
+	 */
 	public static final Integer liaoliaoArticleId = 67;
 	
 	
+	//任务状态
 	/**
-	 * 任务状态
+	 * 未领取任务
+	 * @return 10
 	 */
-	public static final Integer NotReceiveTask = 10;	//未领取任务
-	public static final Integer ReceiveTask = 11;		//已领取任务
+	public static final Integer NotReceiveTask = 10;
+	/**
+	 * 已领取任务
+	 * @return 11
+	 */
+	public static final Integer ReceiveTask = 11;
 	
 	
-
+	/**
+	 * 阅读不翻倍:
+	 * @return 0
+	 */
+	public static final Integer readNotDouble = 0;
+	/**
+	 * 阅读翻倍:
+	 * @return  1
+	 */
+	public static final Integer readDouble = 1;
+	
+		
+	/**
+	 * 发送系统红包官方用户id
+	 * @return 10029
+	 */
+	public static final Integer SystemRedpackage=10029;
 }

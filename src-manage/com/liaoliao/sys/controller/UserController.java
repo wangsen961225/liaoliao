@@ -276,6 +276,7 @@ public class UserController {
 		return str;
 	}
 	
+	
 	/**
 	 * 自动创建大量金钱的VIP用户
 	 * @param request
@@ -431,7 +432,7 @@ public class UserController {
 			extras.put("userId", String.valueOf(feedback.getUser().getId()));
 			extras.put("status", "2");
 			//发送通知
-			JPushUtil.sendAllMessage("用户反馈留言结果通知", extras,1800 );
+			JPushUtil.sendAllMessage("用户反馈留言结果通知", extras,86400);
 		}
 		
 		
@@ -476,7 +477,7 @@ public class UserController {
 			extras.put("userId", String.valueOf(feedback.getUser().getId()));
 			extras.put("status", "3");
 			//发送通知
-			JPushUtil.sendAllMessage("用户反馈留言结果通知", extras,1800 );
+			JPushUtil.sendAllMessage("用户反馈留言结果通知", extras,86400 );
 		}
 		
 		
@@ -521,7 +522,7 @@ public class UserController {
 			extras.put("userId", String.valueOf(feedback.getUser().getId()));
 			extras.put("status", "4");
 			//发送通知
-			JPushUtil.sendAllMessage("用户反馈留言结果通知", extras,1800 );
+			JPushUtil.sendAllMessage("用户反馈留言结果通知", extras,86400 );
 		}
 		
 		map.put("code", 1);
@@ -778,7 +779,7 @@ public class UserController {
 			extras.put("userId", String.valueOf(findById.getSourceId()));
 			extras.put("status", "1");
 			//发送通知
-			JPushUtil.sendAllMessage("用户原创审核结果通知", extras,1800 );
+			JPushUtil.sendAllMessage("用户原创审核结果通知", extras,86400 );
 		}
         
         
@@ -902,7 +903,7 @@ public class UserController {
 			extras.put("userId", String.valueOf(findById.getSourceId()));
 			extras.put("status", "1");
 			//发送通知
-			JPushUtil.sendAllMessage("用户原创审核结果通知", extras,1800 );
+			JPushUtil.sendAllMessage("用户原创审核结果通知", extras,86400 );
 		}
 		
         

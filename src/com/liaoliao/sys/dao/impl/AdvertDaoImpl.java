@@ -97,6 +97,12 @@ public class AdvertDaoImpl extends BaseDaoImpl<Advert,Integer> implements Advert
 		return this.getListByHQL(hql);
 	}
 
+	@Override
+	public List<Advert> toOrder() {
+		String hql="from Advert where type = 1 and position = 'contentPage' and status = 1 order by sort";
+		return this.getListByHQL(hql);
+	}
+
 	
 	
 }

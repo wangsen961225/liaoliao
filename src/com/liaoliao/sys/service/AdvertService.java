@@ -35,7 +35,13 @@ public interface AdvertService {
 
 	Integer findCount();
 
-	List<Advert> findDirectInvest();
+	String findDirectInvest();
+
+	/**
+	 * 随机获取一个待指定的广告(显示在料料头条内容页的内容中)
+	 * @return
+	 */
+	String toOrder();
 
 
 

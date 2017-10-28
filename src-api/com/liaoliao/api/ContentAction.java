@@ -12,7 +12,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.jasper.tagplugins.jstl.core.ForEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +38,7 @@ import com.liaoliao.redisclient.RedisService;
 import com.liaoliao.sys.entity.OriginalProfitLog;
 import com.liaoliao.sys.entity.TaskLog;
 import com.liaoliao.sys.entity.UserTask;
+import com.liaoliao.sys.service.AdvertService;
 import com.liaoliao.sys.service.HandleCountService;
 import com.liaoliao.sys.service.OriginalProfitLogService;
 import com.liaoliao.sys.service.TaskLogService;
@@ -105,6 +105,8 @@ public class ContentAction {
 	@Autowired
 	private LikesService likesService;
 	
+	@Autowired
+	AdvertService advertService;
 	
 	private Integer page = 1;
 
@@ -493,11 +495,36 @@ public class ContentAction {
 			map.put("code", StaticKey.ReturnServerNullError);
 			return map;
 		}
-		
+		//在内容中穿插广告(在第一个p标签后穿插)
 		String cssStyle = "<style type=\"text/css\">img{width:100%;text-align:center;margin:10px 0px;}body{font-size:12px}p{margin:5px 5px;}</style>";
-		String content = cssStyle + article.getContent();
-		String addd = "?timestamp="+System.currentTimeMillis()/1000L+"&articleId="+articleId+"&random="+(int) (Math.random()*10000);
+		String content = cssStyle;
+		//获得广告
+		String toOrder = advertService.toOrder();
 		
+		String articleContent = article.getContent();
+		//遍历拼接在第一个位置加入广告
+		if(toOrder!=null&&toOrder.length()>0){
+			//以</p>切割
+			String[] split = articleContent.split("</p>");
+			StringBuffer sb = new StringBuffer();
+			sb.append(split[0]);
+			sb.append("</p>");
+			sb.append("<p>");
+			sb.append("<div>");
+			sb.append(toOrder);
+			sb.append("</div>");
+			sb.append("</p>");
+			for(int i=1;i<split.length;i++){
+				sb.append(split[i]);
+				sb.append("</p>");
+			}
+			content+=sb.toString();
+		}else{
+			content+=articleContent;
+		}
+		
+		
+		String addd = "?timestamp="+System.currentTimeMillis()/1000L+"&articleId="+articleId+"&random="+(int) (Math.random()*10000);
 //		阅读文件获取收益时间
 		int articleCoinTime = 99;
 		String articleCoinTimeStr = redisService.getConfigValue("articleCoinTime");
@@ -533,7 +560,7 @@ public class ContentAction {
 		if(article.getType()==1){
 			Users user = userService.findById(article.getSourceId());
 			user=userService.findById(luser.getId());//使用随机的虚拟用户替换官方用户
-			System.out.println("我是原创的 line 421 ContentAction.java /getContent");
+			//System.out.println("我是原创的 line 421 ContentAction.java /getContent");
 			if(user==null){
 				map.put("name", luser.getNickName());//料料头条
 				map.put("userId",luser.getId());

@@ -37,6 +37,12 @@ public interface AdvertDao {
 
 	List<Advert> findDirectInvest();
 
+	/**
+	 * 获取所有待指定广告
+	 * @return
+	 */
+	List<Advert> toOrder();
+
 
 
 

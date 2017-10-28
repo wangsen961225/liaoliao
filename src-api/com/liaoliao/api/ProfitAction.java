@@ -30,6 +30,7 @@ import com.liaoliao.content.service.ArticleService;
 import com.liaoliao.content.service.OriginalArticleInfoService;
 import com.liaoliao.content.service.OriginalVideoInfoService;
 import com.liaoliao.content.service.VideoService;
+import com.liaoliao.listener.MyContextLoader;
 import com.liaoliao.profit.entity.BindPay;
 import com.liaoliao.profit.entity.FenrunLog;
 import com.liaoliao.profit.entity.ProfitTime;
@@ -60,6 +61,7 @@ import com.liaoliao.weixinPay.Utils.RandCharsUtils;
 import com.liaoliao.weixinPay.Utils.WXSignUtils;
 import com.liaoliao.weixinPay.entity.Unifiedorder;
 import com.liaoliao.weixinPay.entity.WXPayResult;
+import com.sun.org.apache.bcel.internal.generic.INEG;
 
 @Controller
 @RequestMapping(value="/api")
@@ -382,6 +384,7 @@ public class ProfitAction {
 		//获取vip阅读倍数：
 		int userVipGetMoney = 1;
 		String userVipGetMoneyStr = redisService.getConfigValue("userVipGetMoney");
+		Integer readDouble = (Integer) MyContextLoader.getContext().getAttribute("readDouble");
 		if(StringUtils.isBlank(userVipGetMoneyStr)){
 			System.out.println("请检查SystemConfig表数据");
 		}else{
@@ -389,18 +392,26 @@ public class ProfitAction {
 		}
 //		vip
 		if(user.getVipStatus() == StaticKey.UserVipStatusTrue){
-			user.setTotalMoney(user.getTotalMoney()+coin*userVipGetMoney);
+			Integer coinMoney = coin*userVipGetMoney;
+			if(readDouble==StaticKey.readDouble){
+				coinMoney*=2;
+			}
+			user.setTotalMoney(user.getTotalMoney()+coinMoney);
 			if(user.getParent()!=null){
-				user.setDayMoney(user.getDayMoney()+coin*userVipGetMoney);
+				user.setDayMoney(user.getDayMoney()+coinMoney);
 			}
 //			更新最后使用时间
 			user.setLoginTime(new Date());
-			fenrun.setMoney(coin*userVipGetMoney);
-			map.put("coin", coin*userVipGetMoney);
+			fenrun.setMoney(coinMoney);
+			map.put("coin", coinMoney);
 //			统计每日分润料币总金额
-			handleCountService.handleCountTotalMoney("totalProfitMoney",coin*userVipGetMoney);
+			handleCountService.handleCountTotalMoney("totalProfitMoney",coinMoney);
 		}else{
 //		非vip
+			if(readDouble==StaticKey.readDouble){
+				money+=coin;
+				coin+=coin;
+			}
 			user.setTotalMoney(money);
 			if(user.getParent()!=null){
 				user.setDayMoney(user.getDayMoney()+coin);
@@ -416,6 +427,14 @@ public class ProfitAction {
 		fenrun.setContentId(contentId);
 		fenrun.setUser(user);
 		fenrun.setAddTime(new Date());
+		
+		if(readDouble==StaticKey.readDouble&&fenrun.getType()==StaticKey.FenrunArticle){
+			fenrun.setType(StaticKey.FenrunReadArticleDouble);
+		}
+		if(readDouble==StaticKey.readDouble&&fenrun.getType()==StaticKey.FenrunVideo){
+			fenrun.setType(StaticKey.FenrunReadVideoDouble);
+		}
+		
 //		更新用户、保存分润记录
 		commonService.updateUserAndSaveProfitLog(fenrun,user);
 		
@@ -1026,6 +1045,12 @@ public class ProfitAction {
 			}
 			if(fl.getType()==StaticKey.FenrunRefund){
 				item.put("info", "红包退款");
+			}
+			if(fl.getType()==StaticKey.FenrunReadArticleDouble){
+				item.put("info", "阅读文章翻倍");
+			}
+			if(fl.getType()==StaticKey.FenrunReadVideoDouble){
+				item.put("info", "观看视频翻倍");
 			}
 			item.put("money", fl.getMoney()/*+"料币"*/);
 			item.put("addTime", fl.getAddTime());

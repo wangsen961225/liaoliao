@@ -2,36 +2,29 @@
 <%@ include file="/style/public/base.jsp"%>
 <!DOCTYPE html>
 <html>
-<head>
-<%@ include file="/style/public/meta.jsp"%>
-<link href="${ctx}/style/css/form.css" rel="stylesheet">
-<title>${sys_title}</title>
-</head>
-<body>
-		
+	<head>
+		<%@ include file="/style/public/meta.jsp"%>
+		<link href="${ctx}/style/css/form.css" rel="stylesheet">
+		<title>${sys_title}</title>
+	</head>
+	<body>
 		<!-- 支出明细开始 -->
-	
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	        <h4 >料&nbsp;币&nbsp;明&nbsp;细</h4>
-	     
-	        <table class="table table-hover table-striped table-bordered">
-				<tr>
-					<th>序号</th>
-					<th>料币数</th>
-					<th>类型</th>
-					<th>操作时间</th>
-				</tr>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 >料&nbsp;币&nbsp;明&nbsp;细</h4>
+     
+        <table class="table table-hover table-striped table-bordered">
+			<tr>
+				<th>序号</th>
+				<th>料币数</th>
+				<th>类型</th>
+				<th>操作时间</th>
+			</tr>
 				<c:forEach var="lis" items="${expenditureDetailsList }" varStatus="status">
 					<tr>
 						<td>${status.count}</td> 
 						<td>${lis.money}</td>
 						<%-- <td>${lis.type}</td> --%>
 						<td>
-						
-							<%-- <c:if test="${li.type==-1 }">提现</c:if>
-							<c:if test="${lis.type==0 }">签到</c:if>
-							<c:if test="${lis.type==1 }">原创分润总结</c:if>
-							<c:if test="${lis.type==4 }">新用户红包</c:if> --%>
 							<c:if test="${lis.type==0 }">文章</c:if>
 							<c:if test="${lis.type==1 }">视频</c:if>
 							<c:if test="${lis.type==2 }">提现</c:if>
@@ -51,17 +44,15 @@
 							<c:if test="${lis.type==16 }">土豪世界发红包</c:if>
 							<c:if test="${lis.type==17 }">查看用户详情(约她)</c:if>
 							<c:if test="${lis.type==18 }">退款</c:if>
+							<c:if test="${lis.type==19 }">阅读翻倍</c:if>
 						</td>
 						<td><fmt:formatDate value="${lis.addTime}" type="both"/></td>
 					</tr>
 				</c:forEach>
-				</table>
-			<div style="text-align:center;"><h3>~完~</h3></div>
-		
-		<!-- 支出明细结束 -->
-	
-		<%@ include file="/style/public/footPage.jsp"%>
-	
+			</table>
+		<div style="text-align:center;"><h3>~完~</h3></div>
+	<!-- 支出明细结束 -->
+	<%@ include file="/style/public/footPage.jsp"%>
 </body>
 
 </html>

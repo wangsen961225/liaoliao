@@ -1,9 +1,13 @@
 package com.liaoliao.sys.controller;
 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.quartz.CronScheduleBuilder;
@@ -20,7 +24,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.liaoliao.listener.MyContextLoader;
 import com.liaoliao.quartz.ScheduleJob;
+import com.liaoliao.util.JPushUtil;
+import com.liaoliao.util.StaticKey;
+import com.liaoliao.util.TimeKit;
 
 
 
@@ -97,7 +105,17 @@ public class QuartzController {
 	                }*/
 	        } catch (SchedulerException e) {  
 	            e.printStackTrace();  
-	        }  
+	        } 
+	        if("阅读翻倍".equals(jobName)){
+	        	Map<String, String> extras = new HashMap<String,String>();
+				//状态,用户id
+				
+				extras.put("type", StaticKey.JPushSendOpenReadDouble);
+				extras.put("beginTime", MyContextLoader.getContext().getAttribute("beginReadDoubleTime").toString());
+				extras.put("closeTime", MyContextLoader.getContext().getAttribute("closeReadDoubleTime").toString());
+				//发送通知
+				JPushUtil.sendAllMessage("开启阅读翻倍", extras,86400 );
+	        }
 	        return map;
 	    }  
 	    
@@ -119,7 +137,21 @@ public class QuartzController {
 	        } catch (SchedulerException e) {  
 	            e.printStackTrace();  
 	        }
+	        if("阅读翻倍".equals(jobName)){
+	        	MyContextLoader.getContext().setAttribute("readDouble", StaticKey.readNotDouble);
+	        }
 	        System.out.println("任务="+jobName+"=已结束");
+	        
+	        if("阅读翻倍".equals(jobName)){
+	        	Map<String, String> extras = new HashMap<String,String>();
+				//状态,用户id
+				
+				extras.put("type", StaticKey.JPushSendCloseReadDouble);
+				extras.put("beginTime", MyContextLoader.getContext().getAttribute("beginReadDoubleTime").toString());
+				extras.put("closeTime", new SimpleDateFormat("yyyy-MM-dd").format(new Date()).toString());
+				//发送通知
+				JPushUtil.sendAllMessage("关闭阅读翻倍", extras,86400 );
+	        }
 	        map.put("msg", "关闭成功!");
 	        return map;
 	    }  
@@ -198,6 +230,9 @@ public class QuartzController {
             TriggerKey triggerVIPLogin = TriggerKey.triggerKey("霸屏", jobGroup); 
             CronTrigger VIPLogin = (CronTrigger) scheduler.getTrigger(triggerVIPLogin);
             
+            TriggerKey triggerReadDouble = TriggerKey.triggerKey("阅读翻倍", jobGroup); 
+            CronTrigger readDouble = (CronTrigger) scheduler.getTrigger(triggerReadDouble);
+            
             if(Article==null){
             	map.put("article", 0);//未开启
             }else{
@@ -218,10 +253,23 @@ public class QuartzController {
 			}else{
 				map.put("VIPLogin", 1);//已开启
 			}
-			
+			if(readDouble==null){
+				map.put("readDouble", 0);//未开启
+			}else{
+				map.put("readDouble", 1);//已开启
+			}
             return map;
 	    }
-
 	    
+	    
+	    @RequestMapping("/setReadDoubleTime") 
+	    public String setReadDoubleTime(HttpServletRequest request,String beginReadDoubleTime,String closeReadDoubleTime) throws ParseException{
+	    	ServletContext context = MyContextLoader.getContext();
+	    	context.setAttribute("beginReadDoubleTime", beginReadDoubleTime);
+	    	context.setAttribute("closeReadDoubleTime",closeReadDoubleTime);
+	    	context.setAttribute("readDouble", 0);//0:不翻倍 1:翻倍
+	    	
+			return "quartzManager/quartz";  
+	    }
 }
 

@@ -114,7 +114,6 @@ public class AdminController {
 	    		session.setAttribute("adminUser", adminUser);
 	    		session.setAttribute("token", token);
 	    		List<Permission> pList=permissionService.findByGroupId(adminUser.getAdminGroup().getId());
-//	    		request.setAttribute("list", pList);
 	    		session.setAttribute("list", pList);
 	    		return "redirect:/sys/theHome";
 	        }
@@ -129,7 +128,6 @@ public class AdminController {
 	        try {
 	            currentUser.login(token);
 	        }catch(Exception e){
-//	        	e.printStackTrace();
 	        	System.out.println("用户名或密码不正确");
 	            request.setAttribute("message_login", "用户名或密码不正确");
 	            return InternalResourceViewResolver.FORWARD_URL_PREFIX +"/sys/toLogin";
@@ -148,12 +146,10 @@ public class AdminController {
 	    		}else{
 	    			adminUser=nowAu;
 	    		}
-//	    		request.setAttribute("adminUser", adminUser);
 	    		HttpSession session = request.getSession();
 	    		session.setAttribute("adminUser", adminUser);
 	    		session.setAttribute("token", token);
 	    		List<Permission> pList=permissionService.findByGroupId(adminUser.getAdminGroup().getId());
-//	    		request.setAttribute("list", pList);	
 	    		session.setAttribute("list", pList);
 	    		System.out.println("用户[" + adminUser.getUserName() + "]已登录  "+TimeKit.dateToStr(new Date()));
 	    		return "redirect:/sys/theHome";

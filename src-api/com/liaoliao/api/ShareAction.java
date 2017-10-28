@@ -154,11 +154,13 @@ public class ShareAction {
 		String topAdvert = advertService.findArticleTopAdvert();
 		String topFloatAdvert = advertService.findArticleTopFloatAdvert();
 		String bottomAdvert = advertService.findArticleBottomAdvert();
+		String directInvest = advertService.findDirectInvest();
 		map.put("topAdvert", topAdvert);
 		map.put("topFloatAdvert", topFloatAdvert);
 		map.put("bottomAdvert", bottomAdvert);
 		map.put("content", content);
 		map.put("title", article.getTitle());
+		map.put("directInvest",directInvest );
 		Users luser = userService.findById(StaticKey.liaoliaoArticleId);
 		if(article.getType()==1){
 			Users user = userService.findById(article.getSourceId());
@@ -530,8 +532,6 @@ public class ShareAction {
 			}
 			datas.add(item);
 		}
-		
-		
 		
 //		更多推荐结束
 		

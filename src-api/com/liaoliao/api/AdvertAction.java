@@ -92,11 +92,7 @@ public class AdvertAction {
 	@RequestMapping(value="/directInvest")
 	public String getDirectInvest(HttpServletRequest request) {
 		Map<String,Object> map=new HashMap<String,Object>();
-		List<Advert> directInvest = advertService.findDirectInvest();
-		int random = (int)Math.floor(Math.random()*directInvest.size());
-		StringBuilder advertStr = new StringBuilder();
-		advertStr.append(directInvest.get(random).getContent());
-		String directInvestStr = advertStr.toString();
+		String directInvestStr = advertService.findDirectInvest();
 		map.put("directInvest", directInvestStr);
 		request.setAttribute("map", map);
 		return "share/directInvest";
@@ -382,7 +378,18 @@ public class AdvertAction {
 		return map;
 	}
 	
-	
+/**
+	 * 内容页内容中穿插待指定广告(随机获取一个未被禁用的待指定广告)：
+	 * @return
+	 *//*
+	@RequestMapping(value="/toOrder")
+	public String toOrder(HttpServletRequest request) {
+		Map<String,Object> map=new HashMap<String,Object>();
+		String directInvestStr = advertService.toOrder();
+		map.put("directInvest", directInvestStr);
+		request.setAttribute("map", map);
+		return "share/directInvest";
+	}*/
 }
 
 

@@ -71,5 +71,4 @@
     </bean> -->
     
     <bean id="SpringApplicationContext" class="com.liaoliao.util.ApplicationContextHelper"></bean>
-    <!-- <bean id="mySessionListener" class="com.liaoliao.listener.MySessionListener"></bean> -->
 </beans>

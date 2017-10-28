@@ -25,64 +25,46 @@
 <input class="btn btn-info" type="button" id="closeVipLogin" onclick="removeQuartz('霸屏')" value="关闭会员霸屏"/>   <hr/>
 
 
-
-
-
-
-
-
-
-
-
-<form name="myForm" class="form-inline" method="post" action="${ctx}/sys0000/handleCountList">
-<div class="form-group">
-<label for="dtp_input2" class="control-label">开始时间设定:</label>
- <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
-<input name="datTimeStr" id="datTimeStr" class="form-control" size="16" type="text" value="${time}" readonly>
-<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+<form name="myForm" class="form-inline" method="post" action="${ctx}/sys/setReadDoubleTime">
+			<div class="form-group">
+                <label for="dtp_input2" class="control-label">设置开始日期</label>
+                <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
+                    <input name="beginReadDoubleTime" id="beginReadDoubleTime" class="form-control" size="16" type="text" value="${beginReadDoubleTime}" readonly>
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+					<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="dtp_input2" class="control-label">设置结束日期</label>
+                <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
+                    <input name="closeReadDoubleTime" id="closeReadDoubleTime" class="form-control" size="16" type="text" value="${closeReadDoubleTime}" onblur="compareTime()" readonly>
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+					<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                </div>
+            </div>
+			<button class="btn btn-info" type="button" id="submitTime" onclick="javascript:submitForm()" >提交设置时间</button><br/><br/><br/>
+		</form>
+		<script>
+			function submitForm(){
+				myForm.submit();
+				removeQuartz('阅读翻倍');
+			}
+		</script>
+		<!-- <script>
+			function compareTime(){
+				$("#beginReadDoubleTime").val();
+				$("#closeReadDoubleTime").val();
+				if($("#beginReadDoubleTime").val()>$("#closeReadDoubleTime").val()){
+					$("#submitTime").attr("disabled",true);
+				}else{
+					$("#submitTime").attr("disabled",false);
+				}
+			}
+		</script> -->
+<input class="btn btn-info" type="button" id="openReadDouble" onclick="startQuartz('阅读翻倍')" value="开启阅读翻倍"/>
+<input class="btn btn-info" type="button" id="closeReadDoble" onclick="removeQuartz('阅读翻倍')" value="关闭阅读翻倍"/><hr/>
 </div>
-</div>
-</form>
-<br/>
-<form name="myForm" class="form-inline" method="post" action="${ctx}/sys/">
-<div class="form-group">
-<label for="dtp_input2" class="control-label">结束时间设定:</label>
- <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
-<input name="datTimeStr" id="datTimeStr" class="form-control" size="16" type="text" value="${time}" readonly>
-<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-</div>
-</div>
-</form><br/>
-
-<input class="btn btn-info" type="button" id="openDouble" onclick="" value="开启阅读翻倍"/>
-<input class="btn btn-info" type="button" id="closeDouble" onclick="" value="关闭阅读翻倍"/>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- <hr/>
-
-
-
-
-
-</div>
-
-
-
-
 </body>
 <script type="text/javascript">
 
@@ -118,6 +100,15 @@ $(document).ready(function(){
 			if(data.timer==1){
 				$("#timer").attr("disabled",true);
 			}
+			if(data.readDouble==0){
+				$("#openReadDouble").attr("disabled",false);
+				$("#closeReadDoble").attr("disabled",true);
+			}
+			if(data.readDouble==1){
+				$("#openReadDouble").attr("disabled",true);
+				$("#closeReadDoble").attr("disabled",false);
+			}
+			
 		}
 	})
 })
@@ -128,7 +119,10 @@ function startQuartz(data){
 		  time = "0 0/10 * * * ?";
 	}
 	if(data=="霸屏"){
-		  time = "0 0/15 * * * ?";
+		time = "0 0/15 * * * ?";
+	}
+	if(data=="阅读翻倍"){
+		time = "0 0/1 * * * ?";
 	}
 	$.ajax({
 		type:"GET",
@@ -151,5 +145,40 @@ function removeQuartz(data){
 	});
 }
 
+</script>
+<script type="text/javascript" src="${ctx}/style/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript" src="${ctx}/style/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+<script type="text/javascript">
+    $('.form_datetime').datetimepicker({
+        //language:  'fr',
+        weekStart: 1,
+        todayBtn:  1,
+		autoclose: 1,
+		todayHighlight: 1,
+		startView: 2,
+		forceParse: 0,
+        showMeridian: 1
+    });
+	$('.form_date').datetimepicker({
+        language:  'zh-CN',
+        weekStart: 1,
+        todayBtn:  1,
+		autoclose: 1,
+		todayHighlight: 1,
+		startView: 2,
+		minView: 2,
+		forceParse: 0
+    });
+	$('.form_time').datetimepicker({
+        language:  'zh-CN',
+        weekStart: 1,
+        todayBtn:  1,
+		autoclose: 1,
+		todayHighlight: 1,
+		startView: 1,
+		minView: 0,
+		maxView: 1,
+		forceParse: 0
+    });
 </script>
 </html>

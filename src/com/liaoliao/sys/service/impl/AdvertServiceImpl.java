@@ -131,14 +131,25 @@ public class AdvertServiceImpl implements AdvertService {
 	}
 
 	@Override
-	public List<Advert> findDirectInvest() {
+	public String findDirectInvest() {
 		List<Advert> list = advertDao.findDirectInvest();
-		/*StringBuilder advertStr = new StringBuilder();
-		for (int i = 0; i < list.size(); i++) {
-			advertStr.append(list.get(i).getContent());
-		}
-		return advertStr.toString();*/
-		return list;
+		
+		int random = (int)Math.floor(Math.random()*list.size());
+		StringBuilder advertStr = new StringBuilder();
+		advertStr.append(list.get(random).getContent());
+		String directInvestStr = advertStr.toString();
+		return directInvestStr;
+	}
+
+	@Override
+	public String toOrder() {
+		List<Advert> list = advertDao.toOrder();
+		
+		int random = (int)Math.floor(Math.random()*list.size());
+		StringBuilder advertStr = new StringBuilder();
+		advertStr.append(list.get(random).getContent());
+		String toOrderStr = advertStr.toString();
+		return toOrderStr;
 	}
 
 

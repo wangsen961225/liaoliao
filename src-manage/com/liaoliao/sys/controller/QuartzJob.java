@@ -1,6 +1,7 @@
 package com.liaoliao.sys.controller;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,9 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tomcat.util.descriptor.web.ContextTransaction;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -30,6 +33,7 @@ import com.liaoliao.content.entity.Video;
 import com.liaoliao.content.service.ArticleService;
 import com.liaoliao.content.service.ContentKindService;
 import com.liaoliao.content.service.VideoService;
+import com.liaoliao.listener.MyContextLoader;
 import com.liaoliao.quartz.ScheduleJob;
 import com.liaoliao.redisclient.RedisService;
 import com.liaoliao.sys.service.HandleCountService;
@@ -75,6 +79,7 @@ public class QuartzJob implements Job {
         if("霸屏".equals(name)){
         	unrealVipLogin();
         }
+       
 		if("抓取视频".equals(name)){
 			/*内涵段子*/
 			startneihanVideo();
@@ -110,6 +115,32 @@ public class QuartzJob implements Job {
 			}
 			/*趣头条*/
 			startQuTouTiaoArticle();
+		}
+		 if("阅读翻倍".equals(name)){
+			 try {
+				readDouble();
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+	        }
+	}
+	
+	/**
+	 * 阅读翻倍:
+	 * @throws ParseException 
+	 */
+	private void readDouble() throws ParseException {
+		ServletContext context = MyContextLoader.getContext();
+		String beginReadDoubleTime = (String) context.getAttribute("beginReadDoubleTime");
+		String closeReadDoubleTime = (String) context.getAttribute("closeReadDoubleTime");
+		long begin = TimeKit.StrToDate(beginReadDoubleTime).getTime();
+    	long close = TimeKit.StrToDate(closeReadDoubleTime).getTime();
+    	
+		long currentTimeMillis = System.currentTimeMillis();
+		if(currentTimeMillis>=begin&&currentTimeMillis<close){
+			context.setAttribute("readDouble", StaticKey.readDouble);
+		}else{
+			context.setAttribute("readDouble", StaticKey.readNotDouble);
 		}
 	}
 	/**

@@ -15,9 +15,14 @@
 	</welcome-file-list>
 	
 	<!-- 解决获取手机验证码和找回密码,注册的session不一致问题 -->
-	<!-- <listener>
+	<listener>
 		<listener-class>com.liaoliao.listener.MySessionListener</listener-class>
-	</listener> -->
+	</listener>
+	
+	<!-- 在任何类中都可以获取到ServletContext -->
+	<listener>
+		<listener-class>com.liaoliao.listener.MyContextLoaderListener</listener-class>
+	</listener>
 	
 	<!-- 异常处理 -->
 	<error-page>

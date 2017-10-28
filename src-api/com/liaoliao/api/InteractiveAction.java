@@ -266,7 +266,6 @@ public class InteractiveAction {
 	@ResponseBody
 	@RequestMapping(value="/sendReadPackage")
 	public Map<String,Object> sendReadPackage(HttpServletRequest request,Integer userId,Integer money,Integer number){
-		System.out.println(userId);
 		Map<String,Object> map = new HashMap<>();
 		if(userId==null||"".equals(userId)||money==null||"".equals(money)||number==null||"".equals(number)){
 			map.put("msg", "有参数为空!");
@@ -290,10 +289,6 @@ public class InteractiveAction {
 			return map;
 		}
 		
-		//如果是系统红包,发送通知
-		if(user.getId()==10029){
-		JPushUtil.sendAllsetNotification("通知: 天降红包~~ 金额:"+money+"~ 剩余数量:"+number);
-		}
 		
 		
 		
@@ -312,12 +307,22 @@ public class InteractiveAction {
 		}else
 		list = RandomKit.randomRedPackage(money, number);
 		StaticKey.redPackagelist=list;
-		Map<String, String> extras = new HashMap<String, String>();
-		// 添加附加信息
-		extras.put("type", StaticKey.JPushSendRedPackage);
-		extras.put("userId", String.valueOf(userId));
-		int time = 100;//红包推送生存时间(S)
-		JPushUtil.sendAllMessage(user.getNickName(),extras,time);
+		
+		//如果是系统红包,发送通知
+		if(user.getId()==StaticKey.SystemRedpackage){
+			Map<String, String> extras = new HashMap<String,String>();
+			extras.put("type",StaticKey.JPushSendOfficialUserSendRedpackage.toString() );
+			extras.put("userId", StaticKey.SystemRedpackage.toString());
+		JPushUtil.sendAllsetNotification("通知: 天降红包~~ 金额:"+money+"~ 剩余数量:"+number,extras);
+		}else{
+			Map<String, String> extras = new HashMap<String, String>();
+			// 添加附加信息
+			extras.put("type", StaticKey.JPushSendRedPackage);
+			extras.put("userId", String.valueOf(userId));
+			int time = 100;//红包推送生存时间(S)
+			JPushUtil.sendAllMessage(user.getNickName(),extras,time);
+		}
+		
 		int maxMoney=0;
 		for(int i=0;i<list.size();i++){
 			maxMoney=maxMoney>list.get(i)?maxMoney:list.get(i);
