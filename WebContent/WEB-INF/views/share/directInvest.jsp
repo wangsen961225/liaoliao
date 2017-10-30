@@ -14,8 +14,5 @@
 </head>
 <body>
 	${map.directInvest} 
-	
-	
-	
 </body>
 </html>

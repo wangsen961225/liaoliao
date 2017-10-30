@@ -158,7 +158,14 @@ public class AccountAction {
 	@ResponseBody
 	public Map<String,Object> register(HttpServletRequest request,String mobile,String passWord,String authCode){
 		Map<String,Object> map=new HashMap<String,Object>();
-		HttpSession session = request.getSession();
+//		HttpSession session = request.getSession();
+		String sessionId = request.getHeader("sessionId");
+		HttpSession session = MySessionContext.getSession(sessionId);
+		if(session==null){
+			map.put("msg", "session失效,请重新获取验证码");
+			map.put("code", StaticKey.ReturnClientNullError);
+			return map;
+		}
 		if(mobile==null||"".equals(mobile)||StringUtils.isBlank(passWord)||StringUtils.isBlank(authCode)){
 			map.put("msg", "有属性值为空!");
 			map.put("code", StaticKey.ReturnClientNullError);
@@ -283,18 +290,17 @@ public class AccountAction {
 	@ResponseBody
 	public Map<String,Object> findLossPass(HttpServletRequest request,String mobile,String authCode,String newPassWord){
 		Map<String,Object> map=new HashMap<String,Object>();
+		
 //		HttpSession session = request.getSession();
-//		String sessionId = request.getParameter("sessionId");
+//		String sessionId = request.getParameter("sessionId");//放到请求头,使用getHeader()
+		
 		String sessionId = request.getHeader("sessionId");
-		System.out.println(sessionId +"sessionId");
 		HttpSession session = MySessionContext.getSession(sessionId);
 		if(sessionId==null&&session==null&&"".equals(sessionId)){
 			map.put("code", StaticKey.ReturnSessionInvalid);
 			map.put("msg", "session失效");
 			return map;
 		}
-		System.out.println(session.isNew()+"zhaohui新建的");
-		System.out.println(session.getId());
 		
 		if(StringUtils.isBlank(mobile)||StringUtils.isBlank(authCode)||StringUtils.isBlank(newPassWord)){
 			map.put("msg", "有属性值为空!");
@@ -342,20 +348,18 @@ public class AccountAction {
 	@ResponseBody
 	public Map<String,Object> messageAuthCode(HttpServletRequest request,String mobile){
 		Map<String,Object> map=new HashMap<String,Object>();
-		Users user = userService.findByMobile(mobile);
-	/*	if(user!=null){
+		
+		/*	Users user = userService.findByMobile(mobile);
+		if(user!=null){
 			map.put("message", "用户已存在");
 			map.put("code", StaticKey.ReturnUserAccountExist);
 			return map;
 		}*/
 		
 		HttpSession session = request.getSession();
-		System.out.println(session.isNew()+"验证码新建的");
-		System.out.println(session.getId());
 		String messageCode = RandomKit.messageCode();
 		String messageContent = "亲爱的，您的验证码是:"+messageCode+"。有效期为15分钟，料料君在等你哦~"+"【料料】";
 		session.setAttribute("mobile", mobile);
-		System.out.println(mobile);
 		session.setAttribute("authCode", messageCode);
 //		调用282930短信接口，发送短信
 		Boolean returnStatus = MessageKit.sendMessage(messageContent, mobile);

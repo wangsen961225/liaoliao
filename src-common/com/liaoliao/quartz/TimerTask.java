@@ -170,13 +170,11 @@ public class TimerTask {
 		List<RedPackage> list = redPackageService.findUnDeal();
 		
 		Date date =null;
-		System.err.println("调用退红包方法次数"+"+1   时间:"+new Date().getTime() );
 		for(RedPackage rp:list){
-			date = new Date(new Date().getTime()-1*60*100);//一分钟之前的数据
-//			date = new Date(new Date().getTime()-24*60*60*1000);//24小时之前的数据24*60*60*1000
+//			date = new Date(new Date().getTime()-1*60*100);//一分钟之前的数据
+			date = new Date(new Date().getTime()-24*60*60*1000);//24小时之前的数据24*60*60*1000
 			if(rp.getAddTime().getTime()<= date.getTime()){
 				if(rp.getBalance()>0){
-//					System.out.println("红包退回："+rp.getBalance());
 					FenrunLog fenl = new FenrunLog();
 					fenl.setAddTime(new Date());
 					fenl.setContentId(rp.getId());
