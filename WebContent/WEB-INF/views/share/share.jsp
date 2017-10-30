@@ -55,6 +55,7 @@ $(function () {
 <!-- top广告位 -->
 ${map.topAdvert}
 
+<!-- 直投广告 -->
 ${map.directInvest}
 	
 	
@@ -72,7 +73,7 @@ ${map.directInvest}
 <input type="text" value="${map.userId}" hidden="hidden" > 
 </div>
 </c:if>
-<c:if test="${map.type==2}">
+<%-- <c:if test="${map.type==2}">
 <div style="height:40px;width:100%;color:red;margin-top: -24px;padding-bottom: 10px;">
 <table style="width:100%">
 <tr>
@@ -82,7 +83,7 @@ ${map.directInvest}
 </tr>
 </table>
 </div>
-</c:if>
+</c:if> --%>
 
 
 <!-- 文章 -->
