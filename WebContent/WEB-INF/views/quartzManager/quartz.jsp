@@ -24,6 +24,7 @@
 <input class="btn btn-info" type="button" id="openVipLogin" onclick="startQuartz('霸屏')" value="开启会员霸屏"/>
 <input class="btn btn-info" type="button" id="closeVipLogin" onclick="removeQuartz('霸屏')" value="关闭会员霸屏"/>   <hr/>
 
+	
 
 <form name="myForm" class="form-inline" method="post" action="${ctx}/sys/setReadDoubleTime">
 			<div class="form-group">
@@ -48,7 +49,7 @@
 		<script>
 			function submitForm(){
 				myForm.submit();
-				removeQuartz('阅读翻倍');
+				//removeQuartz('阅读翻倍');
 			}
 		</script>
 		<!-- <script>

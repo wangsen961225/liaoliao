@@ -980,7 +980,7 @@ public class ContentAction {
 		Map<String,Object> map=new HashMap<String,Object>();
 		
 		//判断用户是否领取任务
-		if(1==getTask){
+		if(1!=getTask){
 			map.put("msg", "该用户未领取任务");
 			map.put("code", StaticKey.NotReceiveTask);
 		}
@@ -1038,6 +1038,7 @@ public class ContentAction {
 						fl.setType(StaticKey.FenrunOriginalArticle);
 						fl.setUser(originalUser);
 						fenrunLogService.saveFenrunLog(fl);*/
+						
 						handleCountService.handleCountTotalMoney("totalProfitMoney", money);
 					}
 				}
@@ -1101,7 +1102,7 @@ public class ContentAction {
 		}
 		
 		//如果已经登录，并且转发文章，并且已经领取任务，那么就是完成了任务
-		if(userId!=null&&!("".equals(userId))){
+		if(userId!=null&&!("".equals(userId))&&getTask!=0&&getTask!=null){
 			if(!redisService.getValidate(request,userId)){
 				map.put("msg", "token失效或错误");
 				map.put("code", StaticKey.ReturnClientTokenError);

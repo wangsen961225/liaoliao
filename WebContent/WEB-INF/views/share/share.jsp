@@ -52,11 +52,19 @@ $(function () {
 <div style="border-bottom: 1px solid #e7e7eb;"></div>
 <%-- <jsp:include page="/share/111.jsp" flush="true" /> --%>
 
-<!-- top广告位 -->
-${map.topAdvert}
+
 
 <!-- 直投广告 -->
 ${map.directInvest}
+
+<!-- top广告位 -->
+${map.topAdvert}
+
+<!-- top广告位 -->
+${map.topAdvert}
+<!-- top广告位 -->
+${map.topAdvert}
+
 	
 	
 <%-- ${map.topFloatAdvert} --%>

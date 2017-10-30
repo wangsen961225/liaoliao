@@ -962,9 +962,15 @@ public class ShareAction {
 		}
 	}
 	
-	
-	
-	
-	
+	@RequestMapping(value="/shareRedpackage")
+	public Map<String, Object> shareRedpackage(HttpServletRequest request) {
+		Map<String , Object> map = new HashMap<String,Object>();
+		AppVersion av = appVersionService.findMaxVersion();
+		map.put("downloadUrl", av.getDownloadUrl());
+		map.put("msg", "success");
+		map.put("code", StaticKey.ReturnServerTrue);
+		request.setAttribute("map", map);
+		return map;
+	}
 	
 }

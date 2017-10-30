@@ -8,23 +8,25 @@
 <meta http-equiv="Cache-Control" content="no-store"/>
 <meta http-equiv="Pragma" content="no-cache"/>
 <style>
+html{
+	width:100%;
+	height:auto;
+	 margin: 0px 0px 0px 0px;	
+}
 body{
-      margin: 0px;
-	}	
-
-	img{width:100%;text-align:center;margin:0px 0px;}
- body{font-size:15px}
-p{margin:0px 0px;}
-div{width:100%}
+	  width:100%;
+	  height:auto;
+      margin: 0px 0px 0px 0px;	   
+	}
+	img{width:110%;text-align:center;margin:0px 0px 0px 0px;}
+	div{
+		width:100%;
+	  height:auto;
+      margin: 0px 0px 0px 0px;	
+	}
 </style>
 </head>
 <body>
-${map.signAdvert}
-<!-- <style type="text/css">
-img{width:100%;text-align:center;/* margin:10px 0px; */}
-/* body{font-size:15px}
-p{margin:5px 5px;} */
-div{width:100%}
-</style> -->
+ ${map.signAdvert}
 </body>
 </html>
