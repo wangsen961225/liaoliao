@@ -962,15 +962,40 @@ public class ShareAction {
 		}
 	}
 	
+	
+	
+	@ResponseBody
 	@RequestMapping(value="/shareRedpackage")
-	public Map<String, Object> shareRedpackage(HttpServletRequest request) {
+	public Map<String, Object> shareRedpackage(HttpServletRequest request,Integer money) {
 		Map<String , Object> map = new HashMap<String,Object>();
-		AppVersion av = appVersionService.findMaxVersion();
-		map.put("downloadUrl", av.getDownloadUrl());
+		if(money==null){
+			money=50;
+		}
+		map.put("shareUrl", "share/shareRedpackageInfo?money="+money);
+		map.put("msg", "success");
+		map.put("code", StaticKey.ReturnServerTrue);
+		return map;
+	}
+	
+	
+	
+	
+
+	@RequestMapping(value="/shareRedpackageInfo")
+	public String shareRedpackageInfo(HttpServletRequest request,Integer money) {
+		Map<String , Object> map = new HashMap<String,Object>();
+		if(money==null){
+			money=50;
+		}
+		
+//		AppVersion av = appVersionService.findMaxVersion();
+//		map.put("downloadUrl", av.getDownloadUrl());
+		map.put("downloadUrl", StaticKey.YingyongbaoDownload);
+		map.put("money", money);
 		map.put("msg", "success");
 		map.put("code", StaticKey.ReturnServerTrue);
 		request.setAttribute("map", map);
-		return map;
+		return "share/shareRedpackage";
 	}
 	
 }

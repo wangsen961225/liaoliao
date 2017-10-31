@@ -409,4 +409,10 @@ public abstract class StaticKey {
 	 * @return 10029
 	 */
 	public static final Integer SystemRedpackage=10029;
+	
+	/**
+	 * 應用寶料料下載地址
+	 */
+	public static final String YingyongbaoDownload="http://sj.qq.com/myapp/detail.htm?apkName=com.sjcm.liaoliao";
+	
 }
