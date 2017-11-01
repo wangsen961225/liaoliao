@@ -309,11 +309,11 @@ public class InteractiveAction {
 		StaticKey.redPackagelist=list;
 		
 		//如果是系统红包,发送通知
-		if(user.getId()==StaticKey.SystemRedpackage){
+		if(StaticKey.SystemRedpackage.equals(user.getId())){ 
 			Map<String, String> extras = new HashMap<String,String>();
 			extras.put("type",StaticKey.JPushSendOfficialUserSendRedpackage.toString() );
 			extras.put("userId", StaticKey.SystemRedpackage.toString());
-		JPushUtil.sendAllsetNotification("通知: 天降红包~~ 金额:"+money+"~ 剩余数量:"+number,extras);
+			JPushUtil.sendAllsetNotification("通知: 天降红包~~ 金额:"+money+"~ 剩余数量:"+number,extras);
 		}else{
 			Map<String, String> extras = new HashMap<String, String>();
 			// 添加附加信息

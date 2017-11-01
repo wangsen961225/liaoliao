@@ -145,12 +145,16 @@ public class AdvertServiceImpl implements AdvertService {
 	public String toOrder() {
 		List<Advert> list = advertDao.toOrder();
 		
-		int random = (int)Math.floor(Math.random()*list.size());
-		StringBuilder advertStr = new StringBuilder();
-		advertStr.append(list.get(random).getContent());
-		String toOrderStr = advertStr.toString();
-		return toOrderStr;
+		if(list!=null&&list.size()!=0){
+			int random = (int)Math.floor(Math.random()*list.size());
+			System.out.println(list.size());
+			StringBuilder advertStr = new StringBuilder();
+			advertStr.append(list.get(random).getContent());
+			String toOrderStr = advertStr.toString();
+			return toOrderStr;
+		}else{
+			return null;
+		}
 	}
-
 
 }

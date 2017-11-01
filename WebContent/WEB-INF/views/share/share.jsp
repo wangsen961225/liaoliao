@@ -155,7 +155,7 @@ p{margin:5px 5px;}
 <!-- 更多推荐开始 -->
 
 <!-- <div style="padding-bottom:2px;width:100%;text-align:center;margin:auto;border-style:none none dashed none"></div> -->
-<div style="width:100%;text-align:center;color:red;background-color:#F0f0f0;">----料料引擎为您精心推荐----<br/><br/></div>
+<div style="width:100%;text-align:center;color:red;background-color:#F0f0f0;">----料料引擎为您精心推荐----<br/></div>
 <div>
 <!-- baidu guanggao  -->
 <c:forEach var="li" items="${map.list}">
