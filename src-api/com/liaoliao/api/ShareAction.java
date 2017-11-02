@@ -196,8 +196,9 @@ public class ShareAction {
 			map.put("name", luser.getNickName());
 			map.put("avatar", luser.getAvatar());
 		}
-		AppVersion av = appVersionService.findMaxVersion();
-		map.put("downloadUrl", av.getDownloadUrl());
+//		AppVersion av = appVersionService.findMaxVersion();
+//		map.put("downloadUrl", av.getDownloadUrl());
+		map.put("downloadUrl", StaticKey.YingyongbaoDownload);
 		
 //		更多推荐开始
 		Video videoMore = null;

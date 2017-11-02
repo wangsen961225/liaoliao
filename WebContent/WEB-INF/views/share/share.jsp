@@ -11,123 +11,35 @@
 <meta http-equiv="Expires" content="0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0, maximum-scale=1">
 
-<%-- <meta itemprop="name" content="${map.title}"/>
-<c:if test="${map.type==1}">
-<meta itemprop="image" content="${map.articleImgUrl}" />
-</c:if>
-<c:if test="${map.type==2}">
-<meta itemprop="image" content="${map.videoAva}" />
-</c:if>
-<meta name="description" itemprop="description" content="${map.title}" /> --%>
 
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/style/images/favicon.png" type="image/x-icon" />
-<%-- <link rel="icon" href="${pageContext.request.contextPath}/style/images/favicon.png" type="image/x-icon" />
-<link rel="bookmark" href="${pageContext.request.contextPath}/style/images/favicon.png" type="image/x-icon" /> --%>
+
 <script type="text/javascript" src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-<!-- <script>
-$(function () {
-    var ua = '${map.ua}';
-    var idStr = '${map.idStr}';
-    var type = ${map.type};
-    if(type==1){
-    	var typeStr = 'article/';
-    }
-    if(type==2){
-    	var typeStr = 'video/';
-    }
-    if (ua=='ios') {
-        window.location.href = 'https://app.127120.com:8443/share/'+typeStr+idStr;
-    }
-});
-</script> -->
+
 <title>${map.title}-料料</title>
 </head>
 <body>
-<%-- <center><p style="border-bottom: 1px solid #e7e7eb;padding-bottom: 2px;">料料 - 你的生活中应该有料<p></center> --%>
-<!-- <marquee behavior=alternate direction=left align=middle style="font-size:15px;width:100%;border-bottom: 1px solid #e7e7eb;padding-bottom: 2px;">料料 - 你的生活中应该有料~</marquee> -->
-
-<!-- 标题 -->
-<%-- <h2 style="border-bottom: 1px solid #e7e7eb;padding-bottom: 10px;font-weight:normal;font-size：1.5em;margin-top:5px;">${map.title}</h2> --%>
-<p style="padding: -1px;font-weight:normal;font-size:1.3em;margin-top:-9px;margin-bottom:0px;margin-left:-10px;margin-right:-20px;background-color:#ef4520;color:white;white-space:nowrap;word-wrap:break-word;word-break:break-all;" >${map.title}</p>
-<div style="border-bottom: 1px solid #e7e7eb;"></div>
-<%-- <jsp:include page="/share/111.jsp" flush="true" /> --%>
 
 
-
-<!-- 直投广告 -->
-${map.directInvest}
-
-<!-- top广告位 -->
-${map.topAdvert}
-
-<!-- top广告位 -->
-${map.topAdvert}
-<!-- top广告位 -->
-${map.topAdvert}
-
-	
-	
-<%-- ${map.topFloatAdvert} --%>
-
-<c:if test="${map.type==1}">
-<div style="height:40px;width:100%;color:red;margin-top: -24px;padding-bottom: 10px;">
-<table style="width:100%">
-<%-- <tr>
-<td style="width:3%;height:38px"><img style="height:100%;width:100%;" src="${map.avatar}"></td>
-<td style="width:16%;height:38px">${map.name }<br/>人气：${map.focusNum}</td>
-<td style="width:3%;height:38px"><button type="button"><a  style="text-decoration:none;color:red" href="${map.downloadUrl}" >+ 关注</a></button></td>
-</tr> --%>
-</table>
-<input type="text" value="${map.userId}" hidden="hidden" > 
-</div>
-</c:if>
-<%-- <c:if test="${map.type==2}">
-<div style="height:40px;width:100%;color:red;margin-top: -24px;padding-bottom: 10px;">
-<table style="width:100%">
-<tr>
-<td style="width:3%;height:38px"><img style="height:100%;width:100%;" src="${map.avatar}"></td>
-<td style="width:16%;height:38px"><span style="float:left">${map.name }<br/><span style="margin-left: -8%;">人气：${map.focusNum}</span></span></td>
-<td style="width:3%;height:38px"><button type="button"><a  style="text-decoration:none;color:red" href="${map.downloadUrl}" >+ 关注</a></button></td>
-</tr>
-</table>
-</div>
-</c:if> --%>
-
+<p style="margin:-15px;padding:0px;width:119%;height:100%;">
+	<!-- 直投广告 -->
+	${map.directInvest}
+</p>
+<p style="margin:-15px;padding:0px;width:119%;height:100%;">
+	<!-- top广告位 -->
+ 	${map.topAdvert}
+</p>
 
 <!-- 文章 -->
 <c:if test="${map.type==1}">
 <style type="text/css">
-img{width:100%;text-align:center;margin:10px 0px;}
+img{width:100%;text-align:center;margin:3px 0px;}
 body{font-size:15px}
-p{margin:5px 5px;}
+p{margin:5px;}
 </style>
 <div id="js_content" style="min-height: 500px;max-height: 20000px;overflow-y:hidden">
 ${map.content}
 </div>
-
-<!-- <div id='alpha' style="height: 30px;margin-top: -24px;position: relative;width: 100%;background: rgba(255,255,255,0.8);"></div>
-<div id='zhankai' style="width: 126px;height: 36px;border-radius:15px; border: 2px solid rgba(1,84,142,0.6); position: relative;left: 32%;font-size: 18px;text-align:center">
-<b style="color: rgba(1,84,142,0.6);line-height:36px;">↓展 开 全 文↓</b></div>
-<div id='shouqi' style="display:none;width: 126px;height: 36px;border-radius:15px;border: 2px solid rgba(1,84,142,0.6); position: relative;left: 32%;font-size: 18px; text-align:center">
-<b style="color: rgba(1,84,142,0.6);line-height:36px;">↑全 文 收 起↑</b></div> -->
-
-<!-- <script>
-$(function(){
- $("#zhankai").click(function(){
-		$(this).hide();
-		$("#alpha").hide();
-		$("#js_content").css({"max-height":"20000px"});
-		$("#shouqi").show();
-	});
-	$("#shouqi").click(function(){
-		$(this).hide();
-		$("#js_content").css({"max-height":"1500px"});
-		$("#alpha").show();
-		$("#zhankai").show();
-	});
-})
-</script> -->
-
 
 <br />
 </c:if>
@@ -135,10 +47,9 @@ $(function(){
 <!-- 视频 -->
 <c:if test="${map.type==2}">
 <style>
-/* body{background-color: #123456;color: #FFFFFF} */
 video{width:100%;text-align:center;}
 div{text-align:center;/* color: #FFFFFF */}
-img{width:100%;text-align:center;margin: 10px 0px;}
+img{width:100%;text-align:center;margin: 5px 0px;}
 body{font-size:15px}
 p{margin:5px 5px;}
 </style>
@@ -154,8 +65,12 @@ p{margin:5px 5px;}
 
 <!-- 更多推荐开始 -->
 
-<!-- <div style="padding-bottom:2px;width:100%;text-align:center;margin:auto;border-style:none none dashed none"></div> -->
-<div style="width:100%;text-align:center;color:red;background-color:#F0f0f0;">----料料引擎为您精心推荐----<br/></div>
+<div style="width:104%;text-align:center;align:left;color:red;background-color:#F0f0f0;margin:-6px;padding:0px;">----料料引擎为您精心推荐----<br/><br/><br/>
+		 <!-- top广告位 -->
+  		 ${map.topAdvert}
+</div>
+	
+	
 <div>
 <!-- baidu guanggao  -->
 <c:forEach var="li" items="${map.list}">

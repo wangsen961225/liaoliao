@@ -412,6 +412,7 @@ public abstract class StaticKey {
 	
 	/**
 	 * 應用寶料料下載地址
+	 * @return "http://sj.qq.com/myapp/detail.htm?apkName=com.sjcm.liaoliao"
 	 */
 	public static final String YingyongbaoDownload="http://sj.qq.com/myapp/detail.htm?apkName=com.sjcm.liaoliao";
 	
