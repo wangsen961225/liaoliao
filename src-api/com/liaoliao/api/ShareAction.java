@@ -798,6 +798,7 @@ public class ShareAction {
 	public Map<String,Object> uploadPrimary(HttpServletRequest request,Integer userId,String duration,
 			String description,String title,String content,String imgUrl,String videoUrl,Integer type){
 		Map<String,Object> map = new HashMap<>();
+		System.out.println("cishu");
 		if(userId==null||type==null){
 			map.put("msg", "有参数为空");
 			map.put("code", StaticKey.ReturnClientNullError);

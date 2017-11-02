@@ -49,6 +49,7 @@ import com.liaoliao.user.service.FocusLogService;
 import com.liaoliao.user.service.UserService;
 import com.liaoliao.util.CommonUtil;
 import com.liaoliao.util.RC4Kit;
+import com.liaoliao.util.RandomKit;
 import com.liaoliao.util.StaticKey;
 import com.liaoliao.util.TimeKit;
 
@@ -706,6 +707,12 @@ public class ContentAction {
 			likeType = 1;
 		}
 		map.put("likeType",likeType);
+		
+//		内容页大拇指上方显示本篇文章点赞数: 目前随机:100-1000
+		RandomKit ran = new RandomKit();
+		int countLike = ran.getRandomBetween(100, 1000);
+		map.put("countLike", countLike);
+		
 		
 		//写在阅读分润里面
 	/*	if(article.getType()==1){//原创作品被阅读，作者获得1料币
