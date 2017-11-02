@@ -847,7 +847,7 @@ public class UserController {
 	}
 	
 	/**
-	 * 判定当前原创文章是否通过审核
+	 * 判定当前原创视频是否通过审核
 	 * @param request
 	 * @param id
 	 * @return
