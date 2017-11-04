@@ -245,7 +245,10 @@ public abstract class StaticKey {
 	 * @return 0
 	 */
 	public static final Integer ReturnServerTrue=0;//正确
-	
+	/**
+	 * 客户端传值字段为空
+	 * @return 400
+	 */
 	public static final Integer ReturnClientNullError=400;//客户端传值字段为空
 	
 	/**
