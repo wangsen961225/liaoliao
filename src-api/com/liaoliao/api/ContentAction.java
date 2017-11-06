@@ -194,7 +194,10 @@ public class ContentAction {
 			}
 			item.put("imgUrl", video.getImgUrl());
 			item.put("videoUrl", video.getVideoUrl());
-			item.put("duration", video.getDuration());
+//			item.put("duration", video.getDuration());
+			item.put("duration", null);
+			
+			System.out.println(video.getDuration());
 //			item.put("commentCount", video.getCommentCount());
 //			item.put("likingCount", video.getLikingCount());
 //			item.put("playCount", video.getPlayCount());
@@ -448,13 +451,13 @@ public class ContentAction {
 //			item.put("likingCount", article.getLikingCount());
 //			item.put("commentCount", article.getCommentCount());
 			if(article.getType()==1){
-				item.put("readingCount", article.getReadingCount());
+				item.put("readingCount", article.getReadingCount()*10);//暂定将阅读数和视频播放数扩大十倍
 				item.put("likingCount", article.getLikingCount());
 				item.put("sendingCount", article.getSendingCount());
 				item.put("commentCount", article.getCommentCount());
 				
 			}else{
-				item.put("readingCount", ThreadLocalRandom.current().nextInt(9000, 25000));
+				item.put("readingCount", ThreadLocalRandom.current().nextInt(9000, 25000)*10);//暂定将阅读数和视频播放数扩大十倍
 				item.put("likingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 				item.put("sendingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 				item.put("commentCount", ThreadLocalRandom.current().nextInt(100, 1000));
