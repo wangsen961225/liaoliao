@@ -23,8 +23,9 @@ public class BanUserDaoImpl extends BaseDaoImpl<BanUser,Integer> implements BanU
 
 	@Override
 	public List<BanUser> bannedUserListByTime() {
-		String hqlString = "from BanUser where userStatus = "+StaticKey.UserStatusException+" and addTime > ?0";
-		return this.getListByHQL(hqlString, TimeKit.getDateBefore(3));
+//		String hqlString = "from BanUser where userStatus = "+StaticKey.UserStatusException+" and addTime > ?0";
+		String hqlString = "from BanUser where userStatus =2";
+		return this.getListByHQL(hqlString);
 	}
 
 

@@ -81,6 +81,12 @@ public abstract class StaticKey {
 	public static final Integer FenrunContentOriginal=1;//分润contentId-原创分润总结
 	
 	public static final Integer FenrunContentNewUser=4;//分润contentId-新用户红包
+	/**
+	 * 分润contentId-越狱
+	 * @return 5
+	 */
+	public static final Integer FenrunContentBreakout=5;
+	
 	
 	public static final Integer FenrunArticle=0;//分润日志来源种类-文章
 	
@@ -132,6 +138,11 @@ public abstract class StaticKey {
 	 * @return 20
 	 */
 	public static final Integer FenrunReadVideoDouble=20;//分润日志来源种类-观看视频翻倍
+	/**
+	 * 越狱花费(自己或帮助他人越狱)
+	 * @return 21
+	 */
+	public static final Integer Breakout=21;
 	
 	
 	/**
@@ -418,5 +429,13 @@ public abstract class StaticKey {
 	 * @return "http://sj.qq.com/myapp/detail.htm?apkName=com.sjcm.liaoliao"
 	 */
 	public static final String YingyongbaoDownload="http://sj.qq.com/myapp/detail.htm?apkName=com.sjcm.liaoliao";
+	
+	/**
+	 * 越狱花费
+	 * @return 10000
+	 */
+	public static final Integer BreakoutMoney=10000;
+	
+	
 	
 }

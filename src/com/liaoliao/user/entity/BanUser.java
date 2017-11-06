@@ -52,6 +52,16 @@ public class BanUser implements Serializable{
 	 * 处理时间
 	 */
 	private Date dealTime;
+	/**
+	 * 帮助越狱的用户id
+	 */
+	private Integer breakoutId;  
+	public Integer getBreakoutId() {
+		return breakoutId;
+	}
+	public void setBreakoutId(Integer breakoutId) {
+		this.breakoutId = breakoutId;
+	}
 	public Integer getId() {
 		return id;
 	}

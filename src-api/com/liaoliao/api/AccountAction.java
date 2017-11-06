@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.liaoliao.listener.MySessionContext;
+import com.liaoliao.profit.entity.FenrunLog;
 import com.liaoliao.profit.service.FenrunLogService;
 import com.liaoliao.redisclient.RedisService;
 import com.liaoliao.sys.entity.AdvertClicks;
@@ -606,6 +607,7 @@ public class AccountAction {
 	public Map<String,Object> bannedUserList(HttpServletRequest request) {
 		Map<String,Object> map=new HashMap<String,Object>();
 		List<BanUser> bannedUserList = banUserService.bannedUserListByTime();
+		System.out.println(bannedUserList.size());
 		List<Map<String,Object>> list = new LinkedList<>();
 		Map<String,Object> listMap = null;
 		for(BanUser banUser : bannedUserList){
@@ -746,11 +748,55 @@ public class AccountAction {
 		map.put("msg", "成功");
 		
 		return map;
-		
 	}
 	
-	
-	
-	
+	@ResponseBody
+	@RequestMapping(value="/breakout")
+	public Map<String,Object> breakout(HttpServletRequest request,Integer userId,Integer breakoutId){
+		Map<String,Object> map = new HashMap<>();
+		if(userId==null||"".equals(userId)||breakoutId==null||"".equals(breakoutId)){
+			map.put("msg", "有参数为空!");
+			map.put("code", StaticKey.ReturnClientNullError);
+			return map;
+		}
+			if(!redisService.getValidate(request,userId)){
+			map.put("msg", "token失效或错误!");
+			map.put("code", StaticKey.ReturnClientTokenError);
+			return map;
+		}
+		Users user = userService.findById(userId);
+		if(user==null){
+			map.put("msg", "用户不存在!");
+			map.put("code", StaticKey.ReturnUserAccountNotExist);
+			return map;
+		}
+		Users breakoutUserId = userService.findById(userId);
+		if(breakoutUserId==null){
+			map.put("msg", "用户不存在!");
+			map.put("code", StaticKey.ReturnUserAccountNotExist);
+			return map;
+		}
+		
+		int userMoney=(int) (user.getTotalMoney()-user.getFreezeMoney()-user.getPayMoney()-user.getToBankMoney());
+		if(userMoney<StaticKey.BreakoutMoney){
+			map.put("msg", "余额不足!");
+			map.put("code", StaticKey.ReturnClientNullError);
+			return map;
+		}
+		breakoutUserId.setPayMoney(user.getPayMoney()+StaticKey.BreakoutMoney);
+		userService.updateUser(user);
+		
+		FenrunLog fl = new FenrunLog();
+		fl.setAddTime(new Date());
+		fl.setMoney(-StaticKey.BreakoutMoney);
+		fl.setUser(user);
+		fl.setContentId(StaticKey.FenrunContentBreakout);
+		fl.setType(StaticKey.Breakout);
+		fenrunLogService.saveFenrunLog(fl);
+		
+		map.put("msg", "success");
+		map.put("code", StaticKey.ReturnServerTrue);
+		return map;
+	}
 }
 

@@ -557,13 +557,15 @@ public class ContentAction {
 			luserFl = focusLogService.countNum(luser.getId());
 		}
 		
+		
+		
 		int luserCount=0;
 		if(luserFl!=null){
 			luserCount= luserFl.intValue();
 		}
 		if(article.getType()==1){
 			Users user = userService.findById(article.getSourceId());
-			user=userService.findById(luser.getId());//使用随机的虚拟用户替换官方用户
+			//user=userService.findById(luser.getId());//使用随机的虚拟用户替换官方用户
 			//System.out.println("我是原创的 line 421 ContentAction.java /getContent");
 			if(user==null){
 				map.put("name", luser.getNickName());//料料头条
@@ -664,7 +666,7 @@ public class ContentAction {
 		if(userId!=null&&redisService.getValidate(request,userId)){
 			if(article.getType()==1){
 				FocusLog fl = focusLogService.findByFocusId(userId, article.getSourceId());
-			//	fl = focusLogService.findByFocusId(userId, luser.getId()); 如果是原创的视频或文章,保持真是数据
+			//	fl = focusLogService.findByFocusId(userId, luser.getId()); 如果是原创的视频或文章,保持真实数据
 				if(fl!=null&&fl.getStatus()==1){
 					map.put("focusStatus", StaticKey.FocusTrue);
 				}else{
