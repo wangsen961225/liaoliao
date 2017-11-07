@@ -622,6 +622,7 @@ public class AccountAction {
 		Map<String,Object> listMap = null;
 		for(BanUser banUser : bannedUserList){
 			listMap = new LinkedHashMap<>();
+			listMap.put("userId", banUser.getUser().getId());
 			listMap.put("nickName", banUser.getUser().getNickName());
 			listMap.put("banCause", banUser.getBanCause());
 //			listMap.put("dealTime", banUser.getDealTime());

@@ -77,9 +77,15 @@ public abstract class StaticKey {
 	public static final Integer AdminGroupStatusTrue = 1;//用户组状态正常
 	
 	public static final Integer PageNum=30;//分页       用处：fenrunLog记录条数
-	
+	/**
+	 * 文章分页
+	 * @return 15
+	 */
 	public static final Integer ArticlePageNum=15;//文章分页
-	
+	/**
+	 * 视频分页
+	 * @return 15
+	 */
 	public static final Integer VideoPageNum=15;//视频分页
 	
 	/**

@@ -138,7 +138,7 @@ public class ContentAction {
 			
 		}
 		if(flushType==0){
-			list = videoService.findByRand(8);
+			list = videoService.findByRand(30);//由8-->30 暂时采用此方法解决刷新和下拉造成内容重复(因为请求内容少,看了几条之后就是重复内容)
 		}
 		// Map-->List-->Map 三层转换
 		List<Map<String, Object>> datas = new ArrayList<>();
@@ -197,7 +197,7 @@ public class ContentAction {
 //			item.put("duration", video.getDuration());
 			item.put("duration", null);
 			
-			System.out.println(video.getDuration());
+//			System.out.println(video.getDuration());
 //			item.put("commentCount", video.getCommentCount());
 //			item.put("likingCount", video.getLikingCount());
 //			item.put("playCount", video.getPlayCount());
@@ -411,7 +411,7 @@ public class ContentAction {
 		}
 		
 		if(flushType==0){
-			list = articleService.findByRand(kindId, 8);
+			list = articleService.findByRand(kindId, 30);  //由8-->30 暂时采用此方法解决刷新和下拉造成内容重复(因为请求内容少,看了几条之后就是重复内容)
 		}
 		
 		//获取用户点赞文章记录
