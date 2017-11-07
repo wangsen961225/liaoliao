@@ -552,9 +552,9 @@ public class AccountAction {
 	 */
 	@RequestMapping(value="/banUser")
 	@ResponseBody
-	public Map<String,Object> banUser(HttpServletRequest request,Integer userId) {
+	public Map<String,Object> banUser(HttpServletRequest request,Integer userId,Integer cause) {
 		Map<String,Object> map=new HashMap<String,Object>();
-		if(userId==null){
+		if(userId==null||"".equals(userId)||cause==null){
 			map.put("msg", "参数异常!");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
@@ -577,11 +577,21 @@ public class AccountAction {
 			userService.updateUser(user);
 		}
 		
-		BanUser banUser = banUserService.findByUserId(userId);
+//		BanUser banUser = banUserService.findByUserId(userId);
+		//已被越狱会被记录,如果已被封禁但未被越狱,将会增加被封禁次数
+		BanUser banUser = banUserService.findNotBreakoutByUserId(userId);
 		if(banUser==null){
 			banUser = new BanUser();
 			banUser.setUser(user);
-			banUser.setBanCause("疑似模拟器");
+			if(cause==0){
+				banUser.setBanCause("疑似脚本");
+			}
+			if(cause==1){
+				banUser.setBanCause("疑似模拟器"); 
+			}
+			if(cause==2){
+				banUser.setBanCause("疑似脚本,模拟器"); //脚本和模拟器都使用
+			}
 			banUser.setBanTimes(1);
 //			banUser表标红
 			banUser.setUserStatus(StaticKey.UserStatusException);
@@ -626,7 +636,7 @@ public class AccountAction {
 	
 	/**
 	 * 查询自己是否在小黑屋
-	 * ps:直接根据userId在BanUser表中查userStatus为0的条数，返回null则不在小黑屋
+	 * ps:直接根据userId在BanUser表中查未越狱BanUser，返回null则不在小黑屋
 	 */
 	@RequestMapping(value="/getUserStatus")
 	@ResponseBody
@@ -637,8 +647,8 @@ public class AccountAction {
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
-		BanUser banUser = banUserService.findByUserId(userId);
-		if(banUser==null || banUser.getUserStatus()==StaticKey.UserStatusTrue){
+		BanUser banUser = banUserService.findNotBreakoutByUserId(userId);
+		if(banUser==null || banUser.getUserStatus()==StaticKey.UserStatusTrue||banUser.getDealTime()!=null||banUser.getBreakoutId()!=null){
 			map.put("userStatus", StaticKey.UserStatusTrue);
 		}
 		else{
@@ -750,6 +760,13 @@ public class AccountAction {
 		return map;
 	}
 	
+	/**
+	 * 
+	 * @param request
+	 * @param userId : 关在小黑屋中的用户id
+	 * @param breakoutId : 帮助越狱人的id
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping(value="/breakout")
 	public Map<String,Object> breakout(HttpServletRequest request,Integer userId,Integer breakoutId){
@@ -759,40 +776,59 @@ public class AccountAction {
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
-			if(!redisService.getValidate(request,userId)){
+		/*	if(!redisService.getValidate(request,userId)){
 			map.put("msg", "token失效或错误!");
 			map.put("code", StaticKey.ReturnClientTokenError);
 			return map;
-		}
+		}*/
 		Users user = userService.findById(userId);
 		if(user==null){
 			map.put("msg", "用户不存在!");
 			map.put("code", StaticKey.ReturnUserAccountNotExist);
 			return map;
 		}
-		Users breakoutUserId = userService.findById(userId);
-		if(breakoutUserId==null){
+		Users breakoutUser = userService.findById(breakoutId);
+		if(breakoutUser==null){
 			map.put("msg", "用户不存在!");
 			map.put("code", StaticKey.ReturnUserAccountNotExist);
 			return map;
 		}
-		
-		int userMoney=(int) (user.getTotalMoney()-user.getFreezeMoney()-user.getPayMoney()-user.getToBankMoney());
-		if(userMoney<StaticKey.BreakoutMoney){
-			map.put("msg", "余额不足!");
-			map.put("code", StaticKey.ReturnClientNullError);
+		//判断用户是否在小黑屋
+		BanUser users = banUserService.findNotBreakoutByUserId(userId);
+		if(users==null){
+			map.put("msg", "用户不在小黑屋");
+			map.put("code", StaticKey.ReturnUserAccountNotExist);
 			return map;
 		}
-		breakoutUserId.setPayMoney(user.getPayMoney()+StaticKey.BreakoutMoney);
+		
+		//判断帮助越狱人的余额是否充足
+		int userMoney=(int) (breakoutUser.getTotalMoney()-breakoutUser.getFreezeMoney()-breakoutUser.getPayMoney()-breakoutUser.getToBankMoney());
+		if(userMoney<StaticKey.BreakoutMoney){
+			map.put("msg", "余额不足!");
+			map.put("code", StaticKey.ReturnMoneyLow);
+			return map;
+		}
+		breakoutUser.setPayMoney(breakoutUser.getPayMoney()+StaticKey.BreakoutMoney);
+		userService.updateUser(breakoutUser);
+		//将用户状态改为正常
+		user.setStatus(StaticKey.UserStatusTrue);
 		userService.updateUser(user);
 		
+		//添加分润
 		FenrunLog fl = new FenrunLog();
 		fl.setAddTime(new Date());
 		fl.setMoney(-StaticKey.BreakoutMoney);
-		fl.setUser(user);
+		fl.setUser(breakoutUser);
 		fl.setContentId(StaticKey.FenrunContentBreakout);
 		fl.setType(StaticKey.Breakout);
 		fenrunLogService.saveFenrunLog(fl);
+		
+		//改变小黑屋中用户的状态为正常   2-->1,帮助越狱人的id
+		BanUser banUser = banUserService.findNotBreakoutByUserId(userId);
+		banUser.setUserStatus(StaticKey.UserStatusTrue);
+		banUser.setBreakoutId(breakoutId);
+		banUser.setDealTime(new Date());
+		banUserService.saveOrUpdateBanUser(banUser);
 		
 		map.put("msg", "success");
 		map.put("code", StaticKey.ReturnServerTrue);

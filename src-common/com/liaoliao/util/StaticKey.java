@@ -24,10 +24,22 @@ public abstract class StaticKey {
 	
 	public static final Integer VideoStatusLoding = 2;//视频等待审核
 	
+	/**
+	 * 用户状态禁用
+	 * @return 0
+	 */
 	public static final Integer UserStatusFalse = 0;//用户状态禁用
 	
+	/**
+	 * 用户状态正常
+	 * @return 1
+	 */
 	public static final Integer UserStatusTrue = 1;//用户状态正常
 	
+	/**
+	 * 用户状态标红
+	 * @return 2
+	 */
 	public static final Integer UserStatusException = 2;//用户状态标红
 	
 	public static final Integer UserStatusNewTrue = 1;//是新用户
@@ -267,9 +279,16 @@ public abstract class StaticKey {
 	 * @return 500
 	 */
 	public static final Integer ReturnServerNullError=500;//服务器查询为空或错误
-	
+	/**
+	 * 客户端传值token错误
+	 * @return 666
+	 */
 	public static final Integer ReturnClientTokenError=666;//客户端传值token错误
 //	登录接口
+	/**
+	 * 用户不存在
+	 * @return 100
+	 */
 	public static final Integer ReturnUserAccountNotExist=100;//用户不存在
 	
 	public static final Integer ReturnUserAccountError=120;//密码错误

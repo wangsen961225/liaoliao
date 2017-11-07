@@ -99,6 +99,7 @@
 						<td>
 						  <c:if test="${li.user.status==1}">正常</c:if>
 						  <c:if test="${li.user.status==0}"><p style="color:red">封禁</p></c:if>
+						  <c:if test="${li.user.status==2}"><p style="color:red">在小黑屋</p></c:if>
 						</td>
 						<td>
 						  <c:if test="${li.user.vipStatus==1}">会员</c:if>
@@ -114,7 +115,7 @@
 						  <button class="btn btn-info" type="button" onclick="#">修改</button>
 						  <c:if test="${li.user.status==1}"><button class="btn btn-danger" type="button" onclick="banArticle(${li.user.id})">封禁</button></c:if>
 						  <c:if test="${li.user.status==0}"><button class="btn btn-danger" type="button" onclick="banArticle(${li.user.id})">解禁</button></c:if>
-						  <!-- <button class="btn btn-info" type="button" onclick="#">料币收入支出明细</button> -->
+						  <c:if test="${li.user.status==2}"><button class="btn btn-danger" type="button">在小黑屋</button></c:if>
 						  <button type="button" class="btn btn-primary"  href="${ctx}/sys/expenditureDetails?userId=${li.user.id}"  data-toggle="modal" data-target="#expenditureDetails" > 料币明细</button>
 						</td>
 					</tr>

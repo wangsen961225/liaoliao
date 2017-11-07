@@ -12,4 +12,11 @@ public interface BanUserService {
 
 	List<BanUser> bannedUserListByTime();
 
+	/**
+	 * 查询未越狱的封禁用户记录
+	 * @param userId
+	 * @return
+	 */
+	BanUser findNotBreakoutByUserId(Integer userId);
+
 }

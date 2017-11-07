@@ -31,6 +31,11 @@ public class BanUserServiceImpl implements BanUserService {
 	public List<BanUser> bannedUserListByTime() {
 		return banUserDao.bannedUserListByTime();
 	}
+
+	@Override
+	public BanUser findNotBreakoutByUserId(Integer userId) {
+		return banUserDao.findNotBreakoutByUserId(userId);
+	}
 	
 	
 

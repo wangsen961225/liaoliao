@@ -45,6 +45,8 @@
 							<c:if test="${lis.type==17 }">查看用户详情(约她)</c:if>
 							<c:if test="${lis.type==18 }">退款</c:if>
 							<c:if test="${lis.type==19 }">阅读翻倍</c:if>
+							<c:if test="${lis.type==20 }">观看视频翻倍</c:if>
+							<c:if test="${lis.type==21 }">越狱花费(自己或帮助他人越狱)</c:if>
 						</td>
 						<td><fmt:formatDate value="${lis.addTime}" type="both"/></td>
 					</tr>

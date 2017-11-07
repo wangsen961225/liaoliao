@@ -20,8 +20,6 @@ import com.liaoliao.sys.entity.District;
 @DynamicUpdate(true)//更新某个字段时,不会全部更新一遍.
 @JsonIgnoreProperties({ "handler","hibernateLazyInitializer" }) 
 public class Users implements Serializable{
-	
-	
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -49,7 +47,7 @@ public class Users implements Serializable{
 	private Integer vipStatus;
 	
 	/**
-	 * 来源类型：微信：0 qq：1     微博：2     注册：3
+	 * 来源类型：微信：0 qq：1     微博：2     手机号注册：3
 	 */
 	private Integer sourceType;
 	/**

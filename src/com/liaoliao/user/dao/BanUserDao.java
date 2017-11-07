@@ -12,6 +12,8 @@ public interface BanUserDao {
 
 	List<BanUser> bannedUserListByTime();
 
+	BanUser findNotBreakoutByUserId(Integer userId);
+
 
 
 }
