@@ -810,7 +810,7 @@ public class UserCenterAction {
 	@RequestMapping(value="/originalList")
 	public Map<String,Object> originalList(HttpServletRequest request,Integer userId){
 		Map<String,Object> map = new HashMap<>();
-	/*	if(userId==null||type==null){
+		/*if(userId==null||type==null){
 			map.put("msg", "有参数为空");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;

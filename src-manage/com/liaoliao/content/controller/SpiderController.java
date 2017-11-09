@@ -426,16 +426,22 @@ public class SpiderController {
 	public Map<String,Object> toutiaoArticle() {
 		Map<String,Object> returnMap=new HashMap<String,Object>();
 		int count=0;
-//		String url = "http://www.toutiao.com/api/pc/feed/";
-		String url = "http://www.toutiao.com/api/article/feed/";
+		String url = "http://www.toutiao.com/api/pc/feed/";
+//		String url = "http://www.toutiao.com/api/article/feed/";
 		String tag = "funny";
 //		JSONObject param = JinRiTouTiaoUtil.getUrlParam();
 //		Object as = param.get("as");
 //		Object cp = param.get("cp");
 //		String as = "A165E968744150D";
 //		String cp = "5984813550ED3E1";
-		String as = "A1356A70924C7EE";
-		String cp = "5A021C278EEE8E1";
+		
+//		String as = "A1356A70924C7EE";
+//		String cp = "5A021C278EEE8E1";
+		
+		String as = "A1D5DA60A30B8EB";
+		String cp = "5A03FBA8EEABCE1";
+		
+			
 //		String max_behot_time_tmp = "1501816479";
 		String max_behot_time_tmp = redisService.get("spiderJinritoutiaoNextTime");
 		if(StringUtils.isBlank(max_behot_time_tmp)){
@@ -460,7 +466,11 @@ public class SpiderController {
 		for (int i = 0; i < parseArray.size(); i++) {
 			map = (Map) parseArray.get(i);
 			
-			if(!map.get("tag").equals(tag)){
+			/*if(!map.get("tag").equals(tag)){
+				continue;
+				//空指针
+			}*/
+			if(!tag.equals(map.get("tag"))){
 				continue;
 			}
 			
@@ -580,146 +590,7 @@ public class SpiderController {
 	}
 	
 	
-	/**
-	 * 东方头条1Article采集
-	 */
-	@RequestMapping(value="/dongfangArticle1")
-	@ResponseBody
-	public Map<String,Object> dongfangArticle1() {
-		Map<String,Object> returnMap=new HashMap<String,Object>();
-		int count=0;
-		String url_1 = "https://toutiao.eastday.com/toutiao_h5/pulldown";
-//		String resp = CommonUtil.sendGet(url_1, "type=society&startkey=8213310536440425993&pgnum=-1&jsonpcallback=data");
-		String resp = CommonUtil.sendGet(url_1, "type=xiaohua&startkey=8213310536440425993&pgnum=-1&jsonpcallback=data");
-//		过滤emoji表情
-		resp = CommonUtil.emojiFilter(resp);
-		
-		resp = StringUtils.substringBetween(resp, "data(", "\"})");
-		resp = resp + "\"}";
-
-		Map parse = (Map) JSONObject.parse(resp);
-//		System.out.println("get到的json==="+resp);
-		JSONArray parseArray = (JSONArray) parse.get("data");
-//		System.out.println("解析到的data==="+parseArray);
-		Map map = null;
-//		List<Map> maps = new ArrayList<>();
-		// 遍历这个jsonArray,获取到每一个json对象,然后将其转换成Map对象(在这里其实只需要一个group_id,那么没必要使用map)
-		for (int i = 0; i < parseArray.size()-1; i++) {
-			map = (Map) parseArray.get(i);
-			
-//			TODO 采集视频
-			if(!String.valueOf(map.get("videolist")).equals("[]")){
-				continue;
-			}
-//			System.out.println("文章标题："+map.get("topic"));
-			String title = String.valueOf(map.get("topic"));
-			
-//			System.out.println("文章阅读数："+map.get("urlpv"));
-			
-//			System.out.println("文章评论数："+map.get("comment_count"));
-			Integer commentCount = Integer.valueOf(String.valueOf(map.get("comment_count")));
-			
-//			System.out.println("原始url："+map.get("url"));
-			String sourceUrl = String.valueOf(map.get("url"));
-			
-//			System.out.println("文章key："+map.get("rowkey"));
-			String keyId = String.valueOf(map.get("rowkey"));
-			
-//			System.out.println("发布时间："+map.get("date"));
-			
-			JSONArray lbimgArray = (JSONArray) map.get("lbimg");
-			Map lbimgMap = (Map) lbimgArray.get(0);
-//			System.out.println("文章image_url："+lbimgMap.get("src"));
-
-			
-			List<Map<String, Object>> imgListStr = new ArrayList<>();
-			Map<String, Object> urlStr = null;
-//			System.out.println("文章image_list数："+map.get("miniimg_size"));
-			JSONArray miniimgArray = (JSONArray) map.get("miniimg");
-			for (int j = 0; j < Integer.parseInt((String)map.get("miniimg_size")); j++) {
-				urlStr = new LinkedHashMap<>();
-				Map miniimgMap = (Map) miniimgArray.get(j);
-				urlStr.put("url", miniimgMap.get("src"));
-				imgListStr.add(urlStr);
-			}
-			Map<String, Object> imgListMap = new LinkedHashMap<>();
-			imgListMap.put("imgList", imgListStr);
-			String json = JSON.toJSONString(imgListMap);
-//			System.out.println("文章image_list："+json);
-			
-			String content=null;
-			Connection connection = null;
-			connection = Jsoup.connect(String.valueOf(map.get("url")));
-			try {
-				Document document = connection.get();
-
-				// 获取文章内容
-				Elements contentEle = document.select("[class=J-article-content article-content]");
-//				System.out.println("文章内容："+contentEle.html());
-				content = contentEle.html();
-				if(StringUtils.isBlank(content)){
-					continue;
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-			String imgUrl = String.valueOf(lbimgMap.get("src"));
-			if(map.get("lbimg")!=null){
-				imgUrl = String.valueOf(lbimgMap.get("src"));
-			}
-			else{
-				imgUrl = StringUtils.substringBetween(content,"<img src=\"","\"");
-			}
-			
-			String imgList = null;
-			if(map.get("miniimg_size")!=null){
-				imgList = json;
-			}
-			if(imgUrl!=null && map.get("image_list")==null){
-				imgList = "{\"imgList\":[{\"url\":\""+imgUrl+"\"}]}";
-			}
-			if(imgUrl==null && map.get("image_list")==null){
-				imgList = null;
-			}
-			
-			
-			Integer likingCount = 0;
-			Integer sendingCount = 0;
-			commentCount = 0;
-			Integer readingCount = 0;
-			
-			Article article = new Article();
-			article.setTitle(title);
-			article.setDescription(null);
-			article.setImgUrl(imgUrl);
-			article.setImgList(imgList);
-			article.setKeyId(keyId);
-			article.setCommentCount(commentCount);
-			article.setLikingCount(likingCount);
-			article.setSendingCount(sendingCount);
-			article.setReadingCount(readingCount);
-			article.setSourceId(StaticKey.ArticleDongFangTouTiao);
-			article.setSourceUrl(sourceUrl);
-			article.setAddTime(new Date());
-			article.setStatus(StaticKey.ArticleStatusTrue);
-			article.setType(0);
-			String name="头条";
-			article.setContentKind(contentKindService.findByName(name));
-			Article articleCompare = articleService.findByKeyAndType(keyId,StaticKey.ArticleDongFangTouTiao);
-			if(articleCompare==null&&content!=null){
-				article.setContent(content);
-				articleService.saveArticle(article);
-				count++;
-			}
-		}
-		
 	
-		returnMap.put("msg", "success");
-		returnMap.put("count", count);
-		return returnMap;
-		
-	}
 	
 	/**
 	 * 趣头条Article采集
@@ -1117,7 +988,176 @@ public class SpiderController {
 	}
 	
 	
-	
+	/**
+	 * 今日头条Article采集
+	 */
+	@RequestMapping(value="/toutiaoArticle4Society")
+	@ResponseBody
+	public Map<String,Object> toutiaoArticle4Society() {
+		Map<String,Object> returnMap=new HashMap<String,Object>();
+		int count=0;
+		String url = "http://www.toutiao.com/api/pc/feed/";
+//		String url = "http://www.toutiao.com/api/article/feed/";
+		String tag = "funny";
+//		JSONObject param = JinRiTouTiaoUtil.getUrlParam();
+//		Object as = param.get("as");
+//		Object cp = param.get("cp");
+//		String as = "A165E968744150D";
+//		String cp = "5984813550ED3E1";
+		
+//		String as = "A1356A70924C7EE";
+//		String cp = "5A021C278EEE8E1";
+		
+		String as = "A1D5DA60A30B8EB";
+		String cp = "5A03FBA8EEABCE1";
+		
+			
+//		String max_behot_time_tmp = "1501816479";
+		String max_behot_time_tmp = redisService.get("spiderJinritoutiaoNextTime");
+		if(StringUtils.isBlank(max_behot_time_tmp)){
+			redisService.set("spiderJinritoutiaoNextTime", "0", -1);
+			max_behot_time_tmp = "0";
+		}
+		String resp = SpiderHttpKit.getToutiaoResp(url+"?category="+tag+"&as="+as+"&cp="+cp+"&max_behot_time_tmp="+max_behot_time_tmp+"&utm_source=toutiao&widen=1&max_behot_time=0&tadrequire=true");
+//		过滤emoji表情
+		resp = CommonUtil.emojiFilter(resp);
+		// 文章详情页的前缀(由于今日头条的文章都是在group这个目录下,所以定义了前缀,而且通过请求获取到的html页面)
+		String urlDetails = "http://www.toutiao.com/group/";
+		
+		Map parse = (Map) JSONObject.parse(resp);
+		
+		Map max_behot_time_tmpMap = (Map) parse.get("next");
+		max_behot_time_tmp = String.valueOf(max_behot_time_tmpMap.get("max_behot_time"));
+		redisService.set("spiderJinritoutiaoNextTime", max_behot_time_tmp, -1);
+		
+		JSONArray parseArray = (JSONArray) parse.get("data");
+		Map map = null;
+		// 遍历这个jsonArray,获取到每一个json对象,然后将其转换成Map对象(在这里其实只需要一个group_id,那么没必要使用map)
+		for (int i = 0; i < parseArray.size(); i++) {
+			map = (Map) parseArray.get(i);
+			
+			/*if(!map.get("tag").equals(tag)){
+				continue;
+				//空指针
+			}*/
+			if(!tag.equals(map.get("tag"))){
+				continue;
+			}
+			
+//			System.out.println("文章标题："+map.get("title"));
+			String title=String.valueOf(map.get("title"));
+			
+//			System.out.println("文章描述："+map.get("abstract"));
+			String description = null;
+			if(map.get("abstract")!=null){
+				description = String.valueOf(map.get("abstract"));
+			}else{
+				description = title;
+			}
+			
+			
+//			System.out.println("文章唯一id："+map.get("group_id"));
+			String keyId= String.valueOf(map.get("group_id"));
+			
+			Integer commentCount = (int) (Math.random()*100);
+//			System.out.println("文章评论数："+map.get("comments_count"));
+			if(map.get("comments_count")!=null){
+				commentCount=Integer.valueOf(String.valueOf(map.get("comments_count")));
+			}
+			
+//			System.out.println("原始url："+"http://toutiao.com/group/"+map.get("group_id"));
+			String sourceUrl=String.valueOf("http://toutiao.com/group/"+map.get("group_id"));
+			String content=null;
+/*			Connection connection = Jsoup.connect(urlDetails + map.get("group_id"));
+			try {
+				Document document = connection.get();
+				// 获取文章内容
+				Elements contentEle = document.select("[class=article-content]");
+//				System.out.println("文章内容："+contentEle.html());
+				content = contentEle.html();
+				if(StringUtils.isBlank(content)){
+					continue;
+				}
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}*/
+			
+			String respHTML = SpiderHttpKit.getToutiaoResp(urlDetails+map.get("group_id"));
+//			System.out.println(respHTML);
+			String itemId = StringUtils.substringBetween(respHTML, "item_id:'", "'");
+			if(StringUtils.isBlank(itemId)){
+				itemId = StringUtils.substringBetween(respHTML, "item_id: '", "'");
+				if(StringUtils.isBlank(itemId)){
+					continue;
+				}
+			}
+//			System.out.println(respContent);
+//			System.out.println("文章itemId："+itemId);
+			String respContent = CommonUtil.sendGet("https://m.toutiao.com/i"+itemId+"/info/","");
+			Map parseContent = (Map) JSONObject.parse(respContent);
+//			System.out.println(parseContent);
+			Map comtentMap = (Map) parseContent.get("data");
+			if(comtentMap.get("content")==null){
+				continue;
+			}
+			content = String.valueOf(comtentMap.get("content"));
+//			System.out.println("文章内容："+content);
+			
+//			System.out.println("文章封面图："+map.get("image_url"));
+			String imgUrl = String.valueOf(map.get("image_url"));
+			if(map.get("image_url")!=null){
+				imgUrl = String.valueOf(map.get("image_url"));
+			}
+			else{
+				imgUrl = StringUtils.substringBetween(content,"<img src=\"","\"");
+			}
+			
+//			System.out.println("文章image_list："+map.get("image_list"));
+			String imgList = String.valueOf(map.get("image_list"));
+			if(map.get("image_list")!=null){
+				imgList = "{\"imgList\":"+imgList+"}";
+			}
+			if(imgUrl!=null && map.get("image_list")==null){
+				imgList = "{\"imgList\":[{\"url\":\""+imgUrl+"\"}]}";
+			}
+			if(imgUrl==null && map.get("image_list")==null){
+				imgList = null;
+			}
+			
+			Integer likingCount = 0;
+			Integer sendingCount = 0;
+			commentCount = 0;
+			Integer readingCount = 0;
+			
+			Article article = new Article();
+			article.setTitle(title);
+			article.setDescription(description);
+			article.setImgUrl(imgUrl);
+			article.setImgList(imgList);
+			article.setKeyId(keyId);
+			article.setCommentCount(commentCount);
+			article.setLikingCount(likingCount);
+			article.setSendingCount(sendingCount);
+			article.setReadingCount(readingCount);
+			article.setSourceId(StaticKey.ArticleJinRiTouTiao);
+			article.setSourceUrl(sourceUrl);
+			article.setAddTime(new Date());
+			article.setStatus(StaticKey.ArticleStatusTrue);
+			article.setType(0);
+			String name="头条";
+			article.setContentKind(contentKindService.findByName(name));
+			Article articleCompare = articleService.findByKeyAndType(keyId,StaticKey.ArticleJinRiTouTiao);
+			if(articleCompare==null&&content!=null){
+				article.setContent(content);
+				articleService.saveArticle(article);
+				count++;
+			}
+		}
+		returnMap.put("msg", "success");
+		returnMap.put("count", count);
+		return returnMap;
+	}
 	
 	
 	
