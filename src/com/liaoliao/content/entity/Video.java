@@ -57,7 +57,7 @@ public class Video implements Serializable{
 	}
 
 	
-	public Video(String title, String description, String duration, String videoUrl, String imgUrl, Integer status,
+	public Video(String title, String description, String duration, String videoUrl, String imgUrl, Integer status,Integer type,
 			String keyId, Integer playCount, Integer likingCount, Integer sendingCount, Integer commentCount,
 			Integer sourceId, String sourceUrl, Date addTime) {
 		super();
@@ -75,6 +75,7 @@ public class Video implements Serializable{
 		this.sourceId = sourceId;
 		this.sourceUrl = sourceUrl;
 		this.addTime = addTime;
+		this.type=type;
 	}
 
 

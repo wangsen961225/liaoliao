@@ -242,7 +242,7 @@ public class QuartzJob implements Job {
 			Video videoCompare = videoService.findByKeyAndType(keyId,StaticKey.VideoNeiHanDuanZi);
 			if(videoCompare==null&&videoUrl!=null){
 			video = new Video(title, null, duration, videoUrl, imgUrl,
-					StaticKey.VideoStatusTrue, keyId, playingCount, likingCount, sendingCount,commentCount,
+					StaticKey.VideoStatusTrue,0, keyId, playingCount, likingCount, sendingCount,commentCount,
 					StaticKey.VideoNeiHanDuanZi, sourceUrl, new Date());
 			video.setType(0);
 			videoService.saveVideo(video);
@@ -329,7 +329,7 @@ public class QuartzJob implements Job {
 			if(videoCompare==null&&videoUrl!=null){
 			Video video=null;
 			video = new Video(title, null, duration, videoUrl, imgUrl,
-					StaticKey.VideoStatusTrue, keyId, playCount, likingCount, sendingCount,commentCount,
+					StaticKey.VideoStatusTrue,0, keyId, playCount, likingCount, sendingCount,commentCount,
 					StaticKey.Video360KuaiShiPin, sourceUrl, new Date());
 			video.setType(0);
 			videoService.saveVideo(video);
@@ -438,7 +438,7 @@ public class QuartzJob implements Job {
 			if(videoCompare==null&&videoUrl!=null){
 			Video video=null;
 			video = new Video(title, null, duration, videoUrl, imgUrl,
-					StaticKey.VideoStatusTrue, keyId, playCount, likingCount, sendingCount,commentCount,
+					StaticKey.VideoStatusTrue,0, keyId, playCount, likingCount, sendingCount,commentCount,
 					StaticKey.VideoMeiPai, sourceUrl, new Date());
 			video.setType(0);
 			videoService.saveVideo(video);

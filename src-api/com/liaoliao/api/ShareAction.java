@@ -825,8 +825,7 @@ public class ShareAction {
 			Article article = new Article();
 			article.setAddTime(new Date());
 			article.setContentKind(contentKindService.findByName("头条"));
-//			article.setDescription(content);
-			article.setContent(content);
+			article.setDescription(content);
 			if(imgUrl==null||"".equals(imgUrl)){
 				map.put("msg", "有参数为空");
 				map.put("code", StaticKey.ReturnClientNullError);

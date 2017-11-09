@@ -136,7 +136,7 @@ public class SpiderController {
 			Video videoCompare = videoService.findByKeyAndType(keyId,StaticKey.VideoNeiHanDuanZi);
 			if(videoCompare==null&&videoUrl!=null){
 			video = new Video(title, null, duration, videoUrl, imgUrl,
-					StaticKey.VideoStatusTrue, keyId, playingCount, likingCount, sendingCount,commentCount,
+					StaticKey.VideoStatusTrue,0, keyId, playingCount, likingCount, sendingCount,commentCount,
 					StaticKey.VideoNeiHanDuanZi, sourceUrl, new Date());
 			videoService.saveVideo(video);
 			count++;
@@ -204,7 +204,7 @@ public class SpiderController {
 			if(videoCompare==null&&videoUrl!=null){
 			Video video=null;
 			video = new Video(title, description, null, videoUrl, imgUrl,
-					StaticKey.VideoStatusTrue, keyId, playCount, likingCount, sendingCount,commentCount,
+					StaticKey.VideoStatusTrue,0, keyId, playCount, likingCount, sendingCount,commentCount,
 					StaticKey.VideoXiaoKaXiu, sourceUrl, new Date());
 			videoService.saveVideo(video);
 			count++;
@@ -294,7 +294,7 @@ public class SpiderController {
 			if(videoCompare==null&&videoUrl!=null){
 			Video video=null;
 			video = new Video(title, null, duration, videoUrl, imgUrl,
-					StaticKey.VideoStatusTrue, keyId, playCount, likingCount, sendingCount,commentCount,
+					StaticKey.VideoStatusTrue,0, keyId, playCount, likingCount, sendingCount,commentCount,
 					StaticKey.Video360KuaiShiPin, sourceUrl, new Date());
 			videoService.saveVideo(video);
 			count++;
@@ -406,7 +406,7 @@ public class SpiderController {
 			if(videoCompare==null&&videoUrl!=null){
 			Video video=null;
 			video = new Video(title, null, duration, videoUrl, imgUrl,
-					StaticKey.VideoStatusTrue, keyId, playCount, likingCount, sendingCount,commentCount,
+					StaticKey.VideoStatusTrue,0, keyId, playCount, likingCount, sendingCount,commentCount,
 					StaticKey.VideoMeiPai, sourceUrl, new Date());
 			videoService.saveVideo(video);
 			count++;
@@ -426,13 +426,16 @@ public class SpiderController {
 	public Map<String,Object> toutiaoArticle() {
 		Map<String,Object> returnMap=new HashMap<String,Object>();
 		int count=0;
-		String url = "http://www.toutiao.com/api/pc/feed/";
+//		String url = "http://www.toutiao.com/api/pc/feed/";
+		String url = "http://www.toutiao.com/api/article/feed/";
 		String tag = "funny";
 //		JSONObject param = JinRiTouTiaoUtil.getUrlParam();
 //		Object as = param.get("as");
 //		Object cp = param.get("cp");
-		String as = "A165E968744150D";
-		String cp = "5984813550ED3E1";
+//		String as = "A165E968744150D";
+//		String cp = "5984813550ED3E1";
+		String as = "A1356A70924C7EE";
+		String cp = "5A021C278EEE8E1";
 //		String max_behot_time_tmp = "1501816479";
 		String max_behot_time_tmp = redisService.get("spiderJinritoutiaoNextTime");
 		if(StringUtils.isBlank(max_behot_time_tmp)){
@@ -561,6 +564,7 @@ public class SpiderController {
 			article.setSourceUrl(sourceUrl);
 			article.setAddTime(new Date());
 			article.setStatus(StaticKey.ArticleStatusTrue);
+			article.setType(0);
 			String name="头条";
 			article.setContentKind(contentKindService.findByName(name));
 			Article articleCompare = articleService.findByKeyAndType(keyId,StaticKey.ArticleJinRiTouTiao);
@@ -577,14 +581,15 @@ public class SpiderController {
 	
 	
 	/**
-	 * 东方头条Article采集
+	 * 东方头条1Article采集
 	 */
-	@RequestMapping(value="/dongfangArticle")
+	@RequestMapping(value="/dongfangArticle1")
 	@ResponseBody
-	public Map<String,Object> dongfangArticle() {
+	public Map<String,Object> dongfangArticle1() {
 		Map<String,Object> returnMap=new HashMap<String,Object>();
 		int count=0;
 		String url_1 = "https://toutiao.eastday.com/toutiao_h5/pulldown";
+//		String resp = CommonUtil.sendGet(url_1, "type=society&startkey=8213310536440425993&pgnum=-1&jsonpcallback=data");
 		String resp = CommonUtil.sendGet(url_1, "type=xiaohua&startkey=8213310536440425993&pgnum=-1&jsonpcallback=data");
 //		过滤emoji表情
 		resp = CommonUtil.emojiFilter(resp);
@@ -601,10 +606,6 @@ public class SpiderController {
 		// 遍历这个jsonArray,获取到每一个json对象,然后将其转换成Map对象(在这里其实只需要一个group_id,那么没必要使用map)
 		for (int i = 0; i < parseArray.size()-1; i++) {
 			map = (Map) parseArray.get(i);
-
-			
-			
-			
 			
 //			TODO 采集视频
 			if(!String.valueOf(map.get("videolist")).equals("[]")){
@@ -702,6 +703,7 @@ public class SpiderController {
 			article.setSourceUrl(sourceUrl);
 			article.setAddTime(new Date());
 			article.setStatus(StaticKey.ArticleStatusTrue);
+			article.setType(0);
 			String name="头条";
 			article.setContentKind(contentKindService.findByName(name));
 			Article articleCompare = articleService.findByKeyAndType(keyId,StaticKey.ArticleDongFangTouTiao);
@@ -830,6 +832,7 @@ public class SpiderController {
 			article.setSourceUrl(sourceUrl);
 			article.setAddTime(new Date());
 			article.setStatus(StaticKey.ArticleStatusTrue);
+			article.setType(0);
 			String name="头条";
 			article.setContentKind(contentKindService.findByName(name));
 			Article articleCompare = articleService.findByKeyAndType(keyId,StaticKey.ArticleQuTouTiao);
@@ -955,6 +958,7 @@ public class SpiderController {
 			article.setSourceUrl(sourceUrl);
 			article.setAddTime(new Date());
 			article.setStatus(StaticKey.ArticleStatusTrue);
+			article.setType(0);
 			String name="头条";
 			article.setContentKind(contentKindService.findByName(name));
 			Article articleCompare = articleService.findByKeyAndType(keyId,StaticKey.ArticleMobileSina);
@@ -971,4 +975,152 @@ public class SpiderController {
 }
 	
 	
+	
+	/**
+	 * 东方头条Article采集
+	 */
+	@RequestMapping(value="/dongfangArticle")
+	@ResponseBody
+	public Map<String,Object> dongfangArticle() {
+		Map<String,Object> returnMap=new HashMap<String,Object>();
+		int count=0;
+		String url_1 = "https://toutiao.eastday.com/toutiao_h5/pulldown";
+		String resp = CommonUtil.sendGet(url_1, "type=xiaohua&startkey=8213310536440425993&pgnum=-1&jsonpcallback=data");
+//		过滤emoji表情
+		resp = CommonUtil.emojiFilter(resp);
+		
+		resp = StringUtils.substringBetween(resp, "data(", "\"})");
+		resp = resp + "\"}";
+
+		Map parse = (Map) JSONObject.parse(resp);
+//		System.out.println("get到的json==="+resp);
+		JSONArray parseArray = (JSONArray) parse.get("data");
+//		System.out.println("解析到的data==="+parseArray);
+		Map map = null;
+//		List<Map> maps = new ArrayList<>();
+		// 遍历这个jsonArray,获取到每一个json对象,然后将其转换成Map对象(在这里其实只需要一个group_id,那么没必要使用map)
+		for (int i = 0; i < parseArray.size()-1; i++) {
+			map = (Map) parseArray.get(i);
+			
+//			TODO 采集视频
+			if(!String.valueOf(map.get("videolist")).equals("[]")){
+				continue;
+			}
+//			System.out.println("文章标题："+map.get("topic"));
+			String title = String.valueOf(map.get("topic"));
+			
+//			System.out.println("文章阅读数："+map.get("urlpv"));
+			
+//			System.out.println("文章评论数："+map.get("comment_count"));
+			Integer commentCount = Integer.valueOf(String.valueOf(map.get("comment_count")));
+			
+//			System.out.println("原始url："+map.get("url"));
+			String sourceUrl = String.valueOf(map.get("url"));
+			
+//			System.out.println("文章key："+map.get("rowkey"));
+			String keyId = String.valueOf(map.get("rowkey"));
+			
+//			System.out.println("发布时间："+map.get("date"));
+			
+			JSONArray lbimgArray = (JSONArray) map.get("lbimg");
+			Map lbimgMap = (Map) lbimgArray.get(0);
+//			System.out.println("文章image_url："+lbimgMap.get("src"));
+
+			
+			List<Map<String, Object>> imgListStr = new ArrayList<>();
+			Map<String, Object> urlStr = null;
+//			System.out.println("文章image_list数："+map.get("miniimg_size"));
+			JSONArray miniimgArray = (JSONArray) map.get("miniimg");
+			for (int j = 0; j < Integer.parseInt((String)map.get("miniimg_size")); j++) {
+				urlStr = new LinkedHashMap<>();
+				Map miniimgMap = (Map) miniimgArray.get(j);
+				urlStr.put("url", miniimgMap.get("src"));
+				imgListStr.add(urlStr);
+			}
+			Map<String, Object> imgListMap = new LinkedHashMap<>();
+			imgListMap.put("imgList", imgListStr);
+			String json = JSON.toJSONString(imgListMap);
+//			System.out.println("文章image_list："+json);
+			
+			String content=null;
+			Connection connection = null;
+			connection = Jsoup.connect(String.valueOf(map.get("url")));
+			try {
+				Document document = connection.get();
+
+				// 获取文章内容
+				Elements contentEle = document.select("[class=J-article-content article-content]");
+//				System.out.println("文章内容："+contentEle.html());
+				content = contentEle.html();
+				if(StringUtils.isBlank(content)){
+					continue;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			String imgUrl = String.valueOf(lbimgMap.get("src"));
+			if(map.get("lbimg")!=null){
+				imgUrl = String.valueOf(lbimgMap.get("src"));
+			}
+			else{
+				imgUrl = StringUtils.substringBetween(content,"<img src=\"","\"");
+			}
+			
+			String imgList = null;
+			if(map.get("miniimg_size")!=null){
+				imgList = json;
+			}
+			if(imgUrl!=null && map.get("image_list")==null){
+				imgList = "{\"imgList\":[{\"url\":\""+imgUrl+"\"}]}";
+			}
+			if(imgUrl==null && map.get("image_list")==null){
+				imgList = null;
+			}
+			
+			
+			Integer likingCount = 0;
+			Integer sendingCount = 0;
+			commentCount = 0;
+			Integer readingCount = 0;
+			
+			Article article = new Article();
+			article.setTitle(title);
+			article.setDescription(null);
+			article.setImgUrl(imgUrl);
+			article.setImgList(imgList);
+			article.setKeyId(keyId);
+			article.setCommentCount(commentCount);
+			article.setLikingCount(likingCount);
+			article.setSendingCount(sendingCount);
+			article.setReadingCount(readingCount);
+			article.setSourceId(StaticKey.ArticleDongFangTouTiao);
+			article.setSourceUrl(sourceUrl);
+			article.setAddTime(new Date());
+			article.setStatus(StaticKey.ArticleStatusTrue);
+			article.setType(0);
+			String name="头条";
+			article.setContentKind(contentKindService.findByName(name));
+			Article articleCompare = articleService.findByKeyAndType(keyId,StaticKey.ArticleDongFangTouTiao);
+			if(articleCompare==null&&content!=null){
+				article.setContent(content);
+				articleService.saveArticle(article);
+				count++;
+			}
+		}
+		
+	
+		returnMap.put("msg", "success");
+		returnMap.put("count", count);
+		return returnMap;
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+		
 }

@@ -767,6 +767,7 @@ public class AccountAction {
 	 * @param userId : 关在小黑屋中的用户id
 	 * @param breakoutId : 帮助越狱人的id
 	 * @return
+	 * 如果用户的状态为禁用状态,越狱后状态不改变
 	 */
 	@ResponseBody
 	@RequestMapping(value="/breakout")
@@ -812,8 +813,10 @@ public class AccountAction {
 		breakoutUser.setPayMoney(breakoutUser.getPayMoney()+StaticKey.BreakoutMoney);
 		userService.updateUser(breakoutUser);
 		//将用户状态改为正常
-		user.setStatus(StaticKey.UserStatusTrue);
-		userService.updateUser(user);
+		if(user.getStatus()!=0){
+			user.setStatus(StaticKey.UserStatusTrue);
+			userService.updateUser(user);
+		}
 		
 		//添加分润
 		FenrunLog fl = new FenrunLog();

@@ -408,6 +408,7 @@ public class ContentAction {
 		List<Article> list =null;//articleService.findFive()
 		if(flushType==1){
 			list = articleService.findByKind(kindId,pageNo);
+			System.out.println(list.size());
 		}
 		
 		if(flushType==0){
