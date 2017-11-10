@@ -923,7 +923,8 @@ public class SpiderController {
 				Document document = connection.get();
 
 				// 获取文章内容
-				Elements contentEle = document.select("[class=J-article-content article-content]");
+//				Elements contentEle = document.select("[class=J-article-content article-content]");
+				Elements contentEle = document.select("[class=J-article article]");
 //				System.out.println("文章内容："+contentEle.html());
 				content = contentEle.html();
 				if(StringUtils.isBlank(content)){
