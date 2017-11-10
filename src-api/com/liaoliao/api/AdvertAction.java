@@ -241,7 +241,7 @@ public class AdvertAction {
 			item.put("videoCommentCount", ThreadLocalRandom.current().nextInt(100, 1000));
 			item.put("videoLikingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 			item.put("videoSendingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
-			item.put("videoPlayCount", ThreadLocalRandom.current().nextInt(9000, 25000));
+			item.put("videoPlayCount", ThreadLocalRandom.current().nextInt(90000, 250000));  //又增加10倍
 			
 			Users luser = userService.findById(StaticKey.liaoliaoVideoId);
 			Long luserFl = focusLogService.countNum(StaticKey.liaoliaoVideoId);
@@ -331,7 +331,7 @@ public class AdvertAction {
 			item.put("articleImgList", imgListObj);
 //			item.put("articleReadingCount", article.getReadingCount());
 //			item.put("articleCommentCount", article.getCommentCount());
-			item.put("articleReadingCount", ThreadLocalRandom.current().nextInt(9000, 25000));
+			item.put("articleReadingCount", ThreadLocalRandom.current().nextInt(90000, 250000));  //又翻了十倍
 			item.put("articleLikingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 			item.put("articleSendingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 			item.put("articleCommentCount", ThreadLocalRandom.current().nextInt(100, 1000));

@@ -226,7 +226,7 @@ public class ShareAction {
 			item.put("videoCommentCount", ThreadLocalRandom.current().nextInt(100, 1000));
 			item.put("videoLikingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 			item.put("videoSendingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
-			item.put("videoPlayingCount", ThreadLocalRandom.current().nextInt(9000, 25000));
+			item.put("videoPlayingCount", ThreadLocalRandom.current().nextInt(90000, 250000));//翻了十倍
 //			RC4加密
 			String idStrMoreVideo = RC4Kit.encry_RC4_string(String.valueOf(videoMore.getId()), "liao");
 			item.put("videoShareUrl", "/share/video/"+idStrMoreVideo);
@@ -292,7 +292,7 @@ public class ShareAction {
 			item.put("articleImgList", imgListObjList);
 //			item.put("articleReadingCount", article.getReadingCount());
 //			item.put("articleCommentCount", article.getCommentCount());
-			item.put("articleReadingCount", ThreadLocalRandom.current().nextInt(9000, 25000));
+			item.put("articleReadingCount", ThreadLocalRandom.current().nextInt(90000, 250000)); //翻了十倍
 			item.put("articleLikingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 			item.put("articleSendingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 			item.put("articleCommentCount", ThreadLocalRandom.current().nextInt(100, 1000));
@@ -449,7 +449,7 @@ public class ShareAction {
 			item.put("videoCommentCount", ThreadLocalRandom.current().nextInt(100, 1000));
 			item.put("videoLikingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 			item.put("videoSendingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
-			item.put("videoPlayingCount", ThreadLocalRandom.current().nextInt(9000, 25000));
+			item.put("videoPlayingCount", ThreadLocalRandom.current().nextInt(90000, 250000));//翻了十倍
 //			RC4加密
 			String idStrMoreVideo = RC4Kit.encry_RC4_string(String.valueOf(videoMore.getId()), "liao");
 			item.put("videoShareUrl", "/share/video/"+idStrMoreVideo);
@@ -515,7 +515,7 @@ public class ShareAction {
 			item.put("articleImgList", imgListObjList);
 //			item.put("articleReadingCount", article.getReadingCount());
 //			item.put("articleCommentCount", article.getCommentCount());
-			item.put("articleReadingCount", ThreadLocalRandom.current().nextInt(9000, 25000));
+			item.put("articleReadingCount", ThreadLocalRandom.current().nextInt(90000, 250000));//翻了十倍
 			item.put("articleLikingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 			item.put("articleSendingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 			item.put("articleCommentCount", ThreadLocalRandom.current().nextInt(100, 1000));

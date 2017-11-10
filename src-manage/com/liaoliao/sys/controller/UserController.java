@@ -155,8 +155,8 @@ public class UserController {
 		request.setAttribute("isActive", isActive);	
 		
 		//更新今日总额开始
-		//当今日所有条件未选择时,执行
-		if(isActive==null&&vipStatus==null&&mobile==null&&userName==null){
+		//当今日所有条件未选择时,执行 
+		if(isActive==null&&vipStatus==null&&mobile==null&&userName==null&&(pageNo==0||pageNo==null)){
 			//更新今日总额:从分润日志中查询当日总额,更新user
 			List<Users> updateList=userService.findAll();
 			for (Users user : updateList) {
@@ -784,8 +784,8 @@ public class UserController {
         
         
         
-//		统计每日分润料币总金额
-		handleCountService.handleCountTotalMoney("totalProfitMoney",StaticKey.passArticleMoney);
+//		统计每日分润料币总金额 (取消发表原创,统计料币)
+//		handleCountService.handleCountTotalMoney("totalProfitMoney",StaticKey.passArticleMoney);
 		map.put("code", 1);
 		map.put("msg", "success");
 		return map;
@@ -912,8 +912,8 @@ public class UserController {
         
         
         
-//		统计每日分润料币总金额
-		handleCountService.handleCountTotalMoney("totalProfitMoney",StaticKey.passVideoMoney);
+//		统计每日分润料币总金额(取消发表原创获得料币)
+//		handleCountService.handleCountTotalMoney("totalProfitMoney",StaticKey.passVideoMoney);
 		map.put("code", 1);
 		map.put("msg", "success");
 		return map;
