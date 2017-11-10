@@ -798,6 +798,11 @@ public class ShareAction {
 	public Map<String,Object> uploadPrimary(HttpServletRequest request,Integer userId,String duration,
 			String description,String title,String content,String imgUrl,String videoUrl,Integer type){
 		Map<String,Object> map = new HashMap<>();
+		if(imgUrl==null||"".equals(imgUrl)){
+			map.put("msg", "有参数为空");
+			map.put("code", StaticKey.ReturnClientNullError);
+			return map;
+		}
 		if(userId==null||type==null){
 			map.put("msg", "有参数为空");
 			map.put("code", StaticKey.ReturnClientNullError);
@@ -826,11 +831,13 @@ public class ShareAction {
 			article.setAddTime(new Date());
 			article.setContentKind(contentKindService.findByName("头条"));
 			article.setDescription(content);
-			if(imgUrl==null||"".equals(imgUrl)){
+			
+			/*if(imgUrl==null||"".equals(imgUrl)){
 				map.put("msg", "有参数为空");
 				map.put("code", StaticKey.ReturnClientNullError);
 				return map;
-			}
+			}*/
+			
 			String[] imgs =imgUrl.split(",");
 			String spli="";
 			String fengmianImgs="<div><div class=\"content\">";

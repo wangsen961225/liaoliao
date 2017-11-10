@@ -28,12 +28,12 @@
 	<center>
 		<span style="position: absolute; top: 30%; left: 10%; color: white; width: 80%;" align="center">
 		
-			<center><p style="font-size:1.5em">我在料料获得了<font size="15em" color="red"><strong><i>${map.money }</i></strong></font>&nbsp;料币,首次注册,立即获得1元新手红包,阅读文章,看视频,邀请好友都可以获得料币哟!<br/>在娱乐中把钱赚,你也一起来吧!</p></center>
+			<center><p style="font-size:1.5em">我在料料获得了<font size="15em" color="red"><strong><i>${map.money }</i></strong></font>&nbsp;料币,首次注册,立即获得1元新手红包,阅读文章,看视频,发原创,邀请好友都可获得料币哟!<br/>在娱乐中把钱赚,你也一起来吧!</p></center>
 			<!--软件下载 -->
 			<center>
 				<div id="ceb331">
 					<span class="ut ub-f1 ut-s tx-c" tabindex="0" style="margin: 0 auto; font-size: 20px; display: block; width: 100%; position: absolute; left: 45; top: 60; padding: 0; height: 5em; line-height: 3em;color: #fff;text-align: center;">
-						<a href="${map.downloadUrl}" target="_self"><font color="#fff">点击加入我们吧!</font>
+						<a href="${map.downloadUrl}" target="_self"><font color="#fff">点击加入我们!</font>
 							<div class="box">
 							<img src="http://appliaoliao.oss-cn-hangzhou.aliyuncs.com/ll_share_redpackage/ll_shareRedpackage_023cc8429fec11e78c5400163e031982.png?x-oss-process=style/blank_style">
 							</div>

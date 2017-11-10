@@ -26,12 +26,18 @@
 	</span>
 </div>
 
-	<span style="position: absolute; top: 50%; left: 10%; color: white; width: 80%;" align="center">
+	<span style="position: absolute; top: 30%; left: 10%; color: white; width: 80%;" align="center">
 	<c:if test="${userId==null}">
 		<b>哇哦,您还不是会员,快来注册吧~</b>
 	</c:if>
 	<c:if test="${userId!=null}">
-		<b>亲,您的好友 ${userNickName} 邀请您来料料嗨皮啦~</b>
+		<b>亲,您的好友<font style="color:red;font-size:21px;"> ${userNickName} </font>邀请您来料料嗨皮啦~
+			<br/>
+			首次注册,立即获得<font style="color:red;font-size:22px;"><i><b>&nbsp;1元&nbsp;&nbsp;</b></i></font>新手红包,阅读文章,看视频,发原创,邀请好友都可获得料币哟!
+			<br/>
+			<br/>
+			使用料料客户端一键注册,一键登录,免除注册烦恼,赶紧点击屏幕下方的下载按钮下载吧!
+		</b>
 	</c:if>
 	</span>
 	
@@ -190,6 +196,98 @@
 			return false;
 		}
 	</script>
+
+<!-- 底部悬浮-软件下载 -->
+<div id="ceb33">
+<a href="${map.downloadUrl}" target="_self" style="text-decoration:none;outline:none;-webkit-tap-highlight-color: transparent;">
+	<div id="ceb33_1">
+		<div class="ceb33_2"></div>
+		<div class="ceb33_3"><p>料料</p><p>读文章、看视频、抢红包。</p></div>
+		<!-- <a href="http://zhushou.360.cn/detail/index/soft_id/3875226" target="_self" class="ceb33_4">打开</a> -->
+		<a href="${map.downloadUrl}" target="_self" class="ceb33_4">下载</a>
+	</div>
+	<div id="ceb33_5"></div>
+</a>
+</div>
+<style type="text/css">
+#ceb33 {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 20;
+    width: 100%;
+    height: 53px;
+    background: #ffffff;
+    opacity: 1;
+    border-top: 1px solid #e0e0e0;
+    box-sizing: border-box;
+}
+#ceb33_1 {
+    pointer-events: auto;
+    height: 53px;
+    box-sizing: border-box;
+}
+.ceb33_2 {
+    border: none;
+    height: 36px;
+    width: 36px;
+    position: absolute;
+    bottom: 7px;
+    left: 46px;
+    background: url(${pageContext.request.contextPath}/style/images/logo64.png) no-repeat;
+    background-size: 36px 36px;
+    -webkit-background-size: 36px 36px;
+}
+.ceb33_3 {
+    position: absolute;
+    padding: 11px 0 0 10px;
+    left: 84px;
+    color: #333;
+    font-family: 微软雅黑;
+    text-align: left;
+}
+.ceb33_3 p:first-child {
+    font-weight: 800;
+    font-size: 16px;
+    line-height: 16px;
+    margin: 0;
+}
+.ceb33_3 p:last-child {
+    color: #999;
+    font-size: 12px;
+    line-height: 20px;
+    margin: 0;
+}
+.ceb33_4 {
+    display: inline-block;
+    height: 26px;
+    line-height: 26px;
+    width: 62px;
+    position: absolute;
+    bottom: 12px;
+    right: 16px;
+    box-sizing: border-box;
+    z-index: 99;
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    color: #333;
+    font-size: 13px;
+    text-align: center;
+    text-decoration:none;
+}
+#ceb33_5 {
+    pointer-events: auto;
+    position: absolute;
+    left: 5px;
+    bottom: 0px;
+    height: 53px;
+    width: 40px;
+    background-size: 20px 20px;
+    -webkit-background-size: 20px 20px;
+}
+</style>
+
+
 
 </body>
 </html>

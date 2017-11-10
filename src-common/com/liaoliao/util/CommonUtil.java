@@ -176,7 +176,9 @@ public class CommonUtil {
 	 * @return
 	 */
 	public static String emojiFilter(String emoji) {
-		return emoji.replaceAll("[\\ud800\\udc00-\\udbff\\udfff\\ud800-\\udfff]", "");
+		String replaceAll = emoji.replaceAll("[\\ud800\\udc00-\\udbff\\udfff\\ud800-\\udfff]", "");
+		
+		return replaceAll; 
 	}
 	
 	

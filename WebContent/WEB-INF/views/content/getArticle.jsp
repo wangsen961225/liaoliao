@@ -16,6 +16,7 @@
 <input class="btn btn-info" type="button" onclick="dongfangArticle()" value="获取东方头条文章" style="margin-top: 20%; margin-left: 20%;"/>
 <input class="btn btn-info" type="button" onclick="qutoutiaoArticle()" value="获取趣头条文章" style="margin-top: 20%; margin-left: 20%;"/>
 <input class="btn btn-info" type="button" onclick="mobileSinaArticle()" value="获取手机新浪文章" style="margin-top: 20%; margin-left: 20%;"/>
+<input class="btn btn-info" type="button" onclick="dongfangArticle4Society()" value="获取东方头条文章-社会" style="margin-top: 20%; margin-left: 20%;"/>
 
 </body>
 <script type="text/javascript">
@@ -42,6 +43,20 @@ function dongfangArticle(){
 		success:function(data){
 			if(data.msg == "success"){
 				alert("已从东方头条获取文章:"+data.count+"篇!");
+			}else{
+				alert("阿偶,出错咯,重新获取吧~");
+			}
+		}
+	});
+}
+
+function dongfangArticle4Society(){
+	$.ajax({
+		type:"GET",
+		url:"${ctx}/content/dongfangArticle4Society",
+		success:function(data){
+			if(data.msg == "success"){
+				alert("已从东方头条获取社会-文章:"+data.count+"篇!");
 			}else{
 				alert("阿偶,出错咯,重新获取吧~");
 			}

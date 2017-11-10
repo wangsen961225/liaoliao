@@ -783,6 +783,9 @@ public class SpiderController {
 				
 //				截取数组转list
 				String[] imgSub = StringUtils.substringsBetween(contentEle.html(), "<img src=\"", "\"");
+				if(imgSub==null){
+					continue;
+				}
 				List listOrgin = Arrays.asList(imgSub);
 				
 //				自行构造imgList的json形式
