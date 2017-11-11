@@ -204,6 +204,7 @@ public class ShareAction {
 		Video videoMore = null;
 		Article articleMore = null;
 		List imgListObjList = null;
+		Users users = null;
 		// Map-->List-->Map 三层转换
 		List<Map<String, Object>> datas = new ArrayList<>();
 		Map<String, Object> item = null;
@@ -211,11 +212,19 @@ public class ShareAction {
 			imgListObjList = new ArrayList();
 			
 			videoMore = videoService.findByRand(1).get(0);
+			if(videoMore.getSourceId()>10000){
+				users = userService.findById(videoMore.getSourceId());
+			}else{
+				users = userService.findByRand(1);
+			}
 			articleMore = articleService.findByRand(1,1).get(0);
 			
 			item = new LinkedHashMap<>();
 //			video
 //			item.put("videoId", videoMore.getId());
+			item.put("nickName", users.getNickName());
+			System.out.println(users.getNickName());
+			item.put("avatar", users.getAvatar());
 			item.put("videoTitle", videoMore.getTitle());
 //			item.put("videoDescription", videoMore.getDescription());
 			item.put("videoImgUrl", videoMore.getImgUrl());
@@ -230,6 +239,7 @@ public class ShareAction {
 //			RC4加密
 			String idStrMoreVideo = RC4Kit.encry_RC4_string(String.valueOf(videoMore.getId()), "liao");
 			item.put("videoShareUrl", "/share/video/"+idStrMoreVideo);
+			
 //			article
 //			item.put("articleId", articleMore.getId());
 			item.put("articleTitle", articleMore.getTitle());
