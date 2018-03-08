@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.liaoliao.profit.dao.WeixinPayLogDao;
 import com.liaoliao.profit.entity.WeixinPayLog;
 import com.liaoliao.profit.service.WeixinPayLogService;
+import com.liaoliao.user.entity.Users;
 
 
 @Service
@@ -46,6 +47,38 @@ public class WeixinPayLogServiceImpl implements WeixinPayLogService {
 	@Override
 	public Integer findCount() {
 		return weixinPayLogDao.findCount() ;
+	}
+
+
+	@Override
+	public List<WeixinPayLog> queryByBodyAndUser(String body, Users user) {
+		
+		return weixinPayLogDao.queryByBodyAndUser(body, user);
+	}
+
+
+	@Override
+	public List<WeixinPayLog> findAllByUser(Users users) {
+		return weixinPayLogDao.findAllByUser(users);
+	}
+
+
+	@Override
+	public WeixinPayLog queryOne(Integer id) {
+		return weixinPayLogDao.queryOne(id);
+	}
+
+
+	@Override
+	public WeixinPayLog queryOneByOrderNum(String id) {
+		
+		return weixinPayLogDao.queryOneByOrderNum(id);
+	}
+
+
+	@Override
+	public List<WeixinPayLog> findAllByUserAndType(Users users) {
+		return weixinPayLogDao.findAllByUserAndType(users);
 	}
 
 }

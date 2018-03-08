@@ -1,6 +1,7 @@
 package com.liaoliao.api;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.cn.hnust.controller.MobilePushAction;
+import com.cn.hnust.controller.MobilePushActionProxy;
 import com.liaoliao.content.entity.Article;
 import com.liaoliao.content.entity.Video;
 import com.liaoliao.content.service.ArticleService;
@@ -49,7 +52,6 @@ import com.liaoliao.user.service.RedPackageService;
 import com.liaoliao.user.service.UserService;
 import com.liaoliao.user.service.UserSignService;
 import com.liaoliao.util.CommonUtil;
-import com.liaoliao.util.JPushUtil;
 import com.liaoliao.util.RC4Kit;
 import com.liaoliao.util.StaticKey;
 import com.liaoliao.util.StringKit;
@@ -304,11 +306,13 @@ public class UserCenterAction {
 	/**
 	 * 发广播
 	 * @return
+	 * @throws Exception 
 	 */
 	@RequestMapping(value="/sendBroadcast")
 	@ResponseBody
-	public Map<String,Object> sendBroadcast(HttpServletRequest request, Integer userId, String content, Integer type){
+	public Map<String,Object> sendBroadcast(HttpServletRequest request, Integer userId, String content, Integer type) throws Exception{
 		Map<String,Object> map=new HashMap<>();
+		System.out.println("发法已经进入"+StringUtils.isBlank(content));
 		if(userId==null||StringUtils.isBlank(content)||type==null||(type!=1&&type!=2&&type!=3)){
 			map.put("msg", "参数异常");
 			map.put("code", StaticKey.ReturnClientNullError);
@@ -416,12 +420,18 @@ public class UserCenterAction {
 		fenrun.setAddTime(new Date());
 		fenrunLogService.saveFenrunLog(fenrun);
 		
-		Map<String, String> extras = new HashMap<String, String>();
 		// 添加附加信息
-		extras.put("type", StaticKey.JPushSendBroadcast);
-		extras.put("time", broadcastTime);
-		
-		JPushUtil.sendAllMessage(content,extras,1800);
+		String extras="{\"type\":\""+StaticKey.JPushSendBroadcast+"\",\"time\":\""+broadcastTime+"\"}";
+		System.out.println(extras+"========");
+		// 添加附加信息
+		MobilePushAction mobilePushAction2=new MobilePushActionProxy();
+		try {
+			mobilePushAction2.send(StaticKey.AliPushMessage, content, extras,4000);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	    //JPushUtil.sendAllMessage(content,extras,1800);
+//		AliyunMPushUtil.testAdvancedPush("0",content, extras, 1800);
 //		统计每日sendBroadcast发送广播次数
 		handleCountService.handleCountPlusOne("sendBroadcast");
 		map.put("msg", "success");
@@ -517,10 +527,11 @@ public class UserCenterAction {
 	/**
 	 * 霸屏上线
 	 * @return
+	 * @throws Exception 
 	 */
 	@RequestMapping(value="/vipLoginEffect")
 	@ResponseBody
-	public Map<String,Object> vipLoginEffect(HttpServletRequest request, Integer userId){
+	public Map<String,Object> vipLoginEffect(HttpServletRequest request, Integer userId) throws Exception{
 		Map<String,Object> map=new HashMap<>();
 		if(userId==null){
 			map.put("msg", "有参数为空");
@@ -551,7 +562,7 @@ public class UserCenterAction {
 		long lastTime = -1;
 		String lastTimeStr = redisService.get("vipEffectLastTime_"+userId);
 		if(!StringUtil.isBlank(lastTimeStr)){
-			lastTime = Long.valueOf(lastTimeStr);
+		   lastTime = Long.valueOf(lastTimeStr);
 		}
 		redisService.set("vipEffectLastTime_"+userId,String.valueOf(nowTime),7*24*60*60);
 		long cooldownTime = nowTime-lastTime;
@@ -563,20 +574,30 @@ public class UserCenterAction {
 		}else{
 			vipEffectFreeze = Double.valueOf(vipEffectFreezeStr);
 		}
-		
+	/*	
 		if(cooldownTime < vipEffectFreeze*60*60*1000){
 			map.put("msg", "冷却时间内仅闪亮登场一次，未到冷却时间");
 			map.put("cooldownTime", cooldownTime);
 			map.put("code", StaticKey.ReturnCooldownTimeError);
 			return map;
 		}
-		
-		Map<String, String> extras = new HashMap<String, String>();
-		// 添加附加信息
+		*/
+		/*Map<String, String> extras = new HashMap<String, String>();
 		extras.put("type", StaticKey.JPushVipLoginEffectType);
-		extras.put("userId", String.valueOf(user.getId()));
-		
-		JPushUtil.sendAllMessage(user.getNickName(),extras,1800);
+		extras.put("userId", String.valueOf(user.getId()));*/
+		Users users=userService.queryOne(userId);
+		String extras="{\"type\":\""+StaticKey.JPushVipLoginEffectType+
+				"\",\"userId\":\""+String.valueOf(user.getId())+
+				"\",\"username\":\""+users.getNickName()+
+				"\"}";
+		// 添加附加信息
+		System.out.println(extras+"========");
+		MobilePushAction mobilePushAction2=new MobilePushActionProxy();
+		try {
+			mobilePushAction2.send(StaticKey.AliPushMessage, user.getNickName(), extras,4000);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 		user.setLoginTime(new Date());
 		userService.updateUser(user);
 //		统计每日vipEffect霸屏上线次数

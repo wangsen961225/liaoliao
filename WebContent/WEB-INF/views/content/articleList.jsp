@@ -71,6 +71,7 @@
 						<td>
 						  <c:if test="${li.status==1}">正常</c:if>
 						  <c:if test="${li.status==0}"><p style="color:red">封禁</p></c:if>
+						  <c:if test="${li.status==100}"><p style="color:#FFD700">推荐</p></c:if>
 						</td>
 						<td>${li.contentKind.kindName}</td>
 						<td>${li.readingCount}</td>
@@ -80,6 +81,7 @@
 						  <button class="btn btn-info" type="button" onclick="modifyArticle(${li.id})">修改</button>&nbsp;&nbsp;&nbsp;&nbsp;
 						  <button class="btn btn-danger" type="button" onclick="javascript:return confirm(deleteArticle,${li.id},'确定删除吗?');">删除</button>&nbsp;&nbsp;&nbsp;&nbsp;
 						  <button class="btn btn-danger" type="button" onclick="banArticle(${li.id})">封禁</button>
+						  <button class="btn btn-danger" type="button" onclick="tuiArticle(${li.id})">推荐</button>
 						</td>
 					</tr>
 				</c:forEach>
@@ -137,6 +139,24 @@ function banArticle(id){
 			alert("出错啦~~");
 		}
 	})
+	
+}
+
+function tuiArticle(id){
+	$.ajax({
+		type:"GET",
+		url:"${ctx}/content/tuiArticle?id="+id,
+		success:function(data){
+			if(data.code==200){
+				alert(data.msg);
+				window.location.href="${ctx}/content/toArticle";
+			}
+		},
+		error:function(){
+			alert("出错啦~~");
+		}
+	})
+	
 }
 </script>
 </html>

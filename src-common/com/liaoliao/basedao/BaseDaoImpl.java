@@ -54,7 +54,26 @@ public class BaseDaoImpl<T, ID extends Serializable> implements IBaseDao<T, ID> 
     public void save(T t) {
         this.getSession().save(t);
     }
-
+    /**
+     * 批量保存
+     */
+    @Override
+	public void saveList(List<T> ms) {
+    	Session session = null;
+        if (ms != null && ms.size() > 0) {
+            session = this.getSession(); // 获取Session
+            T t = null; // 创建对象
+            for (int i = 0; i < ms.size(); i++) {
+            	t=ms.get(i); // 获取对象
+              session.save(t); // 保存对象
+              // 批插入的对象立即写入数据库并释放内存
+              if (i % 10 == 0) {
+                session.flush();
+                session.clear();
+              }
+            }
+        }
+	}
     /**
      * <保存或者更新实体>
      * @param t 实体
@@ -244,6 +263,28 @@ public class BaseDaoImpl<T, ID extends Serializable> implements IBaseDao<T, ID> 
         
         return query.list();
     }
+    
+    /**
+     * <根据HQL语句，得到对应的list>
+     * @param hqlString HQL语句
+     * @param values 不定参数的Object数组
+     * @return 查询多个实体的List集合
+     * @see com.perry.basedao.IBaseDao#getListByHQL(java.lang.String, java.lang.Object[])
+     */
+    @Override
+    public List<T> getListByHQLs(String hqlString, Object... values) {
+        Query query = this.getSession().createQuery(hqlString);
+        if (values != null)
+        {
+            for (int i = 0; i < values.length; i++)
+            {
+            	String s = String.valueOf(i);
+                query.setParameter(s, values[i]);
+            }
+        }
+        
+        return query.list();
+    }
 
     /**
      * <根据SQL语句，得到对应的list>
@@ -360,8 +401,11 @@ public class BaseDaoImpl<T, ID extends Serializable> implements IBaseDao<T, ID> 
         }
         return (Long) query.uniqueResult();
     }
+    
+   
 
     /**
+
      * <HQL分页查询>
      * @param hql HQL语句
      * @param countHql 查询记录条数的HQL语句
@@ -482,5 +526,9 @@ public class BaseDaoImpl<T, ID extends Serializable> implements IBaseDao<T, ID> 
         }
 
     }
+
+	
+
+	
 
 }

@@ -7,6 +7,8 @@ import com.liaoliao.content.entity.Video;
 
 public interface VideoService {
 
+	List<Video> findByStatus(Integer status);
+	
 	List<Video> findAll(Integer pageNo,Map<String,Object> map);
 
 	List<Video> findByRand(Integer size);

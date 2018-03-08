@@ -200,8 +200,23 @@ public class ArticleDaoImpl extends BaseDaoImpl<Article,Integer> implements Arti
 		return this.getListByHQL(hql, userId,oldT,nowT);
 	}
 
+	@Override
+	public List<Article> findAll() {
+		String hql="from Article  order by addTime desc";
+		return this.getListByHQL(hql);
+	}
+	
+	@Override
+	public List<Article> findByStatus(Integer status) {
+		String hql="from Article  where status=?0 order by addTime desc";
+		return this.getListByHQL(hql,status);
+	}
 
-
+	@Override
+	public Article findByUserId(Integer articleId, Integer userId) {
+		String hql="from Article  where articleId=?0 and userId==?1";
+		return  this.getByHQL(hql,articleId,userId);
+	}
 
 	
 

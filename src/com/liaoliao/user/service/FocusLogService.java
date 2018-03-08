@@ -9,7 +9,7 @@ public interface FocusLogService {
 	void saveFocusLog(FocusLog fl);
 
 	List<FocusLog> findByUserId(Integer userId);
-
+	Long findFocusCountById(Integer id);
 	
 	Long countNum(Integer id);
 	

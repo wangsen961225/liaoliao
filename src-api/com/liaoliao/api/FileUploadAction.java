@@ -15,9 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.liaoliao.user.service.UserService;
 
 import net.sf.json.JSONObject;
 
@@ -47,8 +44,7 @@ public class FileUploadAction  {
 		response.setCharacterEncoding("UTF-8");  
 		writer = response.getWriter();
 		json = new JSONObject();
-		System.out.println("111111111111111111111");
-//	        //接受文件流并命名
+	        //接受文件流并命名
 	        String imageFileName = imgFileName; 
 	   			String fileContentType = imgContentType;
 	   			if(fileContentType.equals("image/jpeg") || fileContentType.equals("image/pjpeg"))

@@ -1,5 +1,7 @@
 package com.liaoliao.api;
 
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.cn.hnust.controller.MobilePushAction;
+import com.cn.hnust.controller.MobilePushActionProxy;
 import com.liaoliao.listener.MySessionContext;
 import com.liaoliao.profit.entity.FenrunLog;
 import com.liaoliao.profit.service.FenrunLogService;
@@ -77,6 +81,37 @@ public class AccountAction {
 	
 	@Autowired
 	AdvertClicksService advertClicksService;
+	
+	
+	@RequestMapping("/sysRed")
+	public  void sysRed(){
+		int money=2000;
+		Integer number=500;
+		List<Integer> list=null;
+		if(number==1){
+			list=new ArrayList<>();
+			list.add(money);
+		}else{
+			list = RandomKit.randomRedPackage(money, number);
+		}
+		//如果是系统红包,发送通知
+		String extras="{\"type\":\""+StaticKey.JPushSendOfficialUserSendRedpackage.toString()
+		+"\",\"userId\":\""+StaticKey.SystemRedpackage.toString()+"\"}";
+		// 添加附加信息
+		MobilePushAction mobilePushAction2=new MobilePushActionProxy();
+		String tString="通知: 红包金额:"+money+"";
+		System.out.println(tString.length());
+		try {
+			mobilePushAction2.sendMessage(StaticKey.AliPushNotice,"通知: 红包金额:"+money+"~", extras,4000);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+			/*Map<String, String> extras = new HashMap<String,String>();
+			extras.put("type",StaticKey.JPushSendOfficialUserSendRedpackage.toString() );
+			extras.put("userId", StaticKey.SystemRedpackage.toString());
+			JPushUtil.sendAllsetNotification("通知: 天降红包~~ 金额:"+money+"~ 剩余数量:"+number,extras);*/
+		
+	}
 	
 	
 	/**
@@ -340,10 +375,11 @@ public class AccountAction {
 		map.put("code", StaticKey.ReturnServerTrue);
 		return map;
 	}
-	
 	/**
-	 * 获取手机验证码
-	 * 
+	 * 获取手机验证
+	 * @param request
+	 * @param mobile
+	 * @return
 	 */
 	@RequestMapping(value="/messageAuthCode")
 	@ResponseBody
@@ -649,6 +685,7 @@ public class AccountAction {
 			return map;
 		}
 		BanUser banUser = banUserService.findNotBreakoutByUserId(userId);
+		System.out.println(banUser);
 		if(banUser==null || banUser.getUserStatus()==StaticKey.UserStatusTrue||banUser.getDealTime()!=null||banUser.getBreakoutId()!=null){
 			map.put("userStatus", StaticKey.UserStatusTrue);
 		}

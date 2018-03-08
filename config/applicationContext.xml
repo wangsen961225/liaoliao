@@ -51,6 +51,7 @@
 				<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
 				<prop key="hibernate.temp.use_jdbc_metadata_defaults">${hibernate.temp.use_jdbc_metadata_defaults}</prop>
 				<prop key="hibernate.current_session_context_class">${hibernate.current_session_context_class}</prop>
+				<!-- <prop key="hibernate.autoReconnect">true</prop> -->
 			</props>
 		</property>
 	</bean>

@@ -1,8 +1,12 @@
 package com.liaoliao.sys.controller;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
+import java.text.Format;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -10,11 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tomcat.util.descriptor.web.ContextTransaction;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -28,12 +30,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.cn.hnust.controller.MobilePushAction;
+import com.cn.hnust.controller.MobilePushActionProxy;
 import com.liaoliao.content.entity.Article;
 import com.liaoliao.content.entity.Video;
 import com.liaoliao.content.service.ArticleService;
 import com.liaoliao.content.service.ContentKindService;
 import com.liaoliao.content.service.VideoService;
 import com.liaoliao.listener.MyContextLoader;
+import com.liaoliao.profit.entity.MoneyManagement;
+import com.liaoliao.profit.entity.UserMoneyManagement;
+import com.liaoliao.profit.service.MoneyManagementService;
+import com.liaoliao.profit.service.UserMoneyManagementService;
 import com.liaoliao.quartz.ScheduleJob;
 import com.liaoliao.redisclient.RedisService;
 import com.liaoliao.sys.service.HandleCountService;
@@ -42,6 +50,7 @@ import com.liaoliao.user.service.UserService;
 import com.liaoliao.util.CommonUtil;
 import com.liaoliao.util.JPushUtil;
 import com.liaoliao.util.MeipaiUtils;
+import com.liaoliao.util.RandomKit;
 import com.liaoliao.util.SpiderHttpKit;
 import com.liaoliao.util.StaticKey;
 import com.liaoliao.util.TimeKit;
@@ -53,10 +62,12 @@ import com.liaoliao.util.TimeKit;
  */
 @DisallowConcurrentExecution
 public class QuartzJob implements Job {
-	
 	@Autowired
 	private VideoService videoService;
-	
+	@Autowired
+	private  UserMoneyManagementService userMoneyManagementService;
+	@Autowired
+	private MoneyManagementService moneyManagementService;
 	@Autowired
 	private ArticleService articleService;
 	
@@ -76,6 +87,12 @@ public class QuartzJob implements Job {
 	public void execute(JobExecutionContext job) throws JobExecutionException {
         ScheduleJob scheduleJob = (ScheduleJob)job.getMergedJobDataMap().get("scheduleJob");  
         String name=scheduleJob.getJobName();
+        if("系统红包".equals(name)){
+        	sysRed();
+        }
+        if("理财收益".equals(name)){
+        	buyMoneyManagement();
+        }
         if("霸屏".equals(name)){
         	unrealVipLogin();
         }
@@ -123,6 +140,87 @@ public class QuartzJob implements Job {
 				e.printStackTrace();
 			}
 	        }
+	}
+	public  void sysRed(){
+		System.out.println("开始发红包.===================");
+		int money=2000;
+		Integer number=500;
+		List<Integer> list=null;
+		if(number==1){
+			list=new ArrayList<>();
+			list.add(money);
+		}else{
+			list = RandomKit.randomRedPackage(money, number);
+		}
+		//如果是系统红包,发送通知
+		String extras="{\"type\":\""+StaticKey.JPushSendOfficialUserSendRedpackage.toString()
+		+"\",\"userId\":\""+StaticKey.SystemRedpackage.toString()+"\"}";
+		// 添加附加信息
+		MobilePushAction mobilePushAction2=new MobilePushActionProxy();
+		String tString="通知: 红包金额:"+money+"";
+		System.out.println(tString.length());
+		try {
+			mobilePushAction2.sendMessage(StaticKey.AliPushNotice,tString, extras,4000);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+			/*Map<String, String> extras = new HashMap<String,String>();
+			extras.put("type",StaticKey.JPushSendOfficialUserSendRedpackage.toString() );
+			extras.put("userId", StaticKey.SystemRedpackage.toString());
+			JPushUtil.sendAllsetNotification("通知: 天降红包~~ 金额:"+money+"~ 剩余数量:"+number,extras);*/
+		System.out.println("系统红包已结束.");
+	}
+	/**
+	 * 每天下午6:00结算理财收益
+	 */
+	public  void buyMoneyManagement(){
+		System.out.println("结算开始.");
+		List<UserMoneyManagement> list=userMoneyManagementService.queryAll();
+		List<Users> userlists=userService.findAll();
+		for (Users users : userlists) {
+			users.setYesterdayMoney(0.0);
+			userService.updateUser(users);
+		}
+		for (UserMoneyManagement userMoneyManagement : list) {
+			String pid=userMoneyManagement.getMoneyId();
+			Users users=userService.queryOne(userMoneyManagement.getUserId());
+			MoneyManagement moneyManagement=moneyManagementService.queryOne(pid);
+			Date buyDate=userMoneyManagement.getBuyDate();
+			int yue=moneyManagement.getbuyMouth();
+			Calendar c = Calendar.getInstance();
+			Calendar c1 = Calendar.getInstance();
+			Format f = new SimpleDateFormat("yyyy-MM-dd");
+			c.setTime(buyDate);  
+			c.add(Calendar.MONTH, yue);
+			c1.add(Calendar.DAY_OF_MONTH, 1);
+			Date date=c.getTime();
+			Date date1=new Date();
+			Date date2=c1.getTime();
+			Double mday=0.0;
+			int days = ((int)(date.getTime()/1000)-(int)(buyDate.getTime()/1000))/3600/24;//购买到结算的总天数
+			if(users.getId()==10127){
+			}
+			
+			if(date.getTime()<date1.getTime()){
+				userMoneyManagement.setStatus(StaticKey.managementMoneyStatused);
+				userMoneyManagementService.revise(userMoneyManagement);
+//				userService.updateUser(users);
+			}else if(date2.getTime()!=date1.getTime()){
+				Double mDouble=userMoneyManagement.getMoney();//周期
+				Double bDouble=Double.parseDouble(moneyManagement.getInterestRate());//利息
+				Double zDouble=mDouble*yue*bDouble;//每个用户每个产品的预计总利润
+//				userMoneyManagement.setYuMoney(zDouble);
+//				userMoneyManagementService.revise(userMoneyManagement);
+				mday=zDouble/days;//每个用户每个产品每天的利润
+				if(users.getYesterdayMoney()==null){
+					users.setYesterdayMoney(0.0);
+				}
+				users.setYesterdayMoney(users.getYesterdayMoney()+mday);
+				users.setManagementMoney(users.getManagementMoney()+mday);
+				userService.updateUser(users);
+			}
+		}
+		System.out.println("结算结束.");
 	}
 	
 	/**
@@ -864,5 +962,6 @@ public class QuartzJob implements Job {
 		String time = TimeKit.dateToStr(date);
 		System.out.println(time+"==从趣头条采集："+count+"篇文章！");
 	}
+	
 }
 

@@ -23,7 +23,6 @@ import com.liaoliao.content.service.ArticleService;
 import com.liaoliao.content.service.LikesService;
 import com.liaoliao.content.service.VideoService;
 import com.liaoliao.redisclient.RedisService;
-import com.liaoliao.sys.entity.Advert;
 import com.liaoliao.sys.service.AdvertService;
 import com.liaoliao.user.entity.FocusLog;
 import com.liaoliao.user.entity.Users;
@@ -190,11 +189,8 @@ public class AdvertAction {
 	@ResponseBody 
 	public Map<String,Object> getAdArticleVideo(HttpServletRequest request,Integer userId){
 		Map<String,Object> map=new HashMap<String,Object>();
-		
 		Video video = null;
 		Article article = null;
-		
-		
 		List<Likes> likes = new ArrayList<Likes>();
 		List<Likes> articleLikes = null;
 		List<Likes> videoLikes = null;
@@ -219,7 +215,6 @@ public class AdvertAction {
 			}
 		}
 		
-		
 		List imgListObj = new ArrayList();
 		// Map-->List-->Map 三层转换
 		List<Map<String, Object>> datas = new ArrayList<>();
@@ -227,7 +222,6 @@ public class AdvertAction {
 		for (int i = 0; i < 3; i++) {
 			video = videoService.findByRand(1).get(0);
 			article = articleService.findByRand(1,1).get(0);
-			
 			item = new LinkedHashMap<>();
 //			video
 			item.put("videoId", video.getId());
@@ -236,6 +230,7 @@ public class AdvertAction {
 			item.put("videoImgUrl", video.getImgUrl());
 			item.put("videoUrl", video.getVideoUrl());
 			item.put("videoDuration", video.getDuration());
+			item.put("playMoneySum", ThreadLocalRandom.current().nextInt(1000, 25000));
 //			item.put("videoCommentCount", video.getCommentCount());
 //			item.put("videoPlayCount", video.getPlayCount());
 			item.put("videoCommentCount", ThreadLocalRandom.current().nextInt(100, 1000));
@@ -335,6 +330,7 @@ public class AdvertAction {
 			item.put("articleLikingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 			item.put("articleSendingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 			item.put("articleCommentCount", ThreadLocalRandom.current().nextInt(100, 1000));
+			item.put("playMoneySumArt", ThreadLocalRandom.current().nextInt(1000, 20000));
 //			Ad
 			int key = i+1;
 			String addd = "?timestamp="+System.currentTimeMillis()/1000L+"&articleId="+article.getId()+"&videoId="+video.getId()+"&random="+(int) (Math.random()*10000);

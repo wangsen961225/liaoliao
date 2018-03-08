@@ -1,6 +1,7 @@
 package com.liaoliao.sys.controller;
 
 
+import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,11 +25,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.cn.hnust.controller.MobilePushAction;
+import com.cn.hnust.controller.MobilePushActionProxy;
 import com.liaoliao.listener.MyContextLoader;
 import com.liaoliao.quartz.ScheduleJob;
-import com.liaoliao.util.JPushUtil;
 import com.liaoliao.util.StaticKey;
-import com.liaoliao.util.TimeKit;
 
 
 
@@ -52,6 +53,87 @@ public class QuartzController {
 	}
 	
 	
+	   /* *//** 
+	     * 任务创建与更新(未存在的就创建，已存在的则更新) 
+	     * @param request 
+	     * @param response 
+	     * @param scheduleJob 
+	     * @param model 
+	     * @return 
+	     *//*  
+	    @RequestMapping("/startQuartzSysRed")  
+	    @ResponseBody
+	    public Map<String,Object> startQuartzSysRed(HttpServletRequest request,String jobName,String jobGroup,String time){  
+	    	Map<String,Object> map = new HashMap<>(); 
+	    	ScheduleJob job = new ScheduleJob();
+	    	job.setJobGroup(jobGroup.trim());
+	    	job.setJobName(jobName.trim());
+	        try {  
+	                //获取触发器标识  
+	                TriggerKey triggerKey = TriggerKey.triggerKey(jobName.trim(), jobGroup.trim());  
+	                //获取触发器trigger  
+	                CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);  
+	          //   if(null==trigger){//不存在任务  
+	                    //创建任务  
+	                    JobDetail jobDetail = JobBuilder.newJob(QuartzJob.class)  
+	                            .withIdentity(jobName.trim(), jobGroup.trim())  
+	                            .build();  
+	                    jobDetail.getJobDataMap().put("scheduleJob", job);  
+	             //       String timer="0 0/10 * * * ?";
+	                    	
+	                    //表达式调度构建器  
+	                    CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(time);  
+	                    //按新的cronExpression表达式构建一个新的trigger  
+	                    trigger = TriggerBuilder.newTrigger()  
+	                            .withIdentity(job.getJobName(), job.getJobGroup())  
+	                            .withSchedule(scheduleBuilder)  
+	                            .build();  
+	                    scheduler.scheduleJob(jobDetail, trigger);
+	                    map.put("msg", "开启成功!");
+	                }else{
+	                	//存在任务  
+	                    // Trigger已存在，那么更新相应的定时设置  
+	                    //表达式调度构建器  
+	                    CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(time);  
+	                    //按新的cronExpression表达式重新构建trigger  
+	                    trigger = trigger.getTriggerBuilder()  
+	                            .withIdentity(triggerKey)  
+	                            .withSchedule(scheduleBuilder)  
+	                            .build();  
+	                    //按新的trigger重新设置job执行  
+	                    scheduler.rescheduleJob(triggerKey, trigger); 
+	                    map.put("msg", "设置新时间,启动成功!");
+	                }
+	        } catch (SchedulerException e) {  
+	            e.printStackTrace();  
+	        } 
+	        if("阅读翻倍".equals(jobName)){
+	        	Map<String, String> extras = new HashMap<String,String>();
+				//状态,用户id
+				
+				extras.put("type", StaticKey.JPushSendOpenReadDouble);
+				extras.put("beginTime", MyContextLoader.getContext().getAttribute("beginReadDoubleTime").toString());
+				extras.put("closeTime", MyContextLoader.getContext().getAttribute("closeReadDoubleTime").toString());
+				//发送通知
+				JPushUtil.sendAllMessage("开启阅读翻倍", extras,86400 );
+	        	String extras="{\"type\":\""+StaticKey.JPushSendOpenReadDouble+"\","
+	        			+ "\"beginTime\":\""+
+				MyContextLoader.getContext().getAttribute("beginReadDoubleTime").toString()+
+				 "\",\"closeTime\":\""+
+				MyContextLoader.getContext().getAttribute("closeReadDoubleTime").toString()+
+				"\"}";
+				// 添加附加信息
+				MobilePushAction mobilePushAction2=new MobilePushActionProxy();
+				try {
+					mobilePushAction2.send(StaticKey.AliPushMessage, "开启阅读翻倍", extras,86400);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+	        }
+	        return map;
+	    } */ 
+	    
+	    
 	    /** 
 	     * 任务创建与更新(未存在的就创建，已存在的则更新) 
 	     * @param request 
@@ -79,7 +161,7 @@ public class QuartzController {
 	                            .build();  
 	                    jobDetail.getJobDataMap().put("scheduleJob", job);  
 	             //       String timer="0 0/10 * * * ?";
-	                    
+	                    	
 	                    //表达式调度构建器  
 	                    CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(time);  
 	                    //按新的cronExpression表达式构建一个新的trigger  
@@ -107,14 +189,27 @@ public class QuartzController {
 	            e.printStackTrace();  
 	        } 
 	        if("阅读翻倍".equals(jobName)){
-	        	Map<String, String> extras = new HashMap<String,String>();
+	        	/*Map<String, String> extras = new HashMap<String,String>();
 				//状态,用户id
 				
 				extras.put("type", StaticKey.JPushSendOpenReadDouble);
 				extras.put("beginTime", MyContextLoader.getContext().getAttribute("beginReadDoubleTime").toString());
 				extras.put("closeTime", MyContextLoader.getContext().getAttribute("closeReadDoubleTime").toString());
 				//发送通知
-				JPushUtil.sendAllMessage("开启阅读翻倍", extras,86400 );
+				JPushUtil.sendAllMessage("开启阅读翻倍", extras,86400 );*/
+	        	String extras="{\"type\":\""+StaticKey.JPushSendOpenReadDouble+"\","
+	        			+ "\"beginTime\":\""+
+				MyContextLoader.getContext().getAttribute("beginReadDoubleTime").toString()+
+				 "\",\"closeTime\":\""+
+				MyContextLoader.getContext().getAttribute("closeReadDoubleTime").toString()+
+				"\"}";
+				// 添加附加信息
+				MobilePushAction mobilePushAction2=new MobilePushActionProxy();
+				try {
+					mobilePushAction2.send(StaticKey.AliPushMessage, "开启阅读翻倍", extras,86400);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
 	        }
 	        return map;
 	    }  
@@ -143,14 +238,19 @@ public class QuartzController {
 	        System.out.println("任务="+jobName+"=已结束");
 	        
 	        if("阅读翻倍".equals(jobName)){
-	        	Map<String, String> extras = new HashMap<String,String>();
-				//状态,用户id
-				
-				extras.put("type", StaticKey.JPushSendCloseReadDouble);
-				extras.put("beginTime", MyContextLoader.getContext().getAttribute("beginReadDoubleTime").toString());
-				extras.put("closeTime", new SimpleDateFormat("yyyy-MM-dd").format(new Date()).toString());
-				//发送通知
-				JPushUtil.sendAllMessage("关闭阅读翻倍", extras,86400 );
+	        	String extras="{\"type\":\""+StaticKey.JPushSendOpenReadDouble+"\","
+	        			+ "\"beginTime\":\""+
+				MyContextLoader.getContext().getAttribute("beginReadDoubleTime").toString()+
+				 "\",\"closeTime\":\""+
+				 new SimpleDateFormat("yyyy-MM-dd").format(new Date()).toString()+
+				"\"}";
+				// 添加附加信息
+				MobilePushAction mobilePushAction2=new MobilePushActionProxy();
+				try {
+					mobilePushAction2.send(StaticKey.AliPushMessage, "关闭阅读翻倍", extras,86400);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
 	        }
 	        map.put("msg", "关闭成功!");
 	        return map;
@@ -218,6 +318,12 @@ public class QuartzController {
 	    public Map<String,Object> findQuartz(HttpServletRequest request) throws SchedulerException{  
 	    	Map<String,Object> map = new HashMap<String,Object>();
 	    	String jobGroup="1";
+	    	TriggerKey triggerSysRed = TriggerKey.triggerKey("系统红包", jobGroup);  
+            CronTrigger sysRed = (CronTrigger) scheduler.getTrigger(triggerSysRed);
+            
+	    	TriggerKey triggerPlay = TriggerKey.triggerKey("理财收益", jobGroup);  
+            CronTrigger play = (CronTrigger) scheduler.getTrigger(triggerPlay);
+            
             TriggerKey triggerArticle = TriggerKey.triggerKey("抓取文章", jobGroup);  
             CronTrigger Article = (CronTrigger) scheduler.getTrigger(triggerArticle);
             
@@ -233,10 +339,21 @@ public class QuartzController {
             TriggerKey triggerReadDouble = TriggerKey.triggerKey("阅读翻倍", jobGroup); 
             CronTrigger readDouble = (CronTrigger) scheduler.getTrigger(triggerReadDouble);
             
+            if(sysRed==null){
+            	map.put("sysRed", 0);//未开启
+            }else{
+            	map.put("sysRed", 1);//已开启
+            }
+            
             if(Article==null){
             	map.put("article", 0);//未开启
             }else{
             	map.put("article", 1);//已开启
+            }
+            if(play==null){
+            	map.put("play", 0);//未开启
+            }else{
+            	map.put("play", 1);//已开启
             }
 			if(video==null){
 				map.put("video", 0);   //未开启      	

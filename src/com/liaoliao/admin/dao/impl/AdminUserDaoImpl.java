@@ -6,8 +6,6 @@ import com.liaoliao.admin.dao.AdminUserDao;
 import com.liaoliao.admin.entity.AdminUser;
 import com.liaoliao.basedao.BaseDaoImpl;
 import com.liaoliao.basedao.PageResults;
-import com.liaoliao.content.entity.Video;
-import com.liaoliao.util.StaticKey;
 
 
 public class AdminUserDaoImpl extends BaseDaoImpl<AdminUser,Integer> implements AdminUserDao{
@@ -46,4 +44,5 @@ public class AdminUserDaoImpl extends BaseDaoImpl<AdminUser,Integer> implements 
 	public void updateAdminUser(AdminUser au) {
 		this.update(au);
 	}
+
 }

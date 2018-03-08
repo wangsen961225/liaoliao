@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.liaoliao.common.service.CommonService;
 import com.liaoliao.content.entity.Article;
 import com.liaoliao.content.entity.ArticleComment;
+import com.liaoliao.content.entity.KeyWords;
 import com.liaoliao.content.entity.Likes;
 import com.liaoliao.content.entity.OriginalArticleInfo;
 import com.liaoliao.content.entity.OriginalVideoInfo;
@@ -28,6 +30,7 @@ import com.liaoliao.content.entity.Video;
 import com.liaoliao.content.entity.VideoComment;
 import com.liaoliao.content.service.ArticleCommentService;
 import com.liaoliao.content.service.ArticleService;
+import com.liaoliao.content.service.KeyWordsService;
 import com.liaoliao.content.service.LikesService;
 import com.liaoliao.content.service.OriginalArticleInfoService;
 import com.liaoliao.content.service.OriginalVideoInfoService;
@@ -44,10 +47,13 @@ import com.liaoliao.sys.service.OriginalProfitLogService;
 import com.liaoliao.sys.service.TaskLogService;
 import com.liaoliao.sys.service.UserTaskService;
 import com.liaoliao.user.entity.FocusLog;
+import com.liaoliao.user.entity.ReadHistory;
 import com.liaoliao.user.entity.Users;
 import com.liaoliao.user.service.FocusLogService;
+import com.liaoliao.user.service.ReadHistoryService;
 import com.liaoliao.user.service.UserService;
 import com.liaoliao.util.CommonUtil;
+import com.liaoliao.util.HanlpKeyWords;
 import com.liaoliao.util.RC4Kit;
 import com.liaoliao.util.RandomKit;
 import com.liaoliao.util.StaticKey;
@@ -58,6 +64,9 @@ import com.liaoliao.util.TimeKit;
 @RequestMapping(value="/api")
 public class ContentAction {
 	
+	
+	@Autowired
+	private KeyWordsService keyWordsService;
 	@Autowired
 	private VideoService videoService;
 	
@@ -109,8 +118,10 @@ public class ContentAction {
 	@Autowired
 	AdvertService advertService;
 	
+	@Autowired
+	private ReadHistoryService readHistoryService;
 	private Integer page = 1;
-
+	//Users user=userService.queryOne(10029);
 	/**
 	 * 获取视频数据：
 	 * @return
@@ -196,7 +207,7 @@ public class ContentAction {
 			item.put("videoUrl", video.getVideoUrl());
 //			item.put("duration", video.getDuration());
 			item.put("duration", null);
-			
+			item.put("playMoneySum", video.getPlayMoneySum());
 //			System.out.println(video.getDuration());
 //			item.put("commentCount", video.getCommentCount());
 //			item.put("likingCount", video.getLikingCount());
@@ -206,6 +217,8 @@ public class ContentAction {
 			item.put("likingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 			item.put("sendingCount", ThreadLocalRandom.current().nextInt(1000, 3000));
 			item.put("playCount", ThreadLocalRandom.current().nextInt(9000, 25000));
+			//随机出现的打赏金额
+			item.put("playMoneySum", ThreadLocalRandom.current().nextInt(3000, 25000));
 //			RC4加密
 			String idStr = RC4Kit.encry_RC4_string(String.valueOf(video.getId()), "liao");
 			item.put("shareUrl", "/share/video/"+idStr);
@@ -295,7 +308,6 @@ public class ContentAction {
 						item.put("focusCount",28 );
 					}
 					//虚拟用户的关注数结束
-					
 					
 					item.put("name", user.getNickName());
 					item.put("userId", user.getId());
@@ -429,13 +441,24 @@ public class ContentAction {
 			}
 		}
 		
-		
 		List imgListObj = new ArrayList();
 		// Map-->List-->Map 三层转换(保留)
 		List<Map<String, Object>> datas = new ArrayList<>();
 		Map<String, Object> item = null;
 		for(Article article : list){
+			Users users=userService.queryOne(article.getSourceId());
 			item = new LinkedHashMap<>();
+			if(users!=null){
+				item.put("userId", users.getId());
+				item.put("userName", users.getNickName());
+				item.put("userTitleImg", users.getAvatar());	
+			}else{
+				Users user=userService.queryOne(10029);
+				item.put("userId",user.getId());
+				item.put("userName", user.getNickName());
+				item.put("userTitleImg", user.getAvatar());
+			}
+			item.put("playMoneySum", ThreadLocalRandom.current().nextInt(3000, 25000));
 			item.put("id", article.getId());
 			item.put("title", article.getTitle());
 			item.put("description", article.getDescription());
@@ -484,6 +507,7 @@ public class ContentAction {
 	 * 根据Id获取文章内容
 	 * @return
 	 * @throws ParseException 
+	 * 
 	 */
 	@RequestMapping(value="/getContent")
 	@ResponseBody
@@ -494,12 +518,47 @@ public class ContentAction {
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
+		//article 获取不到数据为Null
 		Article article=articleService.findById(articleId);
+		
 		if(article==null){
 			map.put("msg", "该文章不存在");
 			map.put("code", StaticKey.ReturnServerNullError);
 			return map;
 		}
+		ReadHistory readHistory=readHistoryService.findByUserId(articleId, userId,0);
+		if(readHistory!=null){
+			readHistory.setNum(readHistory.getNum()+1);
+			readHistoryService.updateMoble(readHistory);
+		}else{
+			ReadHistory history=new ReadHistory(UUID.randomUUID().toString(),userId,articleId,0,new Date(),1);
+			readHistoryService.savemobile(history);
+		}
+		
+		/*//关键字提取
+		//使用正则表达式清空文章内容里的标签
+		String strs=article.getContent().replaceAll("</?[^>]+>", "");
+		StringBuffer buffer=new StringBuffer(strs).append(article.getDescription()).append(article.getTitle());
+		List<String> list=HanlpKeyWords.getMainIdea(buffer.toString());
+		List<String> liStrings=HanlpKeyWords.getDuanYu(buffer.toString());
+		list.addAll(liStrings);
+		KeyWords keyWords=null;
+		for (String string : list) {
+			keyWords=keyWordsService.findById(userId, string);
+			if(keyWords!=null){
+				keyWords.setFreq(keyWords.getFreq()+1);
+				keyWordsService.updateMoble(keyWords);
+				continue;
+			}else{
+				keyWords =new KeyWords();
+				keyWords.setName(string); 
+				keyWords.setUserId(userId);
+				keyWords.setAddDate(new Date());
+				keyWords.setFreq(1);
+				keyWords.setId(UUID.randomUUID().toString());
+				keyWordsService.add(keyWords);
+			}
+		} */    
 		//在内容中穿插广告(在第一个p标签后穿插)
 		String cssStyle = "<style type=\"text/css\">img{width:100%;text-align:center;margin:10px 0px;}body{font-size:12px}p{margin:5px 5px;}</style>";
 		String content = cssStyle;
@@ -718,7 +777,6 @@ public class ContentAction {
 		RandomKit ran = new RandomKit();
 		int countLike = ran.getRandomBetween(100, 1000);
 		map.put("countLike", countLike);
-		
 		
 		//写在阅读分润里面
 	/*	if(article.getType()==1){//原创作品被阅读，作者获得1料币
@@ -1153,7 +1211,7 @@ public class ContentAction {
 	 */
 	@RequestMapping(value="/playCount")
 	@ResponseBody
-	public Map<String,Object> playCount(HttpServletRequest request,Integer contentId){
+	public Map<String,Object> playCount(HttpServletRequest request,Integer contentId,Integer userId){
 		Map<String,Object> map=new HashMap<String,Object>();
 		if(contentId==null){
 			map.put("msg", "参数异常！");
@@ -1168,10 +1226,20 @@ public class ContentAction {
 			return map;
 		}
 		video.setPlayingCount(video.getPlayingCount()+1);
+		ReadHistory readHistory=readHistoryService.findByUserId(contentId, userId,1);
+		if(readHistory!=null){
+			if(readHistory.getNum()==null){
+				readHistory.setNum(0);
+			}
+			readHistory.setNum(readHistory.getNum()+1);
+			readHistoryService.updateMoble(readHistory);
+		}else{
+			ReadHistory history=new ReadHistory(UUID.randomUUID().toString(),userId,contentId,1,new Date(),1);
+			readHistoryService.savemobile(history);
+		}
 		videoService.updateVideo(video);
 //		统计每日videoContent点击量
 		handleCountService.handleCountPlusOne("videoContent");
-		
 		
 		//写在阅读分润里面
 //		统计原创视频   

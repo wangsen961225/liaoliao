@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.engine.transaction.jta.platform.internal.SynchronizationRegistryBasedSynchronizationStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,9 +46,11 @@ import com.liaoliao.redisclient.RedisService;
 import com.liaoliao.sys.entity.OriginalProfitLog;
 import com.liaoliao.sys.service.HandleCountService;
 import com.liaoliao.sys.service.OriginalProfitLogService;
+import com.liaoliao.user.entity.ReadHistory;
 import com.liaoliao.user.entity.RedPackage;
 import com.liaoliao.user.entity.UserSign;
 import com.liaoliao.user.entity.Users;
+import com.liaoliao.user.service.ReadHistoryService;
 import com.liaoliao.user.service.RedPackageService;
 import com.liaoliao.user.service.UserService;
 import com.liaoliao.user.service.UserSignService;
@@ -61,106 +64,111 @@ import com.liaoliao.weixinPay.Utils.RandCharsUtils;
 import com.liaoliao.weixinPay.Utils.WXSignUtils;
 import com.liaoliao.weixinPay.entity.Unifiedorder;
 import com.liaoliao.weixinPay.entity.WXPayResult;
-import com.sun.org.apache.bcel.internal.generic.INEG;
+
+import antlr.collections.impl.LList;
 
 @Controller
-@RequestMapping(value="/api")
+@RequestMapping(value = "/api")
 public class ProfitAction {
-	
+
 	@Autowired
 	private RedisService redisService;
-	
+
+	@Autowired
+	private ReadHistoryService readHistoryService;
+
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private CommonService commonService;
-	
+
 	@Autowired
 	private UserSignService userSignService;
-	
+
 	@Autowired
 	private FenrunLogService fenrunLogService;
-	
+
 	@Autowired
 	private ArticleService articleService;
-	
+
 	@Autowired
 	private VideoService videoService;
-	
+
 	@Autowired
 	private ToBankService toBankService;
-	
+
 	@Autowired
 	private BindPayService bindPayService;
-	
+
 	@Autowired
 	private HandleCountService handleCountService;
-	
+
 	@Autowired
 	private WeixinPayLogService weixinPayLogService;
-	
+
 	@Autowired
 	private ProfitTimeService profitTimeService;
-	
+
 	@Autowired
 	private OriginalVideoInfoService originalVideoInfoService;
-	
+
 	@Autowired
 	private OriginalArticleInfoService originalArticleInfoService;
-	
+
 	@Autowired
 	private OriginalProfitLogService originalProfitLogService;
-	
+
 	@Autowired
 	private RedPackageService redPackageService;
-	
+
 	private Integer page = 1;
-	
+
 	/**
 	 * 新用户奖励
+	 * 
 	 * @return
 	 */
-	@RequestMapping(value="/newUserReward")
+	@RequestMapping(value = "/newUserReward")
 	@ResponseBody
-	public Map<String,Object> newUserReward(HttpServletRequest request,Integer userId){
-		Map<String,Object> map=new HashMap<String,Object>();
-		if(userId==null){
+	public Map<String, Object> newUserReward(HttpServletRequest request, Integer userId) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		if (userId == null) {
 			map.put("msg", "参数有误");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
-		if(!redisService.getValidate(request,userId)){
+		if (!redisService.getValidate(request, userId)) {
 			map.put("msg", "token失效或错误");
 			map.put("code", StaticKey.ReturnClientTokenError);
 			return map;
 		}
 		Users user = userService.findById(userId);
-		if(user==null){
+		if (user == null) {
 			map.put("msg", "用户不存在！");
 			map.put("code", StaticKey.ReturnUserAccountError);
 			return map;
 		}
-		if(user.getTotalMoney()!=0 || user.getToBankMoney()!=0 || user.getFreezeMoney()!=0
-				|| user.getDayMoney()!=0 || user.getPayMoney()!=0){
+		if (user.getTotalMoney() != 0 || user.getToBankMoney() != 0 || user.getFreezeMoney() != 0
+				|| user.getDayMoney() != 0 || user.getPayMoney() != 0) {
 			map.put("msg", "非新用户");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
-//		新用户送料币数
+		// 新用户送料币数
 		int newUserRewardCoin = 1000;
 		String newUserRewardCoinStr = redisService.getConfigValue("newUserRewardCoin");
-		if(StringUtils.isBlank(newUserRewardCoinStr)){
+		if (StringUtils.isBlank(newUserRewardCoinStr)) {
 			System.out.println("请检查SystemConfig表数据");
-		}else{
+		} else {
 			newUserRewardCoin = Integer.valueOf(newUserRewardCoinStr);
 		}
-//		分钱
-		user.setTotalMoney((double)newUserRewardCoin);
-//		保存非自身获得的钱记录值
-		user.setUnselfMoney((double)newUserRewardCoin);
+		// 分钱
+		user.setTotalMoney((double) newUserRewardCoin);
+		// 保存非自身获得的钱记录值
+		user.setUnselfMoney((double) newUserRewardCoin);
 		userService.updateUser(user);
-//		记录分钱
+		// 记录分钱
 		FenrunLog userLog = new FenrunLog();
 		userLog.setMoney(newUserRewardCoin);
 		userLog.setAddTime(new Date());
@@ -168,73 +176,75 @@ public class ProfitAction {
 		userLog.setType(StaticKey.FenrunNewUser);
 		userLog.setUser(user);
 		fenrunLogService.saveFenrunLog(userLog);
-		
+
 		map.put("msg", "success");
 		map.put("code", StaticKey.ReturnServerTrue);
 		map.put("rewardCoin", newUserRewardCoin);
 		return map;
 	}
-	
+
 	/**
 	 * 阅读获得分润
+	 * 
 	 * @param request
 	 * @param id
-	 * @param type : 0:文章   1：视频
+	 * @param type
+	 *            : 0:文章 1：视频
 	 * @return
 	 */
-	@RequestMapping(value="/coinByRead")
+	@RequestMapping(value = "/coinByRead")
 	@ResponseBody
-	public Map<String,Object> coinByRead(HttpServletRequest request,Integer userId,Integer contentId,Integer type){
-		Map<String,Object> map=new HashMap<String,Object>();
-		
-		if(userId==null||contentId==null||type==null||(type!=0&&type!=1)){
+	public Map<String, Object> coinByRead(HttpServletRequest request, Integer userId, Integer contentId, Integer type) {
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		if (userId == null || contentId == null || type == null || (type != 0 && type != 1)) {
 			map.put("msg", "参数有误");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
-		if(!redisService.getValidate(request,userId)){
+		if (!redisService.getValidate(request, userId)) {
 			map.put("msg", "token失效或错误");
 			map.put("code", StaticKey.ReturnClientTokenError);
 			return map;
 		}
 		Users user = userService.findById(userId);
-//		如果非会员，检测签到状态
-		if(user.getVipStatus()!=StaticKey.UserVipStatusTrue){
+		// 如果非会员，检测签到状态
+		if (user.getVipStatus() != StaticKey.UserVipStatusTrue) {
 			UserSign userSign = userSignService.findById(userId);
-//			从未签到
-			if(userSign==null){
+			// 从未签到
+			if (userSign == null) {
 				map.put("msg", "未签到");
 				map.put("code", StaticKey.ReturnUserSignError);
 				return map;
 			}
 			long lastSignTime = userSign.getSignTime().getTime();
 			long todayTime = TimeKit.todayStart().getTime();
-//			今日未签到
-			if(lastSignTime<todayTime){
+			// 今日未签到
+			if (lastSignTime < todayTime) {
 				map.put("msg", "未签到");
 				map.put("code", StaticKey.ReturnUserSignError);
 				return map;
 			}
 		}
-		if(type==0){
+		if (type == 0) {
 			Article article = articleService.findById(contentId);
-			if(article==null){
+			if (article == null) {
 				map.put("msg", "文章不存在");
 				map.put("code", StaticKey.ReturnServerNullError);
 				return map;
 			}
-			OriginalArticleInfo oai=originalArticleInfoService.findByArticleId(article.getId());
-			if(article.getType()==1){
-				if(oai.getCountMoney()>0){
-					Users originalUser = userService.findById(article.getSourceId());//获取原创作品作者
-					if(originalUser!=null){
-						Integer money=StaticKey.OriginalReadMoney;
-						if(originalUser.getVipStatus()==StaticKey.UserVipStatusTrue){
-							money=StaticKey.OriginalReadMoney*2;
+			OriginalArticleInfo oai = originalArticleInfoService.findByArticleId(article.getId());
+			if (article.getType() == 1) {
+				if (oai.getCountMoney() > 0) {
+					Users originalUser = userService.findById(article.getSourceId());// 获取原创作品作者
+					if (originalUser != null) {
+						Integer money = StaticKey.OriginalReadMoney;
+						if (originalUser.getVipStatus() == StaticKey.UserVipStatusTrue) {
+							money = StaticKey.OriginalReadMoney * 2;
 						}
-						originalUser.setTotalMoney(originalUser.getTotalMoney()+money);
-						originalUser.setDayMoney(originalUser.getDayMoney()+money);
-						oai.setCountMoney(oai.getCountMoney()-money);
+						originalUser.setTotalMoney(originalUser.getTotalMoney() + money);
+						originalUser.setDayMoney(originalUser.getDayMoney() + money);
+						oai.setCountMoney(oai.getCountMoney() - money);
 						userService.updateUser(originalUser);
 						originalArticleInfoService.updateOAI(oai);
 						OriginalProfitLog opl = new OriginalProfitLog();
@@ -247,26 +257,26 @@ public class ProfitAction {
 					}
 				}
 			}
-		}else if(type==1){
+		} else if (type == 1) {
 			Video video = videoService.findById(contentId);
-			if(video==null){
+			if (video == null) {
 				map.put("msg", "视频不存在");
 				map.put("code", StaticKey.ReturnServerNullError);
 				return map;
 			}
-			
-			OriginalVideoInfo ovi=originalVideoInfoService.findByVideoId(video.getId());
-			if(video.getType()==1){
-				if(ovi.getCountMoney()>0){
-					Users originalUser = userService.findById(video.getSourceId());//获取原创作品作者
-					if(originalUser!=null){
-						Integer money=StaticKey.OriginalReadMoney;
-						if(originalUser.getVipStatus()==StaticKey.UserVipStatusTrue){
-							money=StaticKey.OriginalReadMoney*2;
+
+			OriginalVideoInfo ovi = originalVideoInfoService.findByVideoId(video.getId());
+			if (video.getType() == 1) {
+				if (ovi.getCountMoney() > 0) {
+					Users originalUser = userService.findById(video.getSourceId());// 获取原创作品作者
+					if (originalUser != null) {
+						Integer money = StaticKey.OriginalReadMoney;
+						if (originalUser.getVipStatus() == StaticKey.UserVipStatusTrue) {
+							money = StaticKey.OriginalReadMoney * 2;
 						}
-						originalUser.setTotalMoney(originalUser.getTotalMoney()+money);
-						originalUser.setDayMoney(originalUser.getDayMoney()+money);
-						ovi.setCountMoney(ovi.getCountMoney()-money);
+						originalUser.setTotalMoney(originalUser.getTotalMoney() + money);
+						originalUser.setDayMoney(originalUser.getDayMoney() + money);
+						ovi.setCountMoney(ovi.getCountMoney() - money);
 						userService.updateUser(originalUser);
 						originalVideoInfoService.updateOVI(ovi);
 						OriginalProfitLog opl = new OriginalProfitLog();
@@ -279,34 +289,34 @@ public class ProfitAction {
 					}
 				}
 			}
-			
-		}else{
+
+		} else {
 			map.put("msg", "类型错误");
 			map.put("code", StaticKey.ReturnServerNullError);
 			return map;
 		}
 
-//		检测上次分润时间
+		// 检测上次分润时间
 		ProfitTime profitTime = profitTimeService.findByUserId(userId);
-		if(profitTime==null){
+		if (profitTime == null) {
 			profitTime = new ProfitTime();
 			profitTime.setUserId(userId);
 			profitTime.setAddTime(new Date());
 			profitTimeService.saveOrUpdateProfitTime(profitTime);
-		}else{
+		} else {
 			long nowTime = new Date().getTime();
 			long lastTime = profitTime.getAddTime().getTime();
-			long cooldownTime = nowTime-lastTime;
-//			阅读文章获取收益时间
+			long cooldownTime = nowTime - lastTime;
+			// 阅读文章获取收益时间
 			int articleCoinTime = 99;
 			String articleCoinTimeStr = redisService.getConfigValue("articleCoinTime");
-			if(StringUtils.isBlank(articleCoinTimeStr)){
+			if (StringUtils.isBlank(articleCoinTimeStr)) {
 				System.out.println("请检查SystemConfig表数据");
-			}else{
+			} else {
 				articleCoinTime = Integer.valueOf(articleCoinTimeStr);
 			}
-			
-			if(cooldownTime < articleCoinTime*1000){
+
+			if (cooldownTime < articleCoinTime * 1000) {
 				map.put("msg", "呀，红包溜走了");
 				map.put("code", StaticKey.ReturnCoinRunAway);
 				return map;
@@ -314,501 +324,523 @@ public class ProfitAction {
 			profitTime.setAddTime(new Date());
 			profitTimeService.saveOrUpdateProfitTime(profitTime);
 		}
-		
-		//呀，红包溜走了
+
+		// 呀，红包溜走了
 		int randomInt = ThreadLocalRandom.current().nextInt(0, 99);
-//		阅读文章&播放视频 红包溜走的概率
+		// 阅读文章&播放视频 红包溜走的概率
 		double coinRunAway = 0.0;
 		String coinRunAwayStr = redisService.getConfigValue("coinRunAway");
-		if(StringUtils.isBlank(coinRunAwayStr)){
+		if (StringUtils.isBlank(coinRunAwayStr)) {
 			System.out.println("请检查SystemConfig表数据");
-		}else{
+		} else {
 			coinRunAway = Double.valueOf(coinRunAwayStr);
 		}
-		
-		if(randomInt < 100*coinRunAway){
+
+		if (randomInt < 100 * coinRunAway) {
 			map.put("msg", "呀，红包溜走了");
 			map.put("code", StaticKey.ReturnCoinRunAway);
 			return map;
 		}
-		
-		FenrunLog fenrun=new FenrunLog();
-		double money=0.0;
+
+		FenrunLog fenrun = new FenrunLog();
+		double money = 0.0;
 		int coin = 0;
 
-		if(type==0){
-//			阅读文章最小收益值
+		if (type == 0) {
+			// 阅读文章最小收益值
 			int minArticleMoney = 1;
 			String minArticleMoneyStr = redisService.getConfigValue("minArticleMoney");
-			if(StringUtils.isBlank(minArticleMoneyStr)){
+			if (StringUtils.isBlank(minArticleMoneyStr)) {
 				System.out.println("请检查SystemConfig表数据");
-			}else{
+			} else {
 				minArticleMoney = Integer.valueOf(minArticleMoneyStr);
 			}
-//			阅读文章最大收益值
+			// 阅读文章最大收益值
 			int maxArticleMoney = 1;
 			String maxArticleMoneyStr = redisService.getConfigValue("maxArticleMoney");
-			if(StringUtils.isBlank(maxArticleMoneyStr)){
+			if (StringUtils.isBlank(maxArticleMoneyStr)) {
 				System.out.println("请检查SystemConfig表数据");
-			}else{
+			} else {
 				maxArticleMoney = Integer.valueOf(maxArticleMoneyStr);
 			}
-			
+
 			coin = ThreadLocalRandom.current().nextInt(minArticleMoney, maxArticleMoney);
-			money=user.getTotalMoney()+coin;
+			money = user.getTotalMoney() + coin;
 			fenrun.setType(StaticKey.FenrunArticle);
-			
-		}else{
-//			阅读视频最小收益值
+
+		} else {
+			// 阅读视频最小收益值
 			int minVideoMoney = 1;
 			String minVideoMoneyStr = redisService.getConfigValue("minVideoMoney");
-			if(StringUtils.isBlank(minVideoMoneyStr)){
+			if (StringUtils.isBlank(minVideoMoneyStr)) {
 				System.out.println("请检查SystemConfig表数据");
-			}else{
+			} else {
 				minVideoMoney = Integer.valueOf(minVideoMoneyStr);
 			}
-//			阅读视频最大收益值
+			// 阅读视频最大收益值
 			int maxVideoMoney = 1;
 			String maxVideoMoneyStr = redisService.getConfigValue("maxVideoMoney");
-			if(StringUtils.isBlank(maxVideoMoneyStr)){
+			if (StringUtils.isBlank(maxVideoMoneyStr)) {
 				System.out.println("请检查SystemConfig表数据");
-			}else{
+			} else {
 				maxVideoMoney = Integer.valueOf(maxVideoMoneyStr);
 			}
-			
+
 			coin = ThreadLocalRandom.current().nextInt(minVideoMoney, maxVideoMoney);
-			money=user.getTotalMoney()+coin;
+
+			money = user.getTotalMoney() + coin;
 			fenrun.setType(StaticKey.FenrunVideo);
 		}
-		//如果是会员，获取金额翻倍
-		//获取vip阅读倍数：
+		// 查询阅读记录
+		ReadHistory readHistory = readHistoryService.findByUserId(contentId, userId, type);
+		if (readHistory != null) {
+			if (user.getStatus() == StaticKey.UserVipStatusTrue) {
+				if (readHistory.getMoney() == null) {
+					readHistory.setMoney(Double.valueOf(coin * 2));
+				} else {
+					readHistory.setMoney(readHistory.getMoney() + Double.valueOf(coin * 2));
+				}
+			} else {
+				if (readHistory.getMoney() == null) {
+					readHistory.setMoney(Double.valueOf(coin));
+				} else {
+					readHistory.setMoney(readHistory.getMoney() + Double.valueOf(coin));
+				}
+			}
+			readHistoryService.updateMoble(readHistory);
+		}
+
+		// 如果是会员，获取金额翻倍
+		// 获取vip阅读倍数：
 		int userVipGetMoney = 1;
 		String userVipGetMoneyStr = redisService.getConfigValue("userVipGetMoney");
 		Integer readDouble = (Integer) MyContextLoader.getContext().getAttribute("readDouble");
-		if(StringUtils.isBlank(userVipGetMoneyStr)){
+		if (StringUtils.isBlank(userVipGetMoneyStr)) {
 			System.out.println("请检查SystemConfig表数据");
-		}else{
+		} else {
 			userVipGetMoney = Integer.valueOf(userVipGetMoneyStr);
 		}
-//		vip
-		if(user.getVipStatus() == StaticKey.UserVipStatusTrue){
-			Integer coinMoney = coin*userVipGetMoney;
-			if(readDouble==StaticKey.readDouble){
-				coinMoney*=2;
+		// vip
+		if (user.getVipStatus() == StaticKey.UserVipStatusTrue) {
+			Integer coinMoney = coin * userVipGetMoney;
+			if (readDouble == StaticKey.readDouble) {
+				coinMoney *= 2;
 			}
-			user.setTotalMoney(user.getTotalMoney()+coinMoney);
-			if(user.getParent()!=null){
-				user.setDayMoney(user.getDayMoney()+coinMoney);
+			user.setTotalMoney(user.getTotalMoney() + coinMoney);
+			if (user.getParent() != null) {
+				user.setDayMoney(user.getDayMoney() + coinMoney);
 			}
-//			更新最后使用时间
+			// 更新最后使用时间
 			user.setLoginTime(new Date());
 			fenrun.setMoney(coinMoney);
 			map.put("coin", coinMoney);
-//			统计每日分润料币总金额
-			handleCountService.handleCountTotalMoney("totalProfitMoney",coinMoney);
-		}else{
-//		非vip
-			if(readDouble==StaticKey.readDouble){
-				money+=coin;
-				coin+=coin;
+			// 统计每日分润料币总金额
+			handleCountService.handleCountTotalMoney("totalProfitMoney", coinMoney);
+		} else {
+			// 非vip
+			if (readDouble == StaticKey.readDouble) {
+				money += coin;
+				coin += coin;
 			}
 			user.setTotalMoney(money);
-			if(user.getParent()!=null){
-				user.setDayMoney(user.getDayMoney()+coin);
+			if (user.getParent() != null) {
+				user.setDayMoney(user.getDayMoney() + coin);
 			}
-//			更新最后使用时间
+			// 更新最后使用时间
 			user.setLoginTime(new Date());
 			fenrun.setMoney(coin);
 			map.put("coin", coin);
-//			统计每日分润料币总金额
-			handleCountService.handleCountTotalMoney("totalProfitMoney",coin);
+			// 统计每日分润料币总金额
+			handleCountService.handleCountTotalMoney("totalProfitMoney", coin);
 		}
-		
+
 		fenrun.setContentId(contentId);
 		fenrun.setUser(user);
 		fenrun.setAddTime(new Date());
-		
-		if(readDouble==StaticKey.readDouble&&fenrun.getType()==StaticKey.FenrunArticle){
+
+		if (readDouble == StaticKey.readDouble && fenrun.getType() == StaticKey.FenrunArticle) {
 			fenrun.setType(StaticKey.FenrunReadArticleDouble);
 		}
-		if(readDouble==StaticKey.readDouble&&fenrun.getType()==StaticKey.FenrunVideo){
+		if (readDouble == StaticKey.readDouble && fenrun.getType() == StaticKey.FenrunVideo) {
 			fenrun.setType(StaticKey.FenrunReadVideoDouble);
 		}
-		
-//		更新用户、保存分润记录
-		commonService.updateUserAndSaveProfitLog(fenrun,user);
-		
-//		统计每日profitSuccess成功分润次数
+
+		// 更新用户、保存分润记录
+		commonService.updateUserAndSaveProfitLog(fenrun, user);
+
+		// 统计每日profitSuccess成功分润次数
 		handleCountService.handleCountPlusOne("profitSuccess");
-		
+
 		map.put("msg", "success");
 		map.put("code", StaticKey.ReturnServerTrue);
 		return map;
 	}
-	
-	
+
 	/**
 	 * 用户抢vip用户登录时的红包
+	 * 
 	 * @param request
 	 * @param userId
 	 * @param vipId
 	 * @return
 	 */
-	@RequestMapping(value="/grabHongbao")
+	@RequestMapping(value = "/grabHongbao")
 	@ResponseBody
-	public Map<String,Object> grabHongbao(HttpServletRequest request,Integer userId,Integer vipId){
-		Map<String,Object> map=new HashMap<String,Object>();
-		if(userId==null||"".equals(userId)||vipId==null||"".equals(vipId)){
+	public Map<String, Object> grabHongbao(HttpServletRequest request, Integer userId, Integer vipId) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		if (userId == null || "".equals(userId) || vipId == null || "".equals(vipId)) {
 			map.put("msg", "参数异常");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
-		
-		if(!redisService.getValidate(request,userId)){
+
+		if (!redisService.getValidate(request, userId)) {
 			map.put("msg", "token失效或错误");
 			map.put("code", StaticKey.ReturnClientTokenError);
 			return map;
 		}
-		if(userId==vipId){
+		if (userId == vipId) {
 			map.put("msg", "好可惜，红包飞走了~");
 			map.put("code", StaticKey.ReturnCoinRunAway);
 			return map;
 		}
-		
-//		土豪登场每时间间隔内能被抢红包次数
+
+		// 土豪登场每时间间隔内能被抢红包次数
 		String grabHongbaoTimes = redisService.getConfigValue("grabHongbaoTimes");
-//		土豪登场再次能被抢红包冷却时间(小时)
+		// 土豪登场再次能被抢红包冷却时间(小时)
 		double grabHongbaoFreeze = 24;
 		String grabHongbaoFreezeStr = redisService.getConfigValue("grabHongbaoFreeze");
-		if(StringUtils.isBlank(grabHongbaoFreezeStr)){
+		if (StringUtils.isBlank(grabHongbaoFreezeStr)) {
 			System.out.println("请检查SystemConfig表数据");
-		}else{
+		} else {
 			grabHongbaoFreeze = Double.valueOf(grabHongbaoFreezeStr);
 		}
-		
-		long expiredTime = (long) grabHongbaoFreeze*60*60;
-		String grabHongbaoSize = redisService.get("GrabHongbao_"+vipId);
-		
-		if(StringUtils.isBlank(grabHongbaoSize)){
-			redisService.set("GrabHongbao_"+vipId, grabHongbaoTimes, expiredTime);
+
+		long expiredTime = (long) grabHongbaoFreeze * 60 * 60;
+		String grabHongbaoSize = redisService.get("GrabHongbao_" + vipId);
+
+		if (StringUtils.isBlank(grabHongbaoSize)) {
+			redisService.set("GrabHongbao_" + vipId, grabHongbaoTimes, expiredTime);
 			grabHongbaoSize = grabHongbaoTimes;
 		}
-		
-		int grabSize = Integer.valueOf(grabHongbaoSize)-1;
-		
-		redisService.set("GrabHongbao_"+vipId, String.valueOf(grabSize), expiredTime);
-		
-		if(grabSize < 0){
+
+		int grabSize = Integer.valueOf(grabHongbaoSize) - 1;
+
+		redisService.set("GrabHongbao_" + vipId, String.valueOf(grabSize), expiredTime);
+
+		if (grabSize < 0) {
 			map.put("msg", "好可惜，红包飞走了~");
 			map.put("code", StaticKey.ReturnCoinRunAway);
 			return map;
 		}
-		
-		Users user=userService.findById(userId);
-		Users vipUser=userService.findById(vipId);
-		if(user == null || vipUser == null){
+
+		Users user = userService.findById(userId);
+		Users vipUser = userService.findById(vipId);
+		if (user == null || vipUser == null) {
 			map.put("msg", "好可惜，红包飞走了~");
 			map.put("code", StaticKey.ReturnCoinRunAway);
 			return map;
 		}
-//		土豪登场土豪剩余料币低于多少值时不可抢
+		// 土豪登场土豪剩余料币低于多少值时不可抢
 		int grabHongbaoBalance = 0;
 		String grabHongbaoBalanceStr = redisService.getConfigValue("grabHongbaoBalance");
-		if(StringUtils.isBlank(grabHongbaoBalanceStr)){
+		if (StringUtils.isBlank(grabHongbaoBalanceStr)) {
 			System.out.println("请检查SystemConfig表数据");
-		}else{
+		} else {
 			grabHongbaoBalance = Integer.valueOf(grabHongbaoBalanceStr);
 		}
-		if((vipUser.getTotalMoney()-vipUser.getPayMoney()-vipUser.getToBankMoney()-vipUser.getFreezeMoney()) <= grabHongbaoBalance){
+		if ((vipUser.getTotalMoney() - vipUser.getPayMoney() - vipUser.getToBankMoney()
+				- vipUser.getFreezeMoney()) <= grabHongbaoBalance) {
 			map.put("msg", "好可惜，红包飞走了~");
 			map.put("code", StaticKey.ReturnCoinRunAway);
 			return map;
 		}
-//		抢土豪红包最小值
+		// 抢土豪红包最小值
 		int grabHongbaoMin = 0;
 		String grabHongbaoMinStr = redisService.getConfigValue("grabHongbaoMin");
-		if(StringUtils.isBlank(grabHongbaoMinStr)){
+		if (StringUtils.isBlank(grabHongbaoMinStr)) {
 			System.out.println("请检查SystemConfig表数据");
-		}else{
+		} else {
 			grabHongbaoMin = Integer.valueOf(grabHongbaoMinStr);
 		}
-		
-//		抢土豪红包最大值
+
+		// 抢土豪红包最大值
 		int grabHongbaoMax = 0;
 		String grabHongbaoMaxStr = redisService.getConfigValue("grabHongbaoMax");
-		if(StringUtils.isBlank(grabHongbaoMaxStr)){
+		if (StringUtils.isBlank(grabHongbaoMaxStr)) {
 			System.out.println("请检查SystemConfig表数据");
-		}else{
+		} else {
 			grabHongbaoMax = Integer.valueOf(grabHongbaoMaxStr);
 		}
-		
+
 		Integer grabMoney = ThreadLocalRandom.current().nextInt(grabHongbaoMin, grabHongbaoMax);
-		if(grabMoney==0){
+		if (grabMoney == 0) {
 			map.put("msg", "好可惜，红包飞走了~");
 			map.put("code", StaticKey.ReturnCoinRunAway);
 			return map;
 		}
-		
-		if((vipUser.getTotalMoney()-vipUser.getPayMoney()-vipUser.getToBankMoney()-vipUser.getFreezeMoney())<grabMoney){
+
+		if ((vipUser.getTotalMoney() - vipUser.getPayMoney() - vipUser.getToBankMoney()
+				- vipUser.getFreezeMoney()) < grabMoney) {
 			map.put("msg", "好可惜，红包飞走了~");
 			map.put("code", StaticKey.ReturnCoinRunAway);
 			return map;
 		}
-		
-		vipUser.setPayMoney(vipUser.getPayMoney()+grabMoney);
+
+		vipUser.setPayMoney(vipUser.getPayMoney() + grabMoney);
 		FenrunLog VipLog = new FenrunLog();
 		VipLog.setMoney(-grabMoney);
 		VipLog.setAddTime(new Date());
 		VipLog.setContentId(user.getId());
 		VipLog.setType(StaticKey.FenrunGrabVip);
 		VipLog.setUser(vipUser);
-		
-		user.setTotalMoney(user.getTotalMoney()+grabMoney);
+
+		user.setTotalMoney(user.getTotalMoney() + grabMoney);
 		FenrunLog userLog = new FenrunLog();
 		userLog.setMoney(grabMoney);
 		userLog.setAddTime(new Date());
 		userLog.setContentId(vipUser.getId());
 		userLog.setType(StaticKey.FenrunGrabUser);
 		userLog.setUser(user);
-		
-		//更新用户信息以及保存记录
-		commonService.updateUserAndSaveProfitLog(VipLog,vipUser);
-		commonService.updateUserAndSaveProfitLog(userLog,user);
-//		统计每日graspSuccess成功抢红包次数
+
+		// 更新用户信息以及保存记录
+		commonService.updateUserAndSaveProfitLog(VipLog, vipUser);
+		commonService.updateUserAndSaveProfitLog(userLog, user);
+		// 统计每日graspSuccess成功抢红包次数
 		handleCountService.handleCountPlusOne("graspSuccess");
 		map.put("money", grabMoney);
 		map.put("msg", "success");
 		map.put("code", StaticKey.ReturnServerTrue);
 		return map;
 	}
-	
-	
+
 	/**
 	 * 用户抢土豪发放的世界红包
+	 * 
 	 * @param request
 	 * @param userId
 	 * @param vipId
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value="/grabRedPackage")
-	public Map<String,Object> grabRedPackage(HttpServletRequest request,Integer userId,Integer richId){
-		Map<String,Object> map=new HashMap<String,Object>();
-		if(userId==null||"".equals(userId)||richId==null||"".equals(richId)){
+	@RequestMapping(value = "/grabRedPackage")
+	public Map<String, Object> grabRedPackage(HttpServletRequest request, Integer userId, Integer richId) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		if (userId == null || "".equals(userId) || richId == null || "".equals(richId)) {
 			map.put("msg", "参数异常");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
-		if(!redisService.getValidate(request,userId)){
+		if (!redisService.getValidate(request, userId)) {
 			map.put("msg", "token失效或错误");
 			map.put("code", StaticKey.ReturnClientTokenError);
 			return map;
 		}
-		/*if(userId==richId){
-			map.put("msg", "好可惜，红包飞走了~");
-			map.put("code", StaticKey.ReturnCoinRunAway);
-			return map;
-		}*/
+		/*
+		 * if(userId==richId){ map.put("msg", "好可惜，红包飞走了~"); map.put("code",
+		 * StaticKey.ReturnCoinRunAway); return map; }
+		 */
 		List<Integer> list = StaticKey.redPackagelist;
-		if(list==null||list.size()<=0){
+		if (list == null || list.size() <= 0) {
 			map.put("msg", "好可惜，红包飞走了~");
 			map.put("code", StaticKey.ReturnCoinRunAway);
 			return map;
 		}
 		RedPackage rp = redPackageService.findByUserId(richId);
-		if(rp==null||rp.getBalance()<=0){
+		if (rp == null || rp.getBalance() <= 0) {
 			map.put("msg", "好可惜，红包飞走了~");
 			map.put("code", StaticKey.ReturnCoinRunAway);
 			return map;
 		}
-		
-		FenrunLog fl = fenrunLogService.findByRedPackageId(userId,rp.getId());
-		if(fl!=null){
+
+		FenrunLog fl = fenrunLogService.findByRedPackageId(userId, rp.getId());
+		if (fl != null) {
 			map.put("msg", "您已抢过这个红包了!");
 			map.put("code", StaticKey.ReturnCoinRunAway);
 			return map;
 		}
-		Users user=userService.findById(userId);
-		Users vipUser=userService.findById(richId);
-		if(user == null || vipUser == null){
+		Users user = userService.findById(userId);
+		Users vipUser = userService.findById(richId);
+		if (user == null || vipUser == null) {
 			map.put("msg", "好可惜，红包飞走了~");
 			map.put("code", StaticKey.ReturnCoinRunAway);
 			return map;
 		}
-		
-		int random = (int)Math.floor(Math.random()*list.size());
-		Integer grabMoney = list.get(random);//随机到的金额
-		if(list.size()==1){
+
+		int random = (int) Math.floor(Math.random() * list.size());
+		Integer grabMoney = list.get(random);// 随机到的金额
+		if (list.size() == 1) {
 			rp.setStatus(0);
 		}
-		rp.setBalance(rp.getBalance()-grabMoney);
+		rp.setBalance(rp.getBalance() - grabMoney);
 		redPackageService.updateRedPackage(rp);
-		
-		list.remove(random);//将随机到的金额从list里面删除
-		
-		user.setTotalMoney(user.getTotalMoney()+grabMoney);
+
+		list.remove(random);// 将随机到的金额从list里面删除
+
+		user.setTotalMoney(user.getTotalMoney() + grabMoney);
 		FenrunLog userLog = new FenrunLog();
 		userLog.setMoney(grabMoney);
 		userLog.setAddTime(new Date());
 		userLog.setContentId(rp.getId());
 		userLog.setType(StaticKey.FenrunGrabUser);
 		userLog.setUser(user);
-		
-		//更新用户信息以及保存记录
-		commonService.updateUserAndSaveProfitLog(userLog,user);
+
+		// 更新用户信息以及保存记录
+		commonService.updateUserAndSaveProfitLog(userLog, user);
 		map.put("money", grabMoney);
 		map.put("msg", "success");
 		map.put("code", StaticKey.ReturnServerTrue);
 		return map;
 	}
-	
-	
+
 	/**
 	 * 料币提现界面：展示余额
+	 * 
 	 * @return
 	 */
-	@RequestMapping(value="/toTheBank")
+	@RequestMapping(value = "/toTheBank")
 	@ResponseBody
-	public Map<String,Object> toTheBank(HttpServletRequest request,Integer userId){
-		Map<String,Object> map=new HashMap<>();
-		if(userId==null){
+	public Map<String, Object> toTheBank(HttpServletRequest request, Integer userId) {
+		Map<String, Object> map = new HashMap<>();
+		if (userId == null) {
 			map.put("msg", "有参数为空");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
-		if(!redisService.getValidate(request,userId)){
+		if (!redisService.getValidate(request, userId)) {
 			map.put("msg", "token失效或错误");
 			map.put("code", StaticKey.ReturnClientTokenError);
 			return map;
 		}
-		
+
 		Users user = userService.findById(userId);
-		if(user==null){
+		if (user == null) {
 			map.put("msg", "用户不存在！");
 			map.put("code", StaticKey.ReturnUserAccountError);
 			return map;
 		}
-		
-		double balanceMoney = user.getTotalMoney()-user.getFreezeMoney()-user.getPayMoney()-user.getToBankMoney();
-		DecimalFormat df = new DecimalFormat("#.##");    
+
+		double balanceMoney = user.getTotalMoney() - user.getFreezeMoney() - user.getPayMoney() - user.getToBankMoney();
+		DecimalFormat df = new DecimalFormat("#.##");
 		balanceMoney = Double.parseDouble(df.format(balanceMoney));
-		
-//		可提现人民币额度1、2
+
+		// 可提现人民币额度1、2
 		String toBankMoneyStr1 = redisService.getConfigValue("toBankMoney1");
 		String toBankMoneyStr2 = redisService.getConfigValue("toBankMoney2");
-//		料币兑换率
+		// 料币兑换率
 		String liaoCoinRateStr = redisService.getConfigValue("liaoCoinRate");
-		
-		if(StringUtils.isBlank(toBankMoneyStr1)||StringUtils.isBlank(toBankMoneyStr2)||StringUtils.isBlank(liaoCoinRateStr)){
+
+		if (StringUtils.isBlank(toBankMoneyStr1) || StringUtils.isBlank(toBankMoneyStr2)
+				|| StringUtils.isBlank(liaoCoinRateStr)) {
 			map.put("msg", "error");
 			map.put("code", StaticKey.ReturnServerNullError);
 			return map;
 		}
-//		提现额度
+		// 提现额度
 		int toBankMoney1 = Integer.valueOf(toBankMoneyStr1);
 		int toBankMoney2 = Integer.valueOf(toBankMoneyStr2);
-//		料币兑换率
+		// 料币兑换率
 		double liaoCoinRate = Double.valueOf(liaoCoinRateStr);
-		
+
 		BindPay bindPay = bindPayService.findByUser(user);
-		if(bindPay==null){
+		if (bindPay == null) {
 			map.put("bindPayStatus", StaticKey.ReturnBindPayFalse);
-		}else{
+		} else {
 			map.put("bindPayStatus", StaticKey.ReturnBindPayTrue);
 			map.put("trueName", bindPay.getTrueName());
 			map.put("payAccount", bindPay.getPayAccount());
 		}
-		
-//		统计每日tobankShow展示次数
-//		handleCountService.handleCountPlusOne("tobankShow");
+
+		// 统计每日tobankShow展示次数
+		// handleCountService.handleCountPlusOne("tobankShow");
 		map.put("msg", "success");
 		map.put("code", StaticKey.ReturnServerTrue);
-		if(balanceMoney<=0){
+		if (balanceMoney <= 0) {
 			map.put("userMoney", 0);
-		}else
-		map.put("userMoney", (int)balanceMoney);
+		} else
+			map.put("userMoney", (int) balanceMoney);
 		map.put("toBankOne", toBankMoney1);
 		map.put("toBankTwo", toBankMoney2);
 		map.put("liaoCoinRate", liaoCoinRate);
 		return map;
 	}
-	
+
 	/**
 	 * 料币提现提交
+	 * 
 	 * @return
 	 */
-	@RequestMapping(value="/withdrawCash")
+	@RequestMapping(value = "/withdrawCash")
 	@ResponseBody
-	public Map<String,Object> withdrawCash(HttpServletRequest request,Integer userId,Integer type){
-		Map<String,Object> map=new HashMap<>();
-		if(userId==null||type==null){
+	public Map<String, Object> withdrawCash(HttpServletRequest request, Integer userId, Integer type) {
+		Map<String, Object> map = new HashMap<>();
+		if (userId == null || type == null) {
 			map.put("msg", "有参数为空");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
-		if(!redisService.getValidate(request,userId)){
+		if (!redisService.getValidate(request, userId)) {
 			map.put("msg", "token失效或错误");
 			map.put("code", StaticKey.ReturnClientTokenError);
 			return map;
 		}
-		
+
 		Users user = userService.findById(userId);
-		if(user==null){
+		if (user == null) {
 			map.put("msg", "用户不存在！");
 			map.put("code", StaticKey.ReturnUserAccountError);
 			return map;
 		}
-		
+
 		int toBankMoney = 0;
-		if(type==1){
-//			料币兑换人民币额度一
+		if (type == 1) {
+			// 料币兑换人民币额度一
 			String toBankMoneyStr1 = redisService.getConfigValue("toBankMoney1");
-			if(StringUtils.isBlank(toBankMoneyStr1)){
+			if (StringUtils.isBlank(toBankMoneyStr1)) {
 				map.put("msg", "error");
 				map.put("code", StaticKey.ReturnServerNullError);
 				return map;
 			}
 			toBankMoney = Integer.valueOf(toBankMoneyStr1);
-			
+
 		}
-		if(type==2){
-//			料币兑换人民币额度二
+		if (type == 2) {
+			// 料币兑换人民币额度二
 			String toBankMoneyStr2 = redisService.getConfigValue("toBankMoney2");
-			if(StringUtils.isBlank(toBankMoneyStr2)){
+			if (StringUtils.isBlank(toBankMoneyStr2)) {
 				map.put("msg", "error");
 				map.put("code", StaticKey.ReturnServerNullError);
 				return map;
 			}
 			toBankMoney = Integer.valueOf(toBankMoneyStr2);
-			
+
 		}
 
-		
-		double balanceMoney = user.getTotalMoney()-user.getFreezeMoney()-user.getPayMoney()-user.getToBankMoney();
+		double balanceMoney = user.getTotalMoney() - user.getFreezeMoney() - user.getPayMoney() - user.getToBankMoney();
 		DecimalFormat df = new DecimalFormat("#.##");
 		balanceMoney = Double.parseDouble(df.format(balanceMoney));
-//		料币兑换率
+		// 料币兑换率
 		double liaoCoinRate = 0.001;
 		String liaoCoinRateStr = redisService.getConfigValue("liaoCoinRate");
-		if(StringUtils.isBlank(liaoCoinRateStr)){
+		if (StringUtils.isBlank(liaoCoinRateStr)) {
 			System.out.println("请检查SystemConfig表数据");
-		}else{
+		} else {
 			liaoCoinRate = Double.valueOf(liaoCoinRateStr);
 		}
-		
-		int toBankLiaoCoin = (int) (toBankMoney/liaoCoinRate);
-		
-		if((int)balanceMoney < toBankLiaoCoin){
+
+		int toBankLiaoCoin = (int) (toBankMoney / liaoCoinRate);
+
+		if ((int) balanceMoney < toBankLiaoCoin) {
 			map.put("msg", "余额不足！");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
-//		更新提现料币总数
-		double newFreezeMoney = user.getFreezeMoney()+toBankLiaoCoin;
+		// 更新提现料币总数
+		double newFreezeMoney = user.getFreezeMoney() + toBankLiaoCoin;
 		user.setFreezeMoney(newFreezeMoney);
 		userService.updateUser(user);
-		
-//		添加提现记录
+
+		// 添加提现记录
 		ToBank toBank = new ToBank();
 		toBank.setToBankMoney(toBankMoney);
 		toBank.setToBankCoin(toBankLiaoCoin);
@@ -817,8 +849,8 @@ public class ProfitAction {
 		toBank.setAddTime(new Date());
 		toBank.setAddIp(CommonUtil.getIpAddr(request));
 		toBankService.saveToBank(toBank);
-		
-//		添加分润记录
+
+		// 添加分润记录
 		FenrunLog fenrunLog = new FenrunLog();
 		fenrunLog.setMoney(-toBankLiaoCoin);
 		fenrunLog.setContentId(StaticKey.FenrunContentToBank);
@@ -826,62 +858,63 @@ public class ProfitAction {
 		fenrunLog.setUser(user);
 		fenrunLog.setAddTime(new Date());
 		fenrunLogService.saveFenrunLog(fenrunLog);
-//		微信提现二维码url
+		// 微信提现二维码url
 		String wechatUrl = redisService.getConfigValue("wechatUrl");
-		
-//		统计每日drawMoney提现次数
-//	handleCountService.handleCountPlusOne("drawMoney");
+
+		// 统计每日drawMoney提现次数
+		// handleCountService.handleCountPlusOne("drawMoney");
 		map.put("msg", "success");
 		map.put("code", StaticKey.ReturnServerTrue);
 		map.put("wechatUrl", wechatUrl);
 		return map;
 	}
-	
+
 	/**
 	 * 料币提现记录列表
+	 * 
 	 * @return
 	 */
-	@RequestMapping(value="/toTheBankLog")
+	@RequestMapping(value = "/toTheBankLog")
 	@ResponseBody
-	public Map<String,Object> toTheBankLog(HttpServletRequest request,Integer userId,Integer pageNo){
-		Map<String,Object> map=new HashMap<>();
-		if(userId==null){
+	public Map<String, Object> toTheBankLog(HttpServletRequest request, Integer userId, Integer pageNo) {
+		Map<String, Object> map = new HashMap<>();
+		if (userId == null) {
 			map.put("msg", "有参数为空");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
-		if(!redisService.getValidate(request,userId)){
+		if (!redisService.getValidate(request, userId)) {
 			map.put("msg", "token失效或错误");
 			map.put("code", StaticKey.ReturnClientTokenError);
 			return map;
 		}
-		
-		if(pageNo==null){
-			pageNo=page;
-		}else{
-			pageNo=pageNo>1?pageNo:page;
+
+		if (pageNo == null) {
+			pageNo = page;
+		} else {
+			pageNo = pageNo > 1 ? pageNo : page;
 		}
-		
+
 		Users user = userService.findById(userId);
-		if(user==null){
+		if (user == null) {
 			map.put("msg", "用户不存在！");
 			map.put("code", StaticKey.ReturnUserAccountError);
 			return map;
 		}
-		
-		List<ToBank> list = toBankService.findByUser(user,pageNo);
-		List<Map<String,Object>> datas=new ArrayList<>();
+
+		List<ToBank> list = toBankService.findByUser(user, pageNo);
+		List<Map<String, Object>> datas = new ArrayList<>();
 		Map<String, Object> item = null;
-		for(ToBank toBank:list){
-			item=new HashMap<>();
+		for (ToBank toBank : list) {
+			item = new HashMap<>();
 			item.put("toBankMoney", toBank.getToBankMoney());
 			item.put("toBnakStatus", toBank.getToBankStatus());
 			item.put("addTime", toBank.getAddTime());
 			datas.add(item);
 		}
-		
+
 		Long toBankCount = toBankService.findToBankCountByUser(user);
-		if(toBankCount==null){
+		if (toBankCount == null) {
 			toBankCount = 0L;
 		}
 		map.put("toBankCount", toBankCount);
@@ -890,49 +923,50 @@ public class ProfitAction {
 		map.put("code", StaticKey.ReturnServerTrue);
 		return map;
 	}
-	
-	
+
 	/**
 	 * 绑定提现账号
+	 * 
 	 * @return
 	 */
-	@RequestMapping(value="/bindPayAccount")
+	@RequestMapping(value = "/bindPayAccount")
 	@ResponseBody
-	public Map<String,Object> bindPayAccount(HttpServletRequest request, Integer userId, String trueName, String payAccount){
-		Map<String,Object> map=new HashMap<>();
-		if(userId==null||StringUtils.isBlank(payAccount)||StringUtils.isBlank(trueName)){
+	public Map<String, Object> bindPayAccount(HttpServletRequest request, Integer userId, String trueName,
+			String payAccount) {
+		Map<String, Object> map = new HashMap<>();
+		if (userId == null || StringUtils.isBlank(payAccount) || StringUtils.isBlank(trueName)) {
 			map.put("msg", "有参数为空");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
-		
-		if(!redisService.getValidate(request,userId)){
+
+		if (!redisService.getValidate(request, userId)) {
 			map.put("msg", "token失效或错误");
 			map.put("code", StaticKey.ReturnClientTokenError);
 			return map;
 		}
-		
+
 		Users user = userService.findById(userId);
-		if(user==null){
+		if (user == null) {
 			map.put("msg", "用户不存在！");
 			map.put("code", StaticKey.ReturnUserAccountError);
 			return map;
 		}
-		
+
 		BindPay bindPayUser = bindPayService.findByUser(user);
-		if(bindPayUser!=null){
+		if (bindPayUser != null) {
 			map.put("msg", "此用户已绑定！");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
-		
+
 		BindPay bindPayAccount = bindPayService.findByPayAccount(payAccount);
-		if(bindPayAccount!=null){
+		if (bindPayAccount != null) {
 			map.put("msg", "此提现账号已被其他料料用户绑定");
 			map.put("code", StaticKey.ReturnBindPayError);
 			return map;
 		}
-		
+
 		BindPay bindPay = new BindPay();
 		bindPay.setUser(user);
 		bindPay.setPayAccount(payAccount);
@@ -940,245 +974,262 @@ public class ProfitAction {
 		bindPay.setAddTime(new Date());
 		bindPay.setAddIp(CommonUtil.getIpAddr(request));
 		bindPayService.saveBindPay(bindPay);
-		
+
 		map.put("msg", "success");
 		map.put("code", StaticKey.ReturnServerTrue);
 		return map;
 	}
-	
-	
+
 	/**
 	 * 获取用户的分润记录
+	 * 
 	 * @param request
 	 * @param userId
 	 * @param pageNo
 	 * @return
 	 */
-	@RequestMapping(value="/getFenrunLog")
+	@RequestMapping(value = "/getFenrunLog")
 	@ResponseBody
-	public Map<String,Object> getFenrunLog(HttpServletRequest request,Integer userId,Integer pageNo){
-		Map<String,Object> map=new HashMap<String,Object>();
-		if(userId==null||"".equals(userId)){
+	public Map<String, Object> getFenrunLog(HttpServletRequest request, Integer userId, Integer pageNo) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		if (userId == null || "".equals(userId)) {
 			map.put("msg", "参数异常");
 			map.put("code", StaticKey.ReturnClientNullError);
 			return map;
 		}
-		if(!redisService.getValidate(request,userId)){
+		if (!redisService.getValidate(request, userId)) {
 			map.put("msg", "token失效或错误");
 			map.put("code", StaticKey.ReturnClientTokenError);
 			return map;
 		}
-		
+
 		Users user = userService.findById(userId);
-		if(user==null){
+		if (user == null) {
 			map.put("msg", "用户不存在！");
 			map.put("code", StaticKey.ReturnUserAccountError);
 			return map;
 		}
-		
-		if(pageNo==null){
-			pageNo=page;
-		}else{
-			pageNo=pageNo>1?pageNo:page;
+
+		if (pageNo == null) {
+			pageNo = page;
+		} else {
+			pageNo = pageNo > 1 ? pageNo : page;
 		}
-		List<FenrunLog> list=fenrunLogService.findByUserId(userId,pageNo);
-		List<Map<String,Object>> datas=new ArrayList<>();
+		/*
+		 * List<Video> li=videoService.findBySourceId(userId); List<Article>
+		 * li2=articleService.findBySourceId(userId); List<FenrunLog> lists=new
+		 * ArrayList<FenrunLog>(); List<FenrunLog> lis=new
+		 * ArrayList<FenrunLog>(); List<FenrunLog> lis2=new
+		 * ArrayList<FenrunLog>(); for (Article article : li2) {
+		 * lis=fenrunLogService.findByContentId(article.getId());
+		 * lists.addAll(lis); } for (Video video : li) {
+		 * lis2=fenrunLogService.findByContentId(video.getId());
+		 * lists.addAll(lis); } for (FenrunLog fenrunLog : lists) {
+		 * fenrunLog.setMoney(fenrunLog.getMoney()); }
+		 * 
+		 * for (FenrunLog fenrunLog : list) {
+		 * fenrunLog.setMoney(fenrunLog.getMoney());
+		 * System.out.println(fenrunLog.getId()+";;"+fenrunLog.getMoney()); }
+		 * list.addAll(lis); for (FenrunLog fenrunLog : list) {
+		 * System.out.println(fenrunLog.getId()+"==="+fenrunLog.getMoney()+"==="
+		 * +fenrunLog.getUser()); }
+		 */
+		List<FenrunLog> list = fenrunLogService.findByUserId(userId, pageNo);
+		List<Map<String, Object>> datas = new ArrayList<>();
 		Map<String, Object> item = null;
-		for(FenrunLog fl:list){
-			item=new HashMap<>();
-			if(fl.getType()==StaticKey.FenrunArticle){
+		for (FenrunLog fl : list) {
+			item = new HashMap<>();
+			if (fl.getType() == StaticKey.FenrunArticle) {
 				item.put("info", "阅读料料头条");
 			}
-			if(fl.getType()==StaticKey.FenrunVideo){
+			if (fl.getType() == StaticKey.FenrunVideo) {
 				item.put("info", "观看料料视频");
 			}
-			if(fl.getType()==StaticKey.FenrunToBank){
+			if (fl.getType() == StaticKey.FenrunToBank) {
 				item.put("info", "料币提现兑换");
 			}
-			if(fl.getType()==StaticKey.FenrunSign){
+			if (fl.getType() == StaticKey.FenrunSign) {
 				item.put("info", "每日签到");
 			}
-			if(fl.getType()==StaticKey.FenrunBroadcast){
+			if (fl.getType() == StaticKey.FenrunBroadcast) {
 				item.put("info", "发布广播");
 			}
-			if(fl.getType()==StaticKey.FenrunGrabUser){
+			if (fl.getType() == StaticKey.FenrunGrabUser) {
 				item.put("info", "抢土豪红包");
 			}
-			if(fl.getType()==StaticKey.FenrunGrabVip){
+			if (fl.getType() == StaticKey.FenrunGrabVip) {
 				item.put("info", "被屌丝掠夺");
 			}
-			if(fl.getType()==StaticKey.FenrunInvitation){
+			if (fl.getType() == StaticKey.FenrunInvitation) {
 				item.put("info", "邀请好友");
 			}
-			if(fl.getType()==StaticKey.FenrunNewUser){
+			if (fl.getType() == StaticKey.FenrunNewUser) {
 				item.put("info", "新手红包");
 			}
-			if(fl.getType()==StaticKey.FenrunInvitation){
+			if (fl.getType() == StaticKey.FenrunInvitation) {
 				item.put("info", "小奴隶上交");
 			}
-			if(fl.getType()==StaticKey.FenrunDayFenrun){
+			if (fl.getType() == StaticKey.FenrunDayFenrun) {
 				item.put("info", "矿工进贡");
 			}
-			if(fl.getType()==StaticKey.FenrunPassVideo){
+			if (fl.getType() == StaticKey.FenrunPassVideo) {
 				item.put("info", "视频审核通过");
 			}
-			if(fl.getType()==StaticKey.FenrunPassArticle){
+			if (fl.getType() == StaticKey.FenrunPassArticle) {
 				item.put("info", "文章审核通过");
 			}
-			if(fl.getType()==StaticKey.FenrunOriginalArticle){
+			if (fl.getType() == StaticKey.FenrunOriginalArticle) {
 				item.put("info", "原创文章收益");
 			}
-			if(fl.getType()==StaticKey.FenrunOriginalVideo){
+			if (fl.getType() == StaticKey.FenrunOriginalVideo) {
 				item.put("info", "原创视频收益");
 			}
-			if(fl.getType()==StaticKey.FenrunDayTask){
+			if (fl.getType() == StaticKey.FenrunDayTask) {
 				item.put("info", "料料任务奖励");
 			}
-			if(fl.getType()==StaticKey.FenrunOriginalSum){
+			if (fl.getType() == StaticKey.FenrunOriginalSum) {
 				item.put("info", "原创作品收益");
 			}
-			if(fl.getType()==StaticKey.FenrunWorldRedPackage){
+			if (fl.getType() == StaticKey.FenrunWorldRedPackage) {
 				item.put("info", "土豪世界发红包啦");
 			}
-			if(fl.getType()==StaticKey.FenrunLookUser){
+			if (fl.getType() == StaticKey.FenrunLookUser) {
 				item.put("info", "约ta~");
 			}
-			if(fl.getType()==StaticKey.FenrunRefund){
+			if (fl.getType() == StaticKey.FenrunRefund) {
 				item.put("info", "红包退款");
 			}
-			if(fl.getType()==StaticKey.FenrunReadArticleDouble){
+			if (fl.getType() == StaticKey.FenrunReadArticleDouble) {
 				item.put("info", "阅读文章翻倍");
 			}
-			if(fl.getType()==StaticKey.FenrunReadVideoDouble){
+			if (fl.getType() == StaticKey.FenrunReadVideoDouble) {
 				item.put("info", "观看视频翻倍");
 			}
-			item.put("money", fl.getMoney()/*+"料币"*/);
+			if (fl.getType() == StaticKey.FenrunPlayTour) {
+				item.put("info", "打赏料币");
+			}
+			item.put("money", fl.getMoney()/* +"料币" */);
 			item.put("addTime", fl.getAddTime());
 			item.put("type", fl.getType());
 			item.put("id", fl.getId());
 			datas.add(item);
 		}
-		
-//		余额
-		double balanceMoney = user.getTotalMoney()-user.getFreezeMoney()-user.getPayMoney()-user.getToBankMoney();
-//		DecimalFormat df = new DecimalFormat("#.##");
-//		balanceMoney = Double.parseDouble(df.format(balanceMoney));
-		
-//		统计每日profitList展示次数
+
+		// 余额
+		double balanceMoney = user.getTotalMoney() - user.getFreezeMoney() - user.getPayMoney() - user.getToBankMoney();
+		// DecimalFormat df = new DecimalFormat("#.##");
+		// balanceMoney = Double.parseDouble(df.format(balanceMoney));
+
+		// 统计每日profitList展示次数
 		handleCountService.handleCountPlusOne("profitList");
 		map.put("datas", datas);
-		map.put("userMoney", (int)balanceMoney);
+		map.put("userMoney", (int) balanceMoney);
 		map.put("code", StaticKey.ReturnServerTrue);
 		return map;
 	}
 
-	
 	/**
 	 * 获取用户原创分润记录
+	 * 
 	 * @param request
 	 * @param userId
 	 * @param pageNo
 	 * @return
 	 */
-	@RequestMapping(value="/getOriginalLog")
+	@RequestMapping(value = "/getOriginalLog")
 	@ResponseBody
-	public Map<String,Object> getOriginalLog(HttpServletRequest request,Integer userId,Integer pageNo){
-		Map<String,Object> map=new HashMap<String,Object>();
-	/*	if(userId==null||"".equals(userId)){
-			map.put("msg", "参数异常");
-			map.put("code", StaticKey.ReturnClientNullError);
-			return map;
-		}
-		if(!redisService.getValidate(request,userId)){
-			map.put("msg", "token失效或错误");
-			map.put("code", StaticKey.ReturnClientTokenError);
-			return map;
-		}*/
-		
+	public Map<String, Object> getOriginalLog(HttpServletRequest request, Integer userId, Integer pageNo) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		/*
+		 * if(userId==null||"".equals(userId)){ map.put("msg", "参数异常");
+		 * map.put("code", StaticKey.ReturnClientNullError); return map; }
+		 * if(!redisService.getValidate(request,userId)){ map.put("msg",
+		 * "token失效或错误"); map.put("code", StaticKey.ReturnClientTokenError);
+		 * return map; }
+		 */
+
 		Users user = userService.findById(userId);
-		if(user==null){
+		if (user == null) {
 			map.put("msg", "用户不存在！");
 			map.put("code", StaticKey.ReturnUserAccountError);
 			return map;
 		}
-		
-		if(pageNo==null){
-			pageNo=page;
-		}else{
-			pageNo=pageNo>1?pageNo:page;
+
+		if (pageNo == null) {
+			pageNo = page;
+		} else {
+			pageNo = pageNo > 1 ? pageNo : page;
 		}
-		List<FenrunLog> list=fenrunLogService.findOriginalLogByUserId(userId,pageNo);
-		//System.out.println(userId);
-		List<Map<String,Object>> datas=new ArrayList<>();
+		List<FenrunLog> list = fenrunLogService.findOriginalLogByUserId(userId, pageNo);
+		// System.out.println(userId);
+		List<Map<String, Object>> datas = new ArrayList<>();
 		Map<String, Object> item = null;
-		for(FenrunLog fl:list){
-			item=new HashMap<>();
-			if(fl.getType()==StaticKey.FenrunOriginalArticle){
+		for (FenrunLog fl : list) {
+			item = new HashMap<>();
+			if (fl.getType() == StaticKey.FenrunOriginalArticle) {
 				Article a = articleService.findById(fl.getContentId());
 				item.put("type", 0);
-				item.put("title",a.getTitle());
-			}else{
+				item.put("title", a.getTitle());
+			} else {
 				Video a = videoService.findById(fl.getContentId());
 				item.put("type", 1);
-				item.put("title",a.getTitle());
+				item.put("title", a.getTitle());
 			}
-			item.put("money", fl.getMoney()/*+"料币"*/);
+			item.put("money", fl.getMoney()/* +"料币" */);
 			datas.add(item);
 		}
-		
+
 		map.put("datas", datas);
 		map.put("code", StaticKey.ReturnServerTrue);
 		return map;
 	}
-	
-	
-	
+
 	/**
 	 * 进入开通会员界面
+	 * 
 	 * @return
 	 */
-	@RequestMapping(value="/vipShow")
+	@RequestMapping(value = "/vipShow")
 	@ResponseBody
-	public Map<String,Object> chongzhiVIP(HttpServletRequest request){
-		Map<String,Object> map=new HashMap<>();
+	public Map<String, Object> chongzhiVIP(HttpServletRequest request) {
+		Map<String, Object> map = new HashMap<>();
 
-//		统计每日vipShow展示次数
+		// 统计每日vipShow展示次数
 		handleCountService.handleCountPlusOne("vipShow");
-		
+
 		map.put("code", StaticKey.ReturnServerTrue);
 		map.put("msg", "success");
 		return map;
 	}
-	
-	
+
 	/**
 	 * 微信统一下单
+	 * 
 	 * @param request
 	 * @param userId
 	 * @return
 	 */
-	@RequestMapping(value="/weixinPay")
+	@RequestMapping(value = "/weixinPay")
 	@ResponseBody
-	public Map<String,Object> weixinPay(HttpServletRequest request,Integer userId){
+	public Map<String, Object> weixinPay(HttpServletRequest request, Integer userId) {
 		String ip = CommonUtil.getIpAddr(request);
-		Map<String,Object> map = new HashMap<>();
-		//参数组
+		Map<String, Object> map = new HashMap<>();
+		// 参数组
 		String appid = StaticKey.APPID;
 		String mch_id = StaticKey.MCH_ID;
 		String nonce_str = RandCharsUtils.getRandomString(32);
 		String body = StaticKey.Body;
-		String detail = StaticKey.Detail; //商品名称明细列表
-		String attach = StaticKey.Attach; //附加参数 
+		String detail = StaticKey.Detail; // 商品名称明细列表
+		String attach = StaticKey.Attach; // 附加参数
 		String out_trade_no = RandCharsUtils.getRandomString(32);
 		int total_fee = StaticKey.TotalFee;
 		String spbill_create_ip = ip;
 		String time_start = RandCharsUtils.timeStart();
 		String time_expire = RandCharsUtils.timeExpire();
-		String notify_url = StaticKey.notify_url; //回调函数
+		String notify_url = StaticKey.notify_url; // 回调函数
 		String trade_type = StaticKey.TradType;
-		
-		//参数：开始生成签名
-		SortedMap<Object,Object> parameters = new TreeMap<Object,Object>();
+		// 参数：开始生成签名
+		SortedMap<Object, Object> parameters = new TreeMap<Object, Object>();
 		parameters.put("appid", appid);
 		parameters.put("mch_id", mch_id);
 		parameters.put("nonce_str", nonce_str);
@@ -1193,10 +1244,10 @@ public class ProfitAction {
 		parameters.put("notify_url", notify_url);
 		parameters.put("trade_type", trade_type);
 		parameters.put("spbill_create_ip", spbill_create_ip);
-		//第一次签名
+		// 第一次签名
 		String sign = WXSignUtils.createSign("UTF-8", parameters);
-		
-		//存放数据，发送到微信
+
+		// 存放数据，发送到微信
 		Unifiedorder unifiedorder = new Unifiedorder();
 		unifiedorder.setAppid(appid);
 		unifiedorder.setMch_id(mch_id);
@@ -1212,39 +1263,36 @@ public class ProfitAction {
 		unifiedorder.setTime_expire(time_expire);
 		unifiedorder.setNotify_url(notify_url);
 		unifiedorder.setTrade_type(trade_type);
-		//构造xml参数
+		// 构造xml参数
 		String xmlInfo = HttpXmlUtils.xmlInfo(unifiedorder);
 		String wxUrl = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 		String method = "POST";
-		//发送到微信,统一下单，并验证参数签名
+		// 发送到微信,统一下单，并验证参数签名
 		String weixinPost = HttpXmlUtils.httpsRequest(wxUrl, method, xmlInfo).toString();
-		
-		//获取返回值之后进行二次签名
-		Map<String,Object> weixinMap=ParseXMLUtils.jdomParseXml(weixinPost);
-		String prepay_id=(String) weixinMap.get("prepay_id");
-		String return_msg=(String) weixinMap.get("return_msg");
-		if(prepay_id==null){
-			map.put("code",StaticKey.ReturnServerNullError);
+		// 获取返回值之后进行二次签名
+		Map<String, Object> weixinMap = ParseXMLUtils.jdomParseXml(weixinPost);
+		String prepay_id = (String) weixinMap.get("prepay_id");
+		String return_msg = (String) weixinMap.get("return_msg");
+		if (prepay_id == null) {
+			map.put("code", StaticKey.ReturnServerNullError);
 			map.put("msg", return_msg);
 			return map;
 		}
-		
-		//第二次签名
-		SortedMap<Object,Object> parametersAgain = new TreeMap<Object,Object>();
-		Long timestamp=System.currentTimeMillis()/1000L;
+		// 第二次签名
+		SortedMap<Object, Object> parametersAgain = new TreeMap<Object, Object>();
+		Long timestamp = System.currentTimeMillis() / 1000L;
 		parametersAgain.put("appid", appid);
 		parametersAgain.put("partnerid", StaticKey.MCH_ID);
 		parametersAgain.put("prepayid", weixinMap.get("prepay_id"));
 		parametersAgain.put("noncestr", nonce_str);
 		parametersAgain.put("timestamp", timestamp);
 		parametersAgain.put("package", "Sign=WXPay");
-		//二次签名
+		// 二次签名
 		String signAgain = WXSignUtils.createSign("UTF-8", parametersAgain);
-		
 		Users user = userService.findById(userId);
-		
-		//创建订单号
+		// 创建订单号
 		WeixinPayLog weixinPaylog = new WeixinPayLog();
+		weixinPaylog.setReadyMoney(Double.valueOf(total_fee+""));
 		weixinPaylog.setBody(body);
 		weixinPaylog.setUser(user);
 		weixinPaylog.setSpbillCreateIp(ip);
@@ -1254,95 +1302,523 @@ public class ProfitAction {
 		weixinPaylog.setOutTradeNo(out_trade_no);
 		weixinPaylog.setAddTime(new Date());
 		weixinPayLogService.saveWeixinPayLog(weixinPaylog);
-		
-		map.put("prepay_id", weixinMap.get("prepay_id"));
+		/*Users users = weixinPaylog.getUser();
+		users.setVipStatus(StaticKey.UserVipStatusTrue);
+		userService.updateUser(users); // 更新用户vip状态
+*/		map.put("prepay_id", weixinMap.get("prepay_id"));
 		map.put("nonce_str", nonce_str);
+		map.put("out_trade_no", weixinPaylog.getOutTradeNo());
 		map.put("sign", signAgain);
 		map.put("TimeStamp", timestamp);
-		map.put("code",StaticKey.ReturnServerTrue);
+		map.put("code", StaticKey.ReturnServerTrue);
 		map.put("msg", "success");
-		
 		return map;
 	}
 	
-	/** 
-     * 微信支付回调 
-     * @param request 
-     * @param resposne 
-     */  
-    @RequestMapping(value="/notifyUrlWeixin")  
-    public void notifyWeixinPayment(HttpServletRequest request,HttpServletResponse response){
-        try{  
-            BufferedReader reader = request.getReader();  
-            String line = "";  
-            StringBuffer inputString = new StringBuffer();  
-            try{  
-                PrintWriter writer = response.getWriter();  
-                while ((line = reader.readLine()) != null) {  
-                    inputString.append(line);  
-                }  
-                if(reader!=null){  
-                    reader.close();  
-                }  
-                if(!StringUtils.isEmpty(inputString.toString())){  
-                    WXPayResult wxPayResult = JdomParseXmlUtils.getWXPayResult(inputString.toString());  
-                    if("SUCCESS".equalsIgnoreCase(wxPayResult.getReturn_code())){
-                        SortedMap<Object,Object> parameters = new TreeMap<Object,Object>();
-                        parameters.put("appid", wxPayResult.getAppid());  
-                        parameters.put("attach", wxPayResult.getAttach()); 
-                        parameters.put("bank_type", wxPayResult.getBank_type());
-                        parameters.put("cash_fee", wxPayResult.getCash_fee()); 
-                        parameters.put("fee_type", wxPayResult.getFee_type());  
-                        parameters.put("is_subscribe", wxPayResult.getIs_subscribe());
-                        parameters.put("mch_id", wxPayResult.getMch_id());  
-                        parameters.put("nonce_str", wxPayResult.getNonce_str());  
-                        parameters.put("openid", wxPayResult.getOpenid());  
-                        parameters.put("out_trade_no", wxPayResult.getOut_trade_no());  
-                        parameters.put("result_code", wxPayResult.getResult_code());  
-                        parameters.put("return_code", wxPayResult.getReturn_code());  
-                        parameters.put("time_end", wxPayResult.getTime_end());  
-                        parameters.put("total_fee", wxPayResult.getTotal_fee());  
-                        parameters.put("trade_type", wxPayResult.getTrade_type());  
-                        parameters.put("transaction_id", wxPayResult.getTransaction_id());  
-                        //反校验签名  
-                        String sign = WXSignUtils.createSign("UTF-8", parameters);
-                        
-                        if(sign.equals(wxPayResult.getSign())){
-                        	if("SUCCESS".equalsIgnoreCase(wxPayResult.getResult_code())){
-                        		WeixinPayLog weixinPayLog=weixinPayLogService.findByOutTradNo(wxPayResult.getOut_trade_no());
-                        		if(weixinPayLog.getStatus()==StaticKey.WeixinPaySuccess){
-                        			writer.write(HttpXmlUtils.backWeixin("SUCCESS","OK")); 
-                        		}else{
-		                        	weixinPayLog.setStatus(StaticKey.WeixinPaySuccess);
-		                        	weixinPayLog.setPayTime(new Date());
-		                        	Users user = weixinPayLog.getUser();
-		                        	user.setVipStatus(StaticKey.UserVipStatusTrue);
-		                        	userService.updateUser(user); //更新用户vip状态
-		                        	weixinPayLogService.updateWeixinPayLog(weixinPayLog);
-		                            writer.write(HttpXmlUtils.backWeixin("SUCCESS","OK"));  
-                        		}
-                        	}
-                        }else{  
-                            writer.write(HttpXmlUtils.backWeixin("FAIL","签名失败"));  
-                        }  
-                    }else{  
-                        writer.write(HttpXmlUtils.backWeixin("FAIL",wxPayResult.getReturn_msg()));  
-                    }  
-  
-                    if(writer!=null){  
-                        writer.close();  
-                    }  
-                }else{  
-                    writer.write(HttpXmlUtils.backWeixin("FAIL","未获取到微信返回的结果"));  
-                }  
-            }catch(Exception e){  
-                e.printStackTrace();  
-            }  
-        }catch(Exception ex){  
-            ex.printStackTrace();  
-        }  
-    }
+	/**
+	 * 微信支付回调
+	 * 
+	 * @param request
+	 * @param resposne
+	 */
+	@RequestMapping(value = "/notifyUrlWeixin")
+	public void notifyWeixinPayment(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			BufferedReader reader = request.getReader();
+			String line = "";
+			StringBuffer inputString = new StringBuffer();
+			try {
+				PrintWriter writer = response.getWriter();
+				while ((line = reader.readLine()) != null) {
+					inputString.append(line);
+				}
+				if (reader != null) {
+					reader.close();
+				}
+				if (!StringUtils.isEmpty(inputString.toString())) {
+					WXPayResult wxPayResult = JdomParseXmlUtils.getWXPayResult(inputString.toString());
+					if ("SUCCESS".equalsIgnoreCase(wxPayResult.getReturn_code())) {
+						SortedMap<Object, Object> parameters = new TreeMap<Object, Object>();
+						parameters.put("appid", wxPayResult.getAppid());
+						parameters.put("attach", wxPayResult.getAttach());
+						parameters.put("bank_type", wxPayResult.getBank_type());
+						parameters.put("cash_fee", wxPayResult.getCash_fee());
+						parameters.put("fee_type", wxPayResult.getFee_type());
+						parameters.put("is_subscribe", wxPayResult.getIs_subscribe());
+						parameters.put("mch_id", wxPayResult.getMch_id());
+						parameters.put("nonce_str", wxPayResult.getNonce_str());
+						parameters.put("openid", wxPayResult.getOpenid());
+						parameters.put("out_trade_no", wxPayResult.getOut_trade_no());
+						parameters.put("result_code", wxPayResult.getResult_code());
+						parameters.put("return_code", wxPayResult.getReturn_code());
+						parameters.put("time_end", wxPayResult.getTime_end());
+						parameters.put("total_fee", wxPayResult.getTotal_fee());
+						parameters.put("trade_type", wxPayResult.getTrade_type());
+						parameters.put("transaction_id", wxPayResult.getTransaction_id());
+						// 反校验签名
+						String sign = WXSignUtils.createSign("UTF-8", parameters);
 
-    
-    
+						if (sign.equals(wxPayResult.getSign())) {
+							if ("SUCCESS".equalsIgnoreCase(wxPayResult.getResult_code())) {
+								WeixinPayLog weixinPayLog = weixinPayLogService
+										.findByOutTradNo(wxPayResult.getOut_trade_no());
+								if (weixinPayLog.getStatus() == StaticKey.WeixinPaySuccess) {
+									writer.write(HttpXmlUtils.backWeixin("SUCCESS", "OK"));
+								} else {
+									weixinPayLog.setStatus(StaticKey.WeixinPaySuccess);
+									weixinPayLog.setPayTime(new Date());
+									Users user = weixinPayLog.getUser();
+									user.setVipStatus(StaticKey.UserVipStatusTrue);
+									userService.updateUser(user); // 更新用户vip状态
+									weixinPayLogService.updateWeixinPayLog(weixinPayLog);
+									writer.write(HttpXmlUtils.backWeixin("SUCCESS", "OK"));
+								}
+							}
+						} else {
+							writer.write(HttpXmlUtils.backWeixin("FAIL", "签名失败"));
+						}
+					} else {
+						writer.write(HttpXmlUtils.backWeixin("FAIL", wxPayResult.getReturn_msg()));
+					}
+
+					if (writer != null) {
+						writer.close();
+					}
+				} else {
+					writer.write(HttpXmlUtils.backWeixin("FAIL", "未获取到微信返回的结果"));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/**
+	 * 通过微信充值
+	 * 
+	 * @param request
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value = "/weixinPayRecharge")
+	@ResponseBody
+	public Map<String, Object> weixinPayRecharge(HttpServletRequest request, Integer userId,Integer money) {
+		String ip = CommonUtil.getIpAddr(request);
+		Map<String, Object> map = new HashMap<>();
+		// 参数组
+		String appid = StaticKey.APPID;
+		String mch_id = StaticKey.MCH_ID;
+		String nonce_str = RandCharsUtils.getRandomString(32);
+		String body = StaticKey.recharge;
+		String detail = "充值金额:"+money; // 商品名称明细列表
+		String attach = StaticKey.Attach; // 附加参数
+		String out_trade_no = RandCharsUtils.getRandomString(32);
+		int total_fee = money;
+		String spbill_create_ip = ip;
+		String time_start = RandCharsUtils.timeStart();
+		String time_expire = RandCharsUtils.timeExpire();
+		String notify_url = StaticKey.notify_recharge_url; // 回调函数
+		String trade_type = StaticKey.TradType;
+		// 参数：开始生成签名
+		SortedMap<Object, Object> parameters = new TreeMap<Object, Object>();
+		parameters.put("appid", appid);
+		parameters.put("mch_id", mch_id);
+		parameters.put("body", body);
+		parameters.put("nonce_str", nonce_str);
+		parameters.put("detail", detail);
+		parameters.put("attach", attach);
+		parameters.put("out_trade_no", out_trade_no);
+		parameters.put("total_fee", total_fee);
+		parameters.put("time_start", time_start);
+		parameters.put("time_expire", time_expire);
+		parameters.put("notify_url", notify_url);
+		parameters.put("trade_type", trade_type);
+		parameters.put("spbill_create_ip", spbill_create_ip);
+		// 第一次签名
+		String sign = WXSignUtils.createSign("UTF-8", parameters);
+
+		// 存放数据，发送到微信
+		Unifiedorder unifiedorder = new Unifiedorder();
+		unifiedorder.setAppid(appid);
+		unifiedorder.setMch_id(mch_id);
+		unifiedorder.setNonce_str(nonce_str);
+		unifiedorder.setSign(sign);
+		unifiedorder.setBody(body);
+		unifiedorder.setDetail(detail);
+		unifiedorder.setAttach(attach);
+		unifiedorder.setOut_trade_no(out_trade_no);
+		unifiedorder.setTotal_fee(total_fee);
+		unifiedorder.setSpbill_create_ip(spbill_create_ip);
+		unifiedorder.setTime_start(time_start);
+		unifiedorder.setTime_expire(time_expire);
+		unifiedorder.setNotify_url(notify_url);
+		unifiedorder.setTrade_type(trade_type);
+		// 构造xml参数
+		String xmlInfo = HttpXmlUtils.xmlInfo(unifiedorder);
+		String wxUrl = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+		String method = "POST";
+		// 发送到微信,统一下单，并验证参数签名
+		String weixinPost = HttpXmlUtils.httpsRequest(wxUrl, method, xmlInfo).toString();
+		// 获取返回值之后进行二次签名
+		Map<String, Object> weixinMap = ParseXMLUtils.jdomParseXml(weixinPost);
+		String prepay_id = (String) weixinMap.get("prepay_id");
+		String return_msg = (String) weixinMap.get("return_msg");
+		if (prepay_id == null) {
+			map.put("code", StaticKey.ReturnServerNullError);
+			map.put("msg", return_msg);
+			return map;
+		}
+		// 第二次签名
+		SortedMap<Object, Object> parametersAgain = new TreeMap<Object, Object>();
+		Long timestamp = System.currentTimeMillis() / 1000L;
+		parametersAgain.put("appid", appid);
+		parametersAgain.put("partnerid", StaticKey.MCH_ID);
+		parametersAgain.put("prepayid", weixinMap.get("prepay_id"));
+		parametersAgain.put("noncestr", nonce_str);
+		parametersAgain.put("timestamp", timestamp);
+		parametersAgain.put("package", "Sign=WXPay");
+		// 二次签名
+		String signAgain = WXSignUtils.createSign("UTF-8", parametersAgain);
+		Users user = userService.findById(userId);
+		// 创建订单号
+		WeixinPayLog weixinPaylog = new WeixinPayLog();
+		weixinPaylog.setBody(body);
+		weixinPaylog.setUser(user);
+		weixinPaylog.setSpbillCreateIp(ip);
+		weixinPaylog.setStatus(StaticKey.WeixinPayFail);
+		weixinPaylog.setTradeType(trade_type);
+		weixinPaylog.setOutTradeNo(out_trade_no);
+		weixinPaylog.setAddTime(new Date());
+		Integer xx=money/100;
+		weixinPaylog.setReadyMoney(xx.doubleValue());
+		user = weixinPaylog.getUser();
+		List<WeixinPayLog> weixinPayLog2=weixinPayLogService.queryByBodyAndUser(StaticKey.recharge, user);
+		if(weixinPayLog2==null||weixinPayLog2.size()==0){
+			weixinPaylog.setTotalFee(total_fee*10*2);
+		}else{
+			weixinPaylog.setTotalFee(total_fee*10);
+		}
+		weixinPayLogService.saveWeixinPayLog(weixinPaylog);
+			/*weixinPaylog.setStatus(StaticKey.WeixinPaySuccess);
+			weixinPaylog.setPayTime(new Date());
+			userService.updateUser(user);*/
+		map.put("prepay_id", weixinMap.get("prepay_id"));
+		map.put("out_trade_no", weixinPaylog.getOutTradeNo());
+		map.put("nonce_str", nonce_str);
+		map.put("sign", signAgain);
+		map.put("TimeStamp", timestamp);
+		map.put("code", StaticKey.ReturnServerTrue);
+		map.put("msg", "success");
+		return map;
+	}
+
+	/**
+	 * 微信充值回调
+	 * 
+	 * @param request
+	 * @param resposne
+	 */
+	@RequestMapping(value = "/notifyUrlWeixinRecharge")
+	public void notifyWeixinRecharge(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			BufferedReader reader = request.getReader();
+			String line = "";
+			StringBuffer inputString = new StringBuffer();
+			try {
+				PrintWriter writer = response.getWriter();
+				while ((line = reader.readLine()) != null) {
+					inputString.append(line);
+				}
+				if (reader != null) {
+					reader.close();
+				}
+				if (!StringUtils.isEmpty(inputString.toString())) {
+					WXPayResult wxPayResult = JdomParseXmlUtils.getWXPayResult(inputString.toString());
+					if ("SUCCESS".equalsIgnoreCase(wxPayResult.getReturn_code())) {
+						SortedMap<Object, Object> parameters = new TreeMap<Object, Object>();
+						parameters.put("appid", wxPayResult.getAppid());
+						parameters.put("attach", wxPayResult.getAttach());
+						parameters.put("bank_type", wxPayResult.getBank_type());
+						parameters.put("cash_fee", wxPayResult.getCash_fee());
+						parameters.put("fee_type", wxPayResult.getFee_type());
+						parameters.put("is_subscribe", wxPayResult.getIs_subscribe());
+						parameters.put("mch_id", wxPayResult.getMch_id());
+						parameters.put("nonce_str", wxPayResult.getNonce_str());
+						parameters.put("openid", wxPayResult.getOpenid());
+						parameters.put("out_trade_no", wxPayResult.getOut_trade_no());
+						parameters.put("result_code", wxPayResult.getResult_code());
+						parameters.put("return_code", wxPayResult.getReturn_code());
+						parameters.put("time_end", wxPayResult.getTime_end());
+						parameters.put("total_fee", wxPayResult.getTotal_fee());
+						parameters.put("trade_type", wxPayResult.getTrade_type());
+						parameters.put("transaction_id", wxPayResult.getTransaction_id());
+						// 反校验签名
+						String sign = WXSignUtils.createSign("UTF-8", parameters);
+
+						if (sign.equals(wxPayResult.getSign())) {
+							if ("SUCCESS".equalsIgnoreCase(wxPayResult.getResult_code())) {
+								WeixinPayLog weixinPayLog = weixinPayLogService
+										.findByOutTradNo(wxPayResult.getOut_trade_no());
+								Users user = weixinPayLog.getUser();
+								List<WeixinPayLog> weixinPayLog2=weixinPayLogService.queryByBodyAndUser(StaticKey.recharge, user);
+								if(weixinPayLog2==null||weixinPayLog2.size()==0){
+									user.setTotalMoney(user.getTotalMoney()+wxPayResult.getTotal_fee()*1000*2);
+								}else{
+									user.setTotalMoney(user.getTotalMoney()+wxPayResult.getTotal_fee()*1000);
+								}
+									weixinPayLog.setStatus(StaticKey.WeixinPaySuccess);
+									weixinPayLog.setPayTime(new Date());
+									userService.updateUser(user); // 更新用户vip状态
+									weixinPayLogService.updateWeixinPayLog(weixinPayLog);
+									writer.write(HttpXmlUtils.backWeixin("SUCCESS", "OK"));
+								}
+						} else {
+							writer.write(HttpXmlUtils.backWeixin("FAIL", "签名失败"));
+						}
+					} else {
+						writer.write(HttpXmlUtils.backWeixin("FAIL", wxPayResult.getReturn_msg()));
+					}
+
+					if (writer != null) {
+						writer.close();
+					}
+				} else {
+					writer.write(HttpXmlUtils.backWeixin("FAIL", "未获取到微信返回的结果"));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	/**
+	 * 苹果通过微信充值
+	 * 
+	 * @param request
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value = "/applePayRecharge")
+	@ResponseBody
+	public Map<String, Object> applePayRecharge(HttpServletRequest request, Integer userId,Integer payMoney,String payStatus,String orderNumber) {
+		String ip = CommonUtil.getIpAddr(request);
+		String trade_type = StaticKey.TradType;
+		Users users=userService.queryOne(userId);
+		Map<String, Object> map = new HashMap<>();
+		int total_fee = payMoney*1000;
+		if(payStatus.equals("0")){
+			// 参数组
+			String appid = StaticKey.APPID;
+			String mch_id = StaticKey.MCH_ID;
+			String nonce_str = RandCharsUtils.getRandomString(32);
+			String body = StaticKey.recharge;
+			String detail = "充值金额:"+payMoney; // 商品名称明细列表
+			String attach = StaticKey.Attach; // 附加参数
+			String out_trade_no = orderNumber;
+			String spbill_create_ip = ip;
+			String time_start = RandCharsUtils.timeStart();
+			String time_expire = RandCharsUtils.timeExpire();
+			String notify_url = StaticKey.notify_recharge_url; // 回调函数
+
+			// 参数：开始生成签名
+			SortedMap<Object, Object> parameters = new TreeMap<Object, Object>();
+			parameters.put("appid", appid);
+			parameters.put("mch_id", mch_id);
+			parameters.put("body", body);
+			parameters.put("nonce_str", nonce_str);
+			parameters.put("detail", detail);
+			parameters.put("attach", attach);
+			parameters.put("out_trade_no", out_trade_no);
+			parameters.put("total_fee", total_fee);
+			parameters.put("time_start", time_start);
+			parameters.put("time_expire", time_expire);
+			parameters.put("notify_url", notify_url);
+			parameters.put("trade_type", trade_type);
+			parameters.put("spbill_create_ip", spbill_create_ip);
+			// 第一次签名
+			String sign = WXSignUtils.createSign("UTF-8", parameters);
+			// 存放数据，发送到微信
+			Unifiedorder unifiedorder = new Unifiedorder();
+			unifiedorder.setAppid(appid);
+			unifiedorder.setMch_id(mch_id);
+			unifiedorder.setNonce_str(nonce_str);
+			unifiedorder.setSign(sign);
+			unifiedorder.setBody(body);
+			unifiedorder.setDetail(detail);
+			unifiedorder.setAttach(attach);
+			unifiedorder.setOut_trade_no(out_trade_no);
+			unifiedorder.setTotal_fee(total_fee);
+			unifiedorder.setSpbill_create_ip(spbill_create_ip);
+			unifiedorder.setTime_start(time_start);
+			unifiedorder.setTime_expire(time_expire);
+			unifiedorder.setNotify_url(notify_url);
+			unifiedorder.setTrade_type(trade_type);
+			// 构造xml参数
+			String xmlInfo = HttpXmlUtils.xmlInfo(unifiedorder);
+			String wxUrl = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+			String method = "POST";
+			// 发送到微信,统一下单，并验证参数签名
+			String weixinPost = HttpXmlUtils.httpsRequest(wxUrl, method, xmlInfo).toString();
+			// 获取返回值之后进行二次签名
+			Map<String, Object> weixinMap = ParseXMLUtils.jdomParseXml(weixinPost);
+			String prepay_id = (String) weixinMap.get("prepay_id");
+			String return_msg = (String) weixinMap.get("return_msg");
+			if (prepay_id == null) {
+				map.put("code", StaticKey.ReturnServerNullError);
+				map.put("msg", return_msg);
+				return map;
+			}
+
+			// 第二次签名
+			SortedMap<Object, Object> parametersAgain = new TreeMap<Object, Object>();
+			Long timestamp = System.currentTimeMillis() / 1000L;
+			parametersAgain.put("appid", appid);
+			parametersAgain.put("partnerid", StaticKey.MCH_ID);
+			parametersAgain.put("prepayid", weixinMap.get("prepay_id"));
+			parametersAgain.put("noncestr", nonce_str);
+			parametersAgain.put("timestamp", timestamp);
+			parametersAgain.put("package", "Sign=WXPay");
+			// 二次签名
+			String signAgain = WXSignUtils.createSign("UTF-8", parametersAgain);
+			Users user = userService.findById(userId);
+			// 创建订单号
+			WeixinPayLog weixinPaylog = new WeixinPayLog();
+			weixinPaylog.setBody(body);
+			weixinPaylog.setUser(user);
+			weixinPaylog.setSpbillCreateIp(ip);
+			weixinPaylog.setStatus(StaticKey.WeixinPaySuccess);
+			weixinPaylog.setTradeType(trade_type);
+			weixinPaylog.setOutTradeNo(out_trade_no);
+			weixinPaylog.setAddTime(new Date());
+			weixinPaylog.setReadyMoney(payMoney.doubleValue());
+			List<WeixinPayLog> weixinPayLog2=weixinPayLogService.queryByBodyAndUser(StaticKey.recharge, user);
+			if(weixinPayLog2==null||weixinPayLog2.size()==0){
+				weixinPaylog.setTotalFee(total_fee*2);
+				user.setTotalMoney(user.getTotalMoney()+payMoney*1000*2);
+			}else{
+				weixinPaylog.setTotalFee(total_fee);
+				user.setTotalMoney(user.getTotalMoney()+payMoney*1000);
+			}
+			weixinPayLogService.saveWeixinPayLog(weixinPaylog);
+				/*weixinPaylog.setStatus(StaticKey.WeixinPaySuccess);
+				weixinPaylog.setPayTime(new Date());*/
+				userService.updateUser(user);
+			//weixinPayLogService.saveWeixinPayLog(weixinPaylog);
+			map.put("prepay_id", weixinMap.get("prepay_id"));
+			map.put("nonce_str", nonce_str);
+			map.put("sign", signAgain);
+			map.put("TimeStamp", timestamp);
+			map.put("code", StaticKey.ReturnServerTrue);
+			map.put("msg", "success");
+			return map;
+		}else{
+			WeixinPayLog weixinPayLog=new WeixinPayLog();
+			weixinPayLog.setAddTime(new Date());
+			weixinPayLog.setBody(StaticKey.recharge);
+			weixinPayLog.setUser(users);
+			weixinPayLog.setSpbillCreateIp(ip);
+			weixinPayLog.setStatus(StaticKey.WeixinPayFail);
+			weixinPayLog.setTotalFee(total_fee);
+			weixinPayLog.setTradeType(trade_type);
+			weixinPayLog.setOutTradeNo(orderNumber);
+			weixinPayLog.setAddTime(new Date());
+			weixinPayLog.setReadyMoney(payMoney.doubleValue());
+			weixinPayLogService.saveWeixinPayLog(weixinPayLog);
+			map.put("code", StaticKey.ReturnServerNullError);
+			map.put("msg", "充值失败.");
+			return map;
+		}
+	}
+	/**
+	 *微信充值记录
+	 * @param request
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value = "/payRechargeHistory")
+	@ResponseBody
+	public Map<String, Object> payRechargeHistory(HttpServletRequest request, Integer userId) {
+		List<WeixinPayLog> list= weixinPayLogService.findAllByUser(userService.queryOne(userId));
+		Map<String, Object> map1=new HashMap<String, Object>();
+		Map<String, Object> map=null;
+		if(list==null){
+			map1.put("code", 1);
+			map1.put("msg", "暂无充值.");
+		}
+		
+		List<Object>aList=new ArrayList<Object>();
+		for (WeixinPayLog weixinMap : list) {
+			map = new HashMap<>();
+			map.put("money", weixinMap.getTotalFee().intValue());
+			map.put("buyTime",weixinMap.getAddTime());
+			map.put("buyWay", weixinMap.getTradeType());
+			map.put("payStatus", weixinMap.getStatus());
+			map.put("readyMoney", weixinMap.getReadyMoney());
+			aList.add(map);
+		}
+		map1.put("code", 0);
+		map1.put("msg", "信息如下:");
+		map1.put("list", aList);
+		return map1;
+		
+	}
+	
+	/**
+	 * 通过订单号获取信息
+	 * @param request
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value = "/payRechargeById")
+	@ResponseBody
+	public Map<String, Object> payRechargeById(HttpServletRequest request, String id,String status) {
+		Map<String, Object> map1=new HashMap<String, Object>();
+		WeixinPayLog  weixinPayLog =weixinPayLogService.queryOneByOrderNum(id);
+		if(weixinPayLog==null){
+			map1.put("code", 1);
+			map1.put("msg", "无该订单.");
+		}else{
+			map1.put("code", 0);
+			if(weixinPayLog.getBody().equals("开通VIP")){
+				map1.put("body", "1");
+				if(status.equals("0")){
+					Users users = weixinPayLog.getUser();
+					weixinPayLog.setStatus(StaticKey.WeixinPaySuccess);
+					weixinPayLog.setPayTime(new Date());
+					weixinPayLogService.updateWeixinPayLog(weixinPayLog);
+					users.setVipStatus(StaticKey.UserVipStatusTrue);
+					userService.updateUser(users); // 更新用户vip状态
+					map1.put("msg", "恭喜您成为VIP用户.");
+				}else{
+					map1.put("msg", "开通vip失败.");
+				}
+				
+			} else if(weixinPayLog.getBody().equals("充值")){
+				map1.put("body", "0");
+				if(status.equals("0")){
+			 		Users user = weixinPayLog.getUser();
+					if(weixinPayLog!=null){
+						user.setTotalMoney(user.getTotalMoney()+weixinPayLog.getTotalFee().doubleValue());
+					}
+						userService.updateUser(user);
+						weixinPayLog.setStatus(StaticKey.WeixinPaySuccess);
+						weixinPayLog.setPayTime(new Date());
+						weixinPayLogService.updateWeixinPayLog(weixinPayLog);
+						map1.put("msg", "充值成功.");
+				}else {
+					map1.put("msg", "充值失败.");
+				}
+				
+			}
+			
+		}
+		
+	
+		return map1;
+		
+	}
+		
 }

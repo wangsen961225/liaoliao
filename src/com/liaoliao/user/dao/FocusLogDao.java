@@ -20,6 +20,8 @@ public interface FocusLogDao {
 	List<FocusLog> findBeConcernedByUserId(Integer userId);
 
 	FocusLog findByFocusId(Integer userId, Integer focusId);
+	Long getFocusCountById(Integer id);
+	
 
 	void updateFocusLog(FocusLog fl);
 

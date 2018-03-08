@@ -6,7 +6,6 @@ package com.liaoliao.weixinPay.entity;
  * @date 2017年7月15日
  */
 public class WXPayResult {
-
 	private String appid;//公众账号ID
 	private String mch_id;//微信支付分配的商户号
 	private String device_info;//微信支付分配的终端设备号，

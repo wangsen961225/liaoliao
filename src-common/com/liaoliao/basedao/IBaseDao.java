@@ -12,12 +12,24 @@ import java.util.List;
  */
 public interface IBaseDao<T, ID extends Serializable> {
 
+	/**
+	 * 
+	 * @param hqlString
+	 * @param values
+	 * @return
+	 */
+	public List<T> getListByHQLs(String hqlString, Object... values);
     /**
      * <保存实体>
      * <完整保存实体>
      * @param t 实体参数
      */
     public abstract void save(T t);
+    /**
+     * 批量保存信息
+     * @param ts
+     */
+    public abstract void saveList(List<T> ts);
 
     /**
      * <保存或者更新实体>
@@ -142,7 +154,7 @@ public interface IBaseDao<T, ID extends Serializable> {
      * @return 记录总数
      */
     public abstract Long countByHql(String hql, Object... values);
-
+    
     /**
      * <HQL分页查询>
      * @param hql HQL语句
@@ -154,4 +166,5 @@ public interface IBaseDao<T, ID extends Serializable> {
      */
     public abstract PageResults<T> findPageByFetchedHql(String hql, String countHql, int pageNo, int pageSize, Object... values);
 
+   
 }

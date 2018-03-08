@@ -7,6 +7,9 @@ import com.liaoliao.content.entity.Article;
 
 public interface ArticleService {
 
+	
+	List<Article> findByStatus(Integer status);
+	
 	List<Article> findByKind(Integer kindId, Integer pageNo);
 	
 	List<Article> findByRand(Integer kindId, Integer size);
@@ -30,6 +33,8 @@ public interface ArticleService {
 	List<Article> findUserSelfList(Integer pageNo,Map<String,Object> map);
 	
 	public List<Article> findFive();
+	
+	List<Article> findAll();
 
 	List<Article> findBySourceId(Integer userId);
 	

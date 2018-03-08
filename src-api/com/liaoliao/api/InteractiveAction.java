@@ -1,5 +1,6 @@
 package com.liaoliao.api;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.cn.hnust.controller.MobilePushAction;
+import com.cn.hnust.controller.MobilePushActionProxy;
 import com.liaoliao.common.service.CommonService;
 import com.liaoliao.content.entity.Article;
 import com.liaoliao.content.service.ArticleService;
@@ -33,6 +36,8 @@ import com.liaoliao.util.ApplicationContextHelper;
 import com.liaoliao.util.JPushUtil;
 import com.liaoliao.util.RandomKit;
 import com.liaoliao.util.StaticKey;
+
+
 
 /**
  * 交互
@@ -288,10 +293,6 @@ public class InteractiveAction {
 			map.put("code", StaticKey.ReturnUserAccountNotExist);
 			return map;
 		}
-		
-		
-		
-		
 		int userMoney=(int) (user.getTotalMoney()-user.getFreezeMoney()-user.getPayMoney()-user.getToBankMoney());
 		if(userMoney<money){
 			map.put("msg", "余额不足!");
@@ -310,17 +311,34 @@ public class InteractiveAction {
 		
 		//如果是系统红包,发送通知
 		if(StaticKey.SystemRedpackage.equals(user.getId())){ 
-			Map<String, String> extras = new HashMap<String,String>();
+			/*Map<String, String> extras = new HashMap<String,String>();
 			extras.put("type",StaticKey.JPushSendOfficialUserSendRedpackage.toString() );
-			extras.put("userId", StaticKey.SystemRedpackage.toString());
-			JPushUtil.sendAllsetNotification("通知: 天降红包~~ 金额:"+money+"~ 剩余数量:"+number,extras);
+			extras.put("userId", StaticKey.SystemRedpackage.toString());*/
+			String extras="{\"type\":\""+StaticKey.JPushSendOfficialUserSendRedpackage.toString()+"\",\"userId\":\""+ StaticKey.SystemRedpackage.toString()+"\"}";
+			//JPushUtil.sendAllsetNotification("通知:金额:"+money+"~ 剩余数量:"+number,extras);
+			MobilePushAction mobilePushAction2=new MobilePushActionProxy();
+			String tString="通知: 红包金额:"+money+"";
+			System.out.println(tString.length());
+			try {
+				mobilePushAction2.sendMessage(StaticKey.AliPushNotice,tString, extras,4000);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
 		}else{
-			Map<String, String> extras = new HashMap<String, String>();
+			/*Map<String, String> extras = new HashMap<String, String>();
 			// 添加附加信息
 			extras.put("type", StaticKey.JPushSendRedPackage);
 			extras.put("userId", String.valueOf(userId));
 			int time = 100;//红包推送生存时间(S)
-			JPushUtil.sendAllMessage(user.getNickName(),extras,time);
+			JPushUtil.sendAllMessage(user.getNickName(),extras,time);*/
+			String extras="{\"type\":\""+StaticKey.JPushSendRedPackage+"\",\"userId\":\""+String.valueOf(user.getId())+"\"}";
+			// 添加附加信息
+			MobilePushAction mobilePushAction2=new MobilePushActionProxy();
+			try {
+				mobilePushAction2.send(StaticKey.AliPushMessage, user.getNickName(), extras,4000);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		int maxMoney=0;
@@ -368,8 +386,8 @@ public class InteractiveAction {
 			  }.start();*/
 		map.put("maxMoney",maxMoney);
 		map.put("msg", "success");
+		map.put("nickName", user.getNickName());
 		map.put("code", StaticKey.ReturnServerTrue);
-		
 		return map;
 		
 	}
@@ -383,14 +401,14 @@ public class InteractiveAction {
 	public Map<String,Object> focusUserSquare(HttpServletRequest request,Integer userId){
 		Map<String,Object> data = new HashMap<String,Object>();
 		List<Map<String,Object>> userList = new ArrayList<Map<String,Object>>();
-		for(int i=0;i<34;i++){
+		for(int i=0;i<4;i++){
 			Map<String, Object> map = this.getFocusUser(request, 1, userId);
 			if(map.get("item")!=null){
 				userList.add((Map<String, Object>) map.get("item"));
 			}
 		}
 		
-		for(int i=0;i<6;i++){
+		for(int i=0;i<3;i++){
 			Map<String, Object> map = this.getFocusUser(request, 2, userId);
 			if(map.get("item")!=null){
 				userList.add((Map<String, Object>) map.get("item"));
@@ -398,7 +416,7 @@ public class InteractiveAction {
 		}
 		
 		
-		if((userList.size()-40)<0){
+		if((userList.size()-7)<0){
 
 			for(int i=0;i<(40-userList.size());i++){
 				Map<String, Object> map = this.getFocusUser(request, 0, userId);
@@ -606,7 +624,7 @@ public class InteractiveAction {
 		Map<String,Object> data = new HashMap<String,Object>();
 		//随机获取一条
 		Users user = userService.findByRand(sex);
-		
+		Long focuseCount = focusLogService.findFocusCountById(userId);
 		//查找用户关注的料友并判断随机出来的料友是否已关注
 		List<FocusLog> list = list = focusLogService.findByUserId(userId);
 		
@@ -656,7 +674,12 @@ public class InteractiveAction {
 				nickName = user.getNickName();
 			}
 			item.put("sex",user.getSex());
-			item.put("nickName",nickName );
+			item.put("nickName",nickName);
+			Random random = new Random();
+			int liaoCount = random.nextInt(100);
+			int foucusCount = random.nextInt(1500);
+			item.put("liaoCount", liaoCount);
+			item.put("focusCount", foucusCount);
 			if(userId!=null&&redisService.getValidate(request,userId)){
 					fl = focusLogService.findByFocusId(userId, user.getId());
 					if(fl!=null&&fl.getStatus()==1){
@@ -667,11 +690,13 @@ public class InteractiveAction {
 			}else{
 				item.put("focusStatus", StaticKey.FocusFlase);
 			}
-
+			
 		data.put("item", item);
-		
 		data.put("msg", "正确");
 		data.put("code",StaticKey.ReturnServerTrue);
+		
+		
+		
 		
 		return data;
 	}	

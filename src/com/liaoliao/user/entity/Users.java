@@ -3,11 +3,14 @@ package com.liaoliao.user.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicUpdate;
@@ -82,6 +85,16 @@ public class Users implements Serializable{
 	 * 冻结额
 	 */
 	private Double freezeMoney;
+	
+	/**
+	 * 收益总金额
+	 */
+	private Double managementMoney;
+	/**
+	 * 昨日收益
+	 */
+	private Double yesterdayMoney;
+
 	/**
 	 * 提现额
 	 */
@@ -105,6 +118,34 @@ public class Users implements Serializable{
 	
 	private Integer age;
 	
+	private Integer deviceType;
+	/**
+	 * 想约当前用户的数量
+	 */
+	private Integer liaoCount ;
+	@Column(updatable = false, name ="liaoCount", nullable = false, length=50)
+	public Integer getLiaoCount() {
+		return this.liaoCount;
+	}
+
+	public void setLiaoCount(Integer liaoCount) {
+		this.liaoCount = liaoCount;
+	}
+
+
+	
+
+
+	public Integer getDeviceType() {
+		return deviceType;
+	}
+
+
+	public void setDeviceType(Integer deviceType) {
+		this.deviceType = deviceType;
+	}
+
+
 	@ManyToOne
 	@JoinColumn(name="district_id")
 	private District district;
@@ -116,6 +157,25 @@ public class Users implements Serializable{
 	private Date birthdate;
 	
 	
+	public Double getYesterdayMoney() {
+		return yesterdayMoney;
+	}
+
+
+	public void setYesterdayMoney(Double yesterdayMoney) {
+		this.yesterdayMoney = yesterdayMoney;
+	}
+	
+	public Double getManagementMoney() {
+		return managementMoney;
+	}
+
+
+	public void setManagementMoney(Double managementMoney) {
+		this.managementMoney = managementMoney;
+	}
+
+
 	public Users(){
 		super();
 	}
@@ -356,15 +416,6 @@ public class Users implements Serializable{
 	}
 
 
-	@Override
-	public String toString() {
-		return "Users [id=" + id + ", mobile=" + mobile + ", passWord=" + passWord + ", avatar=" + avatar + ", status="
-				+ status + ", vipStatus=" + vipStatus + ", sourceType=" + sourceType + ", nickName=" + nickName
-				+ ", parent=" + parent + ", totalMoney=" + totalMoney + ", payMoney=" + payMoney + ", dayMoney="
-				+ dayMoney + ", unselfMoney=" + unselfMoney + ", freezeMoney=" + freezeMoney + ", toBankMoney="
-				+ toBankMoney + ", loginTime=" + loginTime + ", addTime=" + addTime + ", addIp=" + addIp + ", sex="
-				+ sex + ", age=" + age + ", district=" + district + ", wechat=" + wechat + ", qq=" + qq + "]";
-	}
 
 
 	public Date getBirthdate() {

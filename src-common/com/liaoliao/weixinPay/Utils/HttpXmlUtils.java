@@ -217,6 +217,8 @@ public class HttpXmlUtils {
 			connection.setDoInput(true);
 			connection.setUseCaches(false);
 			connection.setRequestMethod(requestMethod);
+//			connection.setConnectTimeout(1000);  
+//			connection.setReadTimeout(3000); 
 			if (null != output) {
 				OutputStream outputStream = connection.getOutputStream();
 				outputStream.write(output.getBytes("UTF-8"));

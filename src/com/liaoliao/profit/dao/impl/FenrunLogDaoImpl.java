@@ -1,5 +1,5 @@
-package com.liaoliao.profit.dao.impl;
 
+package com.liaoliao.profit.dao.impl;
 import java.util.Date;
 import java.util.List;
 
@@ -103,6 +103,33 @@ public class FenrunLogDaoImpl extends BaseDaoImpl<FenrunLog, Integer> implements
 			dayMoneyTotal=(long) 0;
 		}
 		return (double)dayMoneyTotal;
+	}
+
+
+	@Override
+	public List<FenrunLog> findByContentId(Integer articleId) {
+		String hql=" from FenrunLog where contentId =?0";
+		return this.getListByHQL(hql, articleId);
+	}
+
+	@Override
+	public List<FenrunLog> findByContentIdFive(Integer articleId) {
+		String string="from FenrunLog where type=22 and contentId=? and money<0 order by money asc ";
+		 Query query = this.getSession().createQuery(string);
+		 query.setFirstResult(0); //开始记录 
+		  query.setMaxResults(6); 
+		  query.setParameter(0,articleId);//查询出来的记录数 
+		return query.list();
+	}
+
+
+	@Override
+	public List<FenrunLog> randFind(Integer pageNo) {
+		String string="from FenrunLog where money<0 and type=22 ORDER BY RAND()";
+		Query query=this.getSession().createQuery(string);
+		query.setFirstResult(0);
+		query.setMaxResults(pageNo);
+		return query.list();
 	}
 }
 

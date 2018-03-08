@@ -37,11 +37,21 @@ public class WeixinPayLog implements Serializable{
 	
 	private String outTradeNo;//商品订单号
 	
-	private Integer status; //状态：0：未完成；1：完成
+	private Integer status; //状态：1：未完成；0：完成
 	
 	private Date addTime;//创建时间
 	
 	private Date payTime;//支付时间
+
+	private Double readyMoney;//现金
+	
+	public Double getReadyMoney() {
+		return readyMoney;
+	}
+
+	public void setReadyMoney(Double readyMoney) {
+		this.readyMoney = readyMoney;
+	}
 
 	public Integer getId() {
 		return id;

@@ -30,7 +30,7 @@ body{
 		position: fixed;
         z-index: 1;
 	}
-      #advert
+      /* #advert
       	{
       		position: fixed;
       		background-color:black;
@@ -44,9 +44,9 @@ body{
             color:#C0C0C0;
             font-family:黑体;
             font-size: 0.6em;
-      	}  
+      	}  */ 
       	
-      	#cover {
+      	/* #cover {
       	position: fixed;
       		background-color:#99FFFF;
             width: 19%;
@@ -57,7 +57,7 @@ body{
             z-index: 2;
             border-radius:5px;
             color:#C0C0C0;
-      	}
+      	} */
 </style>
 </style>
 </head>
@@ -66,7 +66,7 @@ body{
  ${map.signAdvert}
  </div>
  <div id="advert">
-		<b>&nbsp;广&nbsp;告</b>
+		<!-- <b>&nbsp;广&nbsp;告</b> -->
 	</div>
 	
 	<!-- 遮挡自带 -->

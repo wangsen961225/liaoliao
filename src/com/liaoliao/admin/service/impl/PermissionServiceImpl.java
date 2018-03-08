@@ -20,9 +20,6 @@ public class PermissionServiceImpl  implements PermissionService{
 	private PermissionDao permissionDao;
 	
 	
-
-	
-	
 	@Override
 	public List<Permission> findByGroupId(Integer groupId) {
 		return permissionDao.findByGroupId(groupId);

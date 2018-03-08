@@ -46,6 +46,6 @@ public class AdminUserServiceImpl  implements AdminUserService{
 	public void updateAdminUser(AdminUser au) {
 		adminUserDao.updateAdminUser(au);
 	}
-	
+
 
 }

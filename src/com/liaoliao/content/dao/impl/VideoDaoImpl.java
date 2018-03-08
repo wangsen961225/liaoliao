@@ -150,4 +150,10 @@ public class VideoDaoImpl extends BaseDaoImpl<Video, Integer>  implements VideoD
 		
 		return this.getListByHQL(hql, userId,oldT,nowT);
 	}
+
+	@Override
+	public List<Video> findByStatus(Integer status) {
+		String hql="from Video where status=?0";
+		return this.getListByHQL(hql, status);
+	}
 }

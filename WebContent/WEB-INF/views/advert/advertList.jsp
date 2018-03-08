@@ -61,6 +61,28 @@ function openAdvert(id){
 				</span>
 		</form>
 		<div>
+		<div>
+				<button  class="guanggao" name="off" value="off">开启广告</button>
+				<button  class="guanggao1" name="on" value="on">关闭广告</button>
+		</div>
+		<script type="text/javascript">
+			$(".guanggao").click(function(){
+					$.ajax({
+						type: "post",
+				        url: "${ctx}/api/getADStatu?name="+$(".guanggao").val(),
+				        success: function(data){
+				        }
+					});
+			})
+			$(".guanggao1").click(function(){
+					$.ajax({
+						type: "post",
+				        url: "${ctx}/api/getADStatu?name="+$(".guanggao1").val(),
+				        success: function(data){
+				        }
+					});
+			})
+		</script>
 			<table class="table table-hover table-striped table-bordered">
 				<tbody>
 				<tr>

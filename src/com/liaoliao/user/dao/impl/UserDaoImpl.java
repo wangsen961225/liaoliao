@@ -15,6 +15,11 @@ import com.liaoliao.util.StaticKey;
 public class UserDaoImpl extends BaseDaoImpl<Users,Integer> implements UserDao {
 
 	@Override
+	public Users queryOne(Integer id) {
+		String hqlString = "from Users where id=?0";
+		return this.getByHQL(hqlString, id);
+	}
+	@Override
 	public Users findById(Integer id) {
 		return this.get(id);
 	}
@@ -70,8 +75,6 @@ public class UserDaoImpl extends BaseDaoImpl<Users,Integer> implements UserDao {
 			hql+=" and dayMoney > 0";
 			countHql+="and dayMoney > 0";
 		}
-		
-		
 		
 		hql+= " and id>10000 order by id desc";
 		countHql+= " and id > 10000 ";
@@ -458,6 +461,14 @@ public class UserDaoImpl extends BaseDaoImpl<Users,Integer> implements UserDao {
 	public List<Users> findAll() {
 		String hqlString = "from Users";
 		return this.getListByHQL(hqlString);
+	}
+	@Override
+	public List<Users> getUser(Integer num) {
+		String string="from Users  ORDER BY RAND()";
+		Query query=this.getSession().createQuery(string);
+		query.setFirstResult(0);
+		query.setMaxResults(num);
+		return query.list();
 	}
 
 

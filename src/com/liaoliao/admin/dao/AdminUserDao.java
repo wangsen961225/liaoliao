@@ -18,5 +18,5 @@ public interface AdminUserDao {
 	AdminUser findById(Integer id);
 
 	void updateAdminUser(AdminUser au);
-
+	
 }

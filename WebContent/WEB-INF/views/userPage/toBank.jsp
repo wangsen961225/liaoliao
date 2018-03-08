@@ -43,7 +43,7 @@
 				</tr>
 				<c:forEach var="li" items="${list}">
 					<tr>
-						<td>${li.id}</td>
+						<td>${li.user.id}</td>
 						<td>${li.user.nickName}</td>
 						<td>${li.bindPay.trueName}</td>
 						<td>${li.bindPay.payAccount}</td>

@@ -401,7 +401,9 @@ public class SpiderController {
 			sendingCount = 0;
 			commentCount = 0;
 			playCount = 0;
-			
+			/**
+			 * 
+			 */
 			Video videoCompare = videoService.findByKeyAndType(keyId,StaticKey.VideoMeiPai);
 			if(videoCompare==null&&videoUrl!=null){
 			Video video=null;
@@ -671,14 +673,17 @@ public class SpiderController {
 			try {
 				Document document = connection.get();
 				String contentStr = document.html();
+				System.out.println(contentStr+"====");
 				// 获取文章内容
 //				Elements wrapEle = document.select("[content]");
 				String sectionStr = "<div><div class=\"content\">"+StringUtils.substringBetween(contentStr, "<div class=\"content\">", "</section>");
+				System.out.println(sectionStr+"====");
 				sectionStr = StringUtils.replace(sectionStr, "data-src", "src");
 				
 //				System.out.println("文章内容："+sectionStr);
 //				System.out.println("===========================================");
 				content = sectionStr;
+				System.out.println(sectionStr+"====");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -709,6 +714,7 @@ public class SpiderController {
 			Article articleCompare = articleService.findByKeyAndType(keyId,StaticKey.ArticleQuTouTiao);
 			if(articleCompare==null&&content!=null){
 				article.setContent(content);
+				System.out.println(JSONObject.toJSON(article));
 				articleService.saveArticle(article);
 				count++;
 			}

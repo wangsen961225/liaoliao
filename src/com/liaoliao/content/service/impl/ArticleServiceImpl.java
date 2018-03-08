@@ -111,7 +111,15 @@ public class ArticleServiceImpl  implements ArticleService{
 		return articleDao.findPassedBySourceId(userId);
 	}
 
-	
-	
+	@Override
+	public List<Article> findAll() {
+		return articleDao.findAll();
+	}
+
+	@Override
+	public List<Article> findByStatus(Integer status) {
+		return articleDao.findByStatus(status);
+	}
+
 
 }

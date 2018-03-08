@@ -155,9 +155,6 @@
 		</div>
 		<!--iframe结束-->
 
-
-
-
 	<div class="header-section">
         <!--footer开始-->
         <footer>
@@ -175,5 +172,9 @@
 <script type="text/javascript" src="${ctx}/style/bootstrap/js/bootstrap.min.js"></script>
 
 
+
+<script type="text/javascript">
+
+</script>
 </body>
 </html>

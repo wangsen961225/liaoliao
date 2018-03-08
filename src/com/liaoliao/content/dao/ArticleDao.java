@@ -11,6 +11,10 @@ public interface ArticleDao {
 	 * TODO 接口api
 	 */
 	
+	Article findByUserId(Integer articleId,Integer userId);
+	
+	List<Article> findByStatus(Integer status);
+	
 	List<Article> findByKind(Integer kindId, Integer pageNo);
 
 	Article findByRand(Integer kindId);//接口下拉刷新获取随机新数据
@@ -21,6 +25,7 @@ public interface ArticleDao {
 	
 	List<Article> findBySourceId(Integer userId);
 	
+	List<Article> findAll();
 	/**
 	 * TODO 公共
 	 */

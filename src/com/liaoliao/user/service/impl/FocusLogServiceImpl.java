@@ -48,4 +48,11 @@ public class FocusLogServiceImpl implements FocusLogService {
 		
 	}
 
+	@Override
+	public Long findFocusCountById(Integer id) {
+		// TODO Auto-generated method stub
+		return focusLogDao.getFocusCountById(id);
+	}
+
+
 }

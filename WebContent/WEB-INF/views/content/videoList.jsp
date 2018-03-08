@@ -72,6 +72,7 @@
 						  <c:if test="${li.status==0}"><p style="color:red">封禁</p></c:if>
 						  <c:if test="${li.status==1}">正常</c:if>
 						  <c:if test="${li.status==2}">待审核</c:if>
+						   <c:if test="${li.status==100}"><p style="color:#FFD700">推荐</p></c:if>
 						</td>
 						<td>${li.playingCount}</td>
 						<td>${li.commentCount}</td>
@@ -80,6 +81,7 @@
 						  <button class="btn btn-info" type="button" onclick="modifyVideo(${li.id});">修改</button>&nbsp;&nbsp;&nbsp;&nbsp;
 						  <button class="btn btn-danger" type="button" onclick="javascript:return confirm(deleteVideo,${li.id},'确定删除吗?');">删除</button>&nbsp;&nbsp;&nbsp;&nbsp;
 						  <button class="btn btn-danger" type="button" onclick="banVideo(${li.id});">封禁</button>
+						   <button class="btn btn-danger" type="button" onclick="tuiVideo(${li.id});">推荐</button>
 						</td>
 					</tr>
 				</c:forEach>
@@ -138,6 +140,24 @@ function banVideo(id){
 		}
 	})
 }
+
+function tuiVideo(id){
+	$.ajax({
+		type:"GET",
+		url:"${ctx}/content/tuiVideo?id="+id,
+		success:function(data){
+			if(data.code==200){
+				alert(data.msg);
+				window.location.href="${ctx}/content/toVideo";
+			}
+		},
+		error:function(){
+			alert("出错啦~~");
+		}
+	})
+}
+
+
 
 
 </script>

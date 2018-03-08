@@ -1,0 +1,87 @@
+<!-- <html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Cache-Control" content="no-store">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0, maximum-scale=1">
+
+
+<link rel="shortcut icon" href="/style/images/favicon.png" type="image/x-icon">
+
+<script type="text/javascript" src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+
+<title>不给点甜头，没心思学习-料料</title>
+</head> 
+<body>-->
+<style type="text/css">
+.loop-wrap {
+    position: relative;
+    width: 240px;
+    height: 48px;
+    overflow: hidden;
+}
+
+.loop-images-container{
+    position: absolute;
+    left: 0; top: 0;
+    width: 500%; /* 横向排列 5张图片 宽度应为主容器5倍 */
+    height: 100%;
+    font-size: 0;
+}
+
+.loop-image{
+    width: 120px;
+    height: 48px;
+}
+.loop-images-container{
+    position: absolute;
+    left: 0; top: 0;
+    width: 500%;
+    height: 100%;
+    font-size: 0;
+    transform: translate(0,0); /* 初始位置位移 */
+    animation: loop 10s linear infinite;
+}
+/* 创建loop动画规则 */
+/* 
+   轮播5张，总耗时10s，单张应为2s(20%)
+   单张切换动画耗时500ms，停留1500ms
+*/
+@keyframes loop {
+    0% {transform: translate(0,0);}
+    15% {transform: translate(0,0);} /* 停留1500ms */
+
+    20% {transform: translate(-20%,0);} /* 切换500ms 位移-20% */
+    35% {transform: translate(-20%,0);}
+
+    40% {transform: translate(-40%,0);}
+    55% {transform: translate(-40%,0);}
+
+    60% {transform: translate(-60%,0);}
+    75% {transform: translate(-60%,0);}
+
+    80% {transform: translate(-80%,0);}
+    95% {transform: translate(-80%,0);}
+
+    100% {transform: translate(0,0);} /* 复位到第一张图片 */
+}
+</style>
+<div class="loop-wrap">
+    <div class="loop-images-container">
+        <img src="/liaoliao/imgs/paly.png" alt="" class="loop-image">
+        <img src="/liaoliao/imgs/paly.png" alt="" class="loop-image">
+        <img src="/liaoliao/imgs/paly.png" alt="" class="loop-image">
+        <img src="/liaoliao/imgs/paly.png" alt="" class="loop-image">
+        <img src="/liaoliao/imgs/paly.png" alt="" class="loop-image">
+        <img src="/liaoliao/imgs/paly.png" alt="" class="loop-image">
+        <img src="/liaoliao/imgs/paly.png" alt="" class="loop-image">
+        <img src="/liaoliao/imgs/paly.png" alt="" class="loop-image">
+        <img src="/liaoliao/imgs/paly.png" alt="" class="loop-image">
+        <img src="/liaoliao/imgs/paly.png" alt="" class="loop-image">
+    </div>
+</div>
+
+
+
+<!-- </body>
+</html> -->

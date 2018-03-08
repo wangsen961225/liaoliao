@@ -31,7 +31,7 @@ public class Video implements Serializable{
 	
 	private String imgUrl;
 	
-	private Integer status;//状态：0：封禁  1：正常  2：待审核
+	private Integer status;//状态：0：封禁  1：正常  2：待审核  100:推荐
 	
 	private Integer type;//是否原创：0:非原创   1:原创
 	
@@ -51,7 +51,18 @@ public class Video implements Serializable{
 	
 	private Date addTime;
 	
+	private Double playMoneySum;
 	
+	public Double getPlayMoneySum() {
+		return playMoneySum;
+	}
+
+
+	public void setPlayMoneySum(Double playMoneySum) {
+		this.playMoneySum = playMoneySum;
+	}
+
+
 	public Video(){
 		super();
 	}

@@ -1,0 +1,248 @@
+*{
+margin:0;
+padding:0;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+outline: none;
+-webkit-appearance: none;
+-webkit-text-size-adjust: none;
+-webkit-touch-callout:none; 
+-webkit-overflow-scrolling:touch;
+}
+html,
+body{
+height:100%;
+}
+
+header{
+height: 1.06rem;
+position: relative;
+font-size: .32rem;
+text-align: center;
+line-height: 0.91rem;
+padding-left: 1.29rem;
+}
+.top{
+height:1.21rem;
+}
+.header-icon{
+	height: .81rem;
+	width: .81rem;
+	background:url(../images/icon.png);
+	background-size: cover;
+	position: absolute;
+	left: .28rem;
+	top: .15rem;
+	bottom: .10rem;
+}
+.swiper-container{
+	float: left;
+	height: 1.06rem;
+	width: 4.53rem;
+	top: .15rem;
+	bottom: .10rem;
+}
+.lunbo{
+	height: .81rem;
+
+}
+button{
+	float: right;	
+}
+.tip{
+	background: #FF4520;
+	height: .41rem;
+	width: 1.08rem;
+	text-align: center;
+	color: #F8F8F8;
+	font-size: .28rem;
+	margin-top: .35rem;
+	margin-bottom: .31rem;
+	margin-right: .27rem;
+	outline:none;
+	border: none;
+	border-radius: 0.05rem;
+}
+
+section{
+padding:0 .31rem 0 .31rem;
+}
+section >.title{
+font-family: "迷你简粗宋体"
+color：#000;
+font-size: .48rem;
+}
+.user{
+margin-top:.3rem;
+overflow: hidden;
+}
+.user>img{
+float: left;
+}
+.user>.user-message{
+float: left;
+margin-left: 0.3rem;
+font-family: "黑体"；
+}
+.user>.user-message>.name{
+font-size: .32rem;
+display: block;
+margin-top: .2rem;
+}
+.user>.user-message>.time{
+margin-top: .2rem;
+font-size: .26rem;
+display: block;
+}
+.concern{
+float: right;
+height: .47rem;
+width:1.27rem;
+background: #FF4520;
+color:#F8F8F8;
+margin-top:.6rem;
+outline:none;
+border: none;
+border-radius: 0.05rem;
+}
+p{
+font-size: .34rem;
+color:#333;
+margin-top:.3rem;
+font-family: "黑体";
+}
+p.second{
+margin-bottom: .19rem;
+}
+.first{
+width:100%;
+}
+.second{
+width:100%;
+margin-top:.27rem;
+}
+.third{
+width:100%;
+margin-top:.27rem;
+}
+.forth{
+width:100%;
+margin-top:.27rem;
+}
+.download{
+background: #ff3924;
+color:#fff;
+border:none;
+outline:none;
+height: .8rem;
+width:100%;
+margin-top:  .24rem;
+border-radius: .05rem;
+font-family: "黑体";
+}
+.row{
+padding:0 .31rem 0 .31rem; 
+}
+.more{
+margin-top:.63rem;
+position: relative;
+}
+.more>h2{
+font-size: .48rem;
+}
+.more>.bar{
+width:1.8rem;
+height: .13rem;
+position: absolute;
+top:1.1rem;
+left:-0.1rem;
+}
+.video{
+margin-top:.3rem;
+border-top:1px solid #CCCCCC;
+border-bottom:1px solid #CCCCCC;
+padding:.11rem 0 .24rem 0;
+overflow: hidden;
+width: 100%;
+}
+.video-left{
+float: left;
+width:30%;
+}
+.video-right{
+width:60%;
+margin-top:0;
+}
+.up-down{
+border-bottom:1px solid #CCCCCC; 
+overflow: hidden; 
+}
+.up-down-message{
+margin-top:0;
+}
+.xiaohuo{
+float: left;
+margin-left: .27rem;
+width:30%;
+}
+.up-down .first{
+margin-left: 0;
+}
+.comment{
+margin-top:.39rem;
+position: relative;
+}
+.comment>h2{
+font-size: .48rem;
+}
+.comment>.bar{
+width:1.8rem;
+height: .13rem;
+position: absolute;
+top:.7rem;
+left:-0.1rem;
+}
+.head-sculpture{
+	height: .6rem;
+	width: .6rem;
+}
+.comment-user{
+margin-top: .6rem;
+color:#d6d6d6;
+}
+.comment-user .time b{
+display: inline-block;
+width:.35rem;
+height:.40rem;
+background: url(../images/praise_r19_c14.png);
+background-size: cover;
+margin-left:.3rem;
+}
+.summery{
+margin-top:0;
+width:100%;
+font-size: .4rem;
+margin-top:.3rem;
+text-align: center;
+color:#000;
+
+}
+.more-comment{
+width:100%;
+height: .6rem;
+background: #FF4520;
+color:#F8F8F8;
+border:none;
+outline:none;
+border-radius: 0.05rem;
+margin-top: .24rem;
+margin-bottom: .25rem;
+}
+#down-red{
+	position: absolute;
+	font-family: "黑体";
+	top: 4.22rem;
+	font-size: .32rem;
+	left: .88rem;
+	right: .82rem;
+	z-index: 2
+}

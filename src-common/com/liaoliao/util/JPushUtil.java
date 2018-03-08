@@ -18,6 +18,7 @@ import cn.jpush.api.push.model.notification.IosNotification;
 import cn.jpush.api.push.model.notification.Notification;
 
 /**
+ * 极光推送
  * @author Vio
  * @date 2017年7月15日
  */

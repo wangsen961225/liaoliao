@@ -61,6 +61,22 @@ public class FenrunLogServiceImpl implements FenrunLogService {
 	public Double todayTotal(Integer userId) {
 		return fenrunLogDao.todayTotal(userId);
 	}
+
+	@Override
+	public List<FenrunLog> findByContentId(Integer articleId) {
+		return fenrunLogDao.findByContentId(articleId);
+	}
+
+	@Override
+	public List<FenrunLog> findByContentIdFive(Integer articleId) {
+		return fenrunLogDao.findByContentIdFive(articleId);
+	}
+
+	@Override
+	public List<FenrunLog> randFind(Integer pageNo) {
+		
+		return fenrunLogDao.randFind(pageNo);
+	}
 	
 	
 

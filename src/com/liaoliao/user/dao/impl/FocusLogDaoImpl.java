@@ -21,7 +21,7 @@ public class FocusLogDaoImpl extends BaseDaoImpl<FocusLog,Integer> implements Fo
 
 	@Override
 	public List<FocusLog> findBeConcernedByUserId(Integer userId) {
-		String hql = "from FocusLog where focusUser.id = ?0 and status = 1";
+		String hql = "from FocusLog where focusUser.id = ?0 and status = 1 ORDER BY addTime desc";
 		return this.getListByHQL(hql,userId);
 		
 	}
@@ -42,4 +42,13 @@ public class FocusLogDaoImpl extends BaseDaoImpl<FocusLog,Integer> implements Fo
 		this.update(fl);
 		
 	}
+
+	@Override
+	public Long getFocusCountById(Integer id) {
+		// TODO Auto-generated method stub
+		String hql = "select count(a) from FocusLog a where focusUser.id = ?0";
+		return this.countByHql(hql,id);
+	}
+
+	
 }

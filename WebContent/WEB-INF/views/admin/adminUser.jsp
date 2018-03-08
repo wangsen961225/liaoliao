@@ -107,7 +107,8 @@
 function modAdminUser(id){
 	$.ajax({
 		type: "GET",
-        url: "${ctx}/sys/getAdminUser?id="+id,
+       url: "${ctx}/sys/getAdminUser?id="+id, 
+        /* url: "${ctx}/mobilePush/send?title=zhangsan&text=111", */
         success: function(data){
         	if(data.msg==0){
         		alert("用户组选择错误!");
@@ -134,6 +135,8 @@ function modAdminUser(id){
         }
 	});
 }
+
+
 </script>
 <!-- 修改用户 -->	
 <form class="form-signin" action="${ctx}/sys/modAdminUser" method="post" id="myForm">
@@ -177,9 +180,6 @@ function modAdminUser(id){
   </div>
 </div>
 </form>
-
-
-
 	
 </body>
 </html>

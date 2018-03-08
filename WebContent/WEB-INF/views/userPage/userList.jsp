@@ -6,6 +6,38 @@
 <%@ include file="/style/public/meta.jsp"%>
 <link href="${ctx}/style/css/form.css" rel="stylesheet">
 <title>${sys_title}</title>
+<style type="text/css">
+	/*鼠标按下时颜色变为绿色*/
+	.userid{
+		color:red;
+		 text-decoration: underline;
+		 cursor: pointer;
+	}
+  .userid:hover{
+    color:green;
+  }
+  .selected{
+			  font-weight:bold !important; 
+			  color: 	#8E8E8E !important;
+			  text-decoration: underline;
+			  cursor: pointer;
+		  }
+</style>
+<script>
+$(function(){
+    $(".userid").click(function(e) {
+        $("*").removeClass('selected');
+        $(e.target).addClass('selected');  // 然后为被点击元素添加selected样式
+        var userId=$(this).html();
+        openByuserid(userId);
+    });
+})
+
+function openByuserid(userId){
+	window.location.href="${ctx}/sys/readHistory?userId="+userId;
+}
+</script>
+
 </head>
 <body>
 	<div class="data_list">
@@ -77,7 +109,7 @@
 				</tr>
 				<c:forEach var="li" items="${list}">
 					<tr>
-						<td>${li.user.id}</td>
+						<td class="userid" >${li.user.id}</td>
 						<td>
 							<c:if test="${li.user.sourceType==0 }">微信用户</c:if>
 							<c:if test="${li.user.sourceType==1 }">QQ用户</c:if>

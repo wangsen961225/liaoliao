@@ -8,7 +8,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
+/***
+ * 数据库的封装类
+ * @author Administrator
+ *
+ */
 @Entity
 @Table(name="ll_admin_user")
 public class AdminUser implements Serializable{

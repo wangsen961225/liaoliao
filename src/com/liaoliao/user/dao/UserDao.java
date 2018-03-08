@@ -9,7 +9,11 @@ import com.liaoliao.sys.entity.SystemConfig;
 import com.liaoliao.user.entity.Users;
 
 public interface UserDao {
-
+	
+	List<Users> getUser(Integer num);
+	
+	Users queryOne(Integer id);
+	
 	Users findById(Integer id);
 
 	Users findByMobile(String mobile);

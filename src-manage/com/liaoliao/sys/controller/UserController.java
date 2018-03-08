@@ -1,5 +1,6 @@
 package com.liaoliao.sys.controller;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+import javax.jws.soap.SOAPBinding.Use;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +16,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.cn.hnust.controller.MobilePushAction;
+import com.cn.hnust.controller.MobilePushActionProxy;
 import com.liaoliao.content.entity.Article;
-import com.liaoliao.content.entity.ArticleComment;
 import com.liaoliao.content.entity.Feedback;
+import com.liaoliao.content.entity.KeyWords;
 import com.liaoliao.content.entity.OriginalArticleInfo;
 import com.liaoliao.content.entity.OriginalVideoInfo;
 import com.liaoliao.content.entity.Video;
-import com.liaoliao.content.entity.VideoComment;
 import com.liaoliao.content.service.ArticleCommentService;
 import com.liaoliao.content.service.ArticleService;
 import com.liaoliao.content.service.FeedbackService;
+import com.liaoliao.content.service.KeyWordsService;
 import com.liaoliao.content.service.OriginalArticleInfoService;
 import com.liaoliao.content.service.OriginalVideoInfoService;
 import com.liaoliao.content.service.VideoCommentService;
@@ -39,7 +43,9 @@ import com.liaoliao.sys.entity.BroadcastLog;
 import com.liaoliao.sys.service.AdvertClicksService;
 import com.liaoliao.sys.service.BroadcastLogService;
 import com.liaoliao.sys.service.HandleCountService;
+import com.liaoliao.user.entity.ReadHistory;
 import com.liaoliao.user.entity.Users;
+import com.liaoliao.user.service.ReadHistoryService;
 import com.liaoliao.user.service.UserService;
 import com.liaoliao.util.JPushUtil;
 import com.liaoliao.util.StaticKey;
@@ -95,6 +101,11 @@ public class UserController {
 	@Autowired
 	VideoCommentService videoCommentService;
 	
+	@Autowired
+	private KeyWordsService keyWordsService;
+	@Autowired
+	private ReadHistoryService readHistoryService;
+	
 	private Integer page=1;
 	
 	
@@ -148,7 +159,6 @@ public class UserController {
 		request.setAttribute("url", "/sys/userList");	
 		request.setAttribute("pageNo", pageNo);	
 		request.setAttribute("condition", condition);
-		
 		request.setAttribute("vipStatus", vipStatus);
 		request.setAttribute("userName", userName);	
 		request.setAttribute("mobile", mobile);	
@@ -425,14 +435,26 @@ public class UserController {
 		Feedback feedback = feedbackService.findById(id);
 		
 		if(feedback!=null){
-			Map<String, String> extras = new HashMap<String,String>();
+			/*Map<String, String> extras = new HashMap<String,String>();
 			//状态,用户id
 			
 			extras.put("type", StaticKey.JPushSendFeedback);
 			extras.put("userId", String.valueOf(feedback.getUser().getId()));
 			extras.put("status", "2");
 			//发送通知
-			JPushUtil.sendAllMessage("用户反馈留言结果通知", extras,86400);
+			JPushUtil.sendAllMessage("用户反馈留言结果通知", extras,86400);*/
+			String extras="{\"type\":\""+StaticKey.JPushSendFeedback+"\","
+        			+ "\"userId\":\""+
+        			String.valueOf(feedback.getUser().getId())+
+			 "\",\"status\":\"2\"}";
+		
+			// 添加附加信息
+			MobilePushAction mobilePushAction2=new MobilePushActionProxy();
+			try {
+				mobilePushAction2.send(StaticKey.AliPushMessage, "用户反馈留言结果通知", extras,86400);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		
@@ -470,17 +492,28 @@ public class UserController {
 		
 		Feedback feedback = feedbackService.findById(id);
 		if(feedback!=null){
-			Map<String, String> extras = new HashMap<String,String>();
+			/*Map<String, String> extras = new HashMap<String,String>();
 			//状态,用户id
 			
 			extras.put("type", StaticKey.JPushSendFeedback);
 			extras.put("userId", String.valueOf(feedback.getUser().getId()));
-			extras.put("status", "3");
+			extras.put("status", "3");*/
 			//发送通知
-			JPushUtil.sendAllMessage("用户反馈留言结果通知", extras,86400 );
+			//JPushUtil.sendAllMessage("用户反馈留言结果通知", extras,86400 );
+
+			String extras="{\"type\":\""+StaticKey.JPushSendFeedback+"\","
+        			+ "\"userId\":\""+
+        			String.valueOf(feedback.getUser().getId())+
+			 "\",\"status\":\"3\"}";
+			System.out.println(extras+"========");
+			// 添加附加信息
+			MobilePushAction mobilePushAction2=new MobilePushActionProxy();
+			try {
+				mobilePushAction2.send(StaticKey.AliPushMessage, "用户反馈留言结果通知", extras,86400);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
 		}
-		
-		
 		map.put("code", 1);
 		map.put("msg", "success");
 		return map;
@@ -767,22 +800,30 @@ public class UserController {
         articleService.updateArticle(article);
         originalArticleInfoService.updateOAI(oai);
         
-        
        Article findById = articleService.findById(id);
         System.err.println("tongguo le ");
         System.out.println(findById);
 		if(findById!=null){
-			Map<String, String> extras = new HashMap<String,String>();
+			/*Map<String, String> extras = new HashMap<String,String>();
 			//状态,用户id
-			
 			extras.put("type", StaticKey.JPushSendOriginal);
 			extras.put("userId", String.valueOf(findById.getSourceId()));
 			extras.put("status", "1");
 			//发送通知
-			JPushUtil.sendAllMessage("用户原创审核结果通知", extras,86400 );
+			JPushUtil.sendAllMessage("用户原创审核结果通知", extras,86400 );*/
+			String extras="{\"type\":\""+StaticKey.JPushSendOriginal+"\","
+        			+ "\"userId\":\""+
+        			String.valueOf(findById.getSourceId())+
+			 "\",\"status\":\"1\"}";
+			System.out.println(extras+"========");
+			// 添加附加信息
+			MobilePushAction mobilePushAction2=new MobilePushActionProxy();
+			try {
+				mobilePushAction2.send(StaticKey.AliPushMessage, "用户原创审核结果通知", extras,86400);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
 		}
-        
-        
         
 //		统计每日分润料币总金额 (取消发表原创,统计料币)
 //		handleCountService.handleCountTotalMoney("totalProfitMoney",StaticKey.passArticleMoney);
@@ -896,14 +937,25 @@ public class UserController {
         
         Video findById = videoService.findById(id);
 		if(findById!=null){
-			Map<String, String> extras = new HashMap<String,String>();
+			/*Map<String, String> extras = new HashMap<String,String>();
 			//状态,用户id
 			
 			extras.put("type", StaticKey.JPushSendOriginal);
 			extras.put("userId", String.valueOf(findById.getSourceId()));
 			extras.put("status", "1");
 			//发送通知
-			JPushUtil.sendAllMessage("用户原创审核结果通知", extras,86400 );
+			JPushUtil.sendAllMessage("用户原创审核结果通知", extras,86400 );*/
+			String extras="{\"type\":\""+StaticKey.JPushSendOriginal+"\","
+        			+ "\"userId\":\""+
+        			String.valueOf(findById.getSourceId())+
+			 "\",\"status\":\"1\"}";
+			System.out.println(extras+"========");			
+			MobilePushAction mobilePushAction2=new MobilePushActionProxy();
+			try {
+				mobilePushAction2.send(StaticKey.AliPushMessage, "用户原创审核结果通知", extras,86400);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
 		}
 		
         
@@ -1027,12 +1079,204 @@ public class UserController {
 			data.put("code", -1);
 			data.put("msg","该用户没有获得过料币！" );
 		}
-//		request.getSession().setAttribute("expenditureDetailsList", expenditureDetailsList);
 		request.setAttribute("expenditureDetailsList", expenditureDetailsList);
-//		request.setAttribute("data", data);
-		//return "userPage/userList";
-		//return expenditureDetailsList;
 		return "userPage/expenditureDetailsList";
-		
 	}
+	//用户阅读记录
+	@RequestMapping(value="/readHistory")
+	public String readHistory(HttpServletRequest request,Integer userId,Integer pageNo){
+		List<ReadHistory> list=null;
+		List<Map<String, String>> maps=new ArrayList<Map<String,String>>();
+		Map<String, String> map=null;
+		Integer count = null;
+		if(pageNo==null){
+			pageNo=page;
+		}else{
+			pageNo=pageNo>1?pageNo:page;
+		}
+		String condition="";
+		if(userId!=null&&!("".equals(userId))){
+			condition+="&userId="+userId;
+		}
+			list=readHistoryService.queryAll(userId,pageNo);
+			count=readHistoryService.findCount(userId);
+			request.setAttribute("url", "/sys/readHistory");	
+			request.setAttribute("condition", condition);
+			request.setAttribute("userId", userId);
+			request.setAttribute("pageNo", pageNo);	
+		
+		if(count==null){
+			request.setAttribute("count",0);
+			request.getSession().setAttribute("count", 0);
+		}else{
+			request.setAttribute("count", (int)(Math.ceil((double)count/15)));
+			request.getSession().setAttribute("count", (int)(Math.ceil((double)count/15)));
+		}
+		Users users2=null;
+		String title=null;
+		String dyte=null;
+		for (ReadHistory readHistory : list) {
+			map=new HashMap<String,String>();
+			Video video=videoService.findById(readHistory.getArticleId());
+			if(video==null){
+				Article article=articleService.findById(readHistory.getArticleId());
+				title=article.getTitle();
+			}else{
+				title=video.getTitle();
+			}
+			Integer type=readHistory.getType();
+			if(type==0){
+				dyte="文章";
+			}else if (type==1) {
+				dyte="视频";
+			}
+			users2=userService.queryOne(readHistory.getUserId());
+			if(users2==null){
+			map.put("read", "--");
+			}else{
+			map.put("read", users2.getNickName());
+			}
+			if(readHistory.getNum()==null){
+				map.put("num", "1");
+			}else{
+				map.put("num", readHistory.getNum().toString());
+			}
+			map.put("title", title);
+			map.put("type", dyte);
+			int s=0;
+			if(readHistory.getMoney()==null){
+				readHistory.setMoney(0.0);
+			}else{
+				s=readHistory.getMoney().intValue();
+			}
+			map.put("money", s+"");
+			map.put("addDate", readHistory.getAddDate().toString());
+			maps.add(map);
+		}
+		request.setAttribute("list", maps);
+		return "userPage/readHistory";
+	}
+	
+	//关键字记录
+			@RequestMapping(value="/keyWordsHistory")
+			public String keyWordsHistory(HttpServletRequest request,Integer userId,Integer pageNo){
+				Map<String,Object> map = new HashMap<>();
+				String condition="";
+				if(userId!=null&&!("".equals(userId))){
+					map.put("userId", userId);
+					condition+="&userId="+userId;
+				}
+				List<KeyWords> lists=null;
+				Integer count = null;
+				if(pageNo==null){
+					pageNo=page;
+				}else{
+					pageNo=pageNo>1?pageNo:page;
+				}
+					lists=keyWordsService.queryAll(userId,pageNo);
+					count=keyWordsService.findCount(userId);
+					request.setAttribute("url", "/sys/keyWordsHistory");
+					request.setAttribute("condition", condition);
+					request.setAttribute("pageNo", pageNo);
+				if(count==null){
+					request.setAttribute("count",0);
+					request.getSession().setAttribute("count", 0);
+				}else{
+					request.setAttribute("count", (int)(Math.ceil((double)count/15)));
+					request.getSession().setAttribute("count", (int)(Math.ceil((double)count/15)));
+				}
+				request.setAttribute("lists", lists);
+				return "userPage/keyWords";
+			}
+			
+			//今日推荐
+			@RequestMapping(value="/recommend")
+			public String todayRecommend(HttpServletRequest request){
+				List<Article> list=articleService.findByStatus(StaticKey.ArticleStatusTui);
+				List<Video> vlist=videoService.findByStatus(StaticKey.VideoStatusTui);
+				List<String> aList=new ArrayList<String>();
+				if(vlist!=null){
+					for (Video video : vlist) {
+						aList.add(video.getTitle());
+					}
+				}
+				
+				if(list!=null){
+				for (Article article : list) {
+					aList.add(article.getTitle());
+				}
+				}
+				request.setAttribute("list", aList);
+				return "userPage/recommend";
+			}
+			//登录app设备记录
+			@RequestMapping("/userDeviceTypeHistory")
+			@ResponseBody
+			public Map<String,Object> userDeviceTypeHistory(HttpServletRequest request ,Integer userId,Integer deviceType){
+				Map<String, Object> map=new HashMap<String,Object>();
+				Users user=userService.queryOne(userId);
+				if(user==null||user.equals("")){
+					map.put("msg", "没有该用户.");
+					map.put("code",StaticKey.ReturnUserAccountNotExist);
+					return map;
+				}
+				user.setDeviceType(deviceType);
+				userService.updateUser(user);
+				map.put("msg", "用户使用的设备是:"+deviceType);
+				map.put("code","0");
+				return map;
+			}
+			
+			//购买vip
+			@RequestMapping("/UserBuyVIP")
+			@ResponseBody
+			public Map<String,Object> UserBuyVIP(HttpServletRequest request ,Integer userId){
+				Map<String, Object> map=new HashMap<String,Object>();
+				Users user=userService.queryOne(userId);
+				if(user==null||user.equals("")){
+					map.put("msg", "没有该用户.");
+					map.put("code",StaticKey.ReturnUserAccountNotExist);
+					return map;
+				}
+				if(user.getVipStatus().equals(StaticKey.UserVipStatusTrue)){
+					map.put("msg", "您已经是VIP会员");
+					map.put("code","1");
+				}else{
+					user.setVipStatus(StaticKey.UserVipStatusTrue);
+					userService.updateUser(user);
+					map.put("msg", "恭喜您成为VIP会员.");
+					map.put("code","0");
+				}
+				return map;
+			}
+			/**
+			 * 通过用户得到用户的基本信息
+			 * @param request
+			 * @param userId
+			 * @return
+			 */
+			@RequestMapping("/getUserById")
+			@ResponseBody
+		public Map<String, Object> getUser(HttpServletRequest request ,Integer userId){
+			Users users=userService.queryOne(userId);
+			Map<String, Object> map=new HashMap<String,Object>();
+			if(users==null){
+				map.put("code",1);
+				map.put("msg","无该用户.");
+			}else{
+				List<WeixinPayLog> list=weixinPayLogService.findAllByUserAndType(users);
+				if(list.size()==0){
+					map.put("status", 1);
+				}else{
+					map.put("status", 0);
+				}
+				map.put("code",0);
+				map.put("msg","信息如下:");
+				map.put("nickName", users.getNickName());
+				map.put("userImg",users.getAvatar());
+				map.put("yuMoney", users.getTotalMoney());
+			}
+			return map;
+			
+		}
 }

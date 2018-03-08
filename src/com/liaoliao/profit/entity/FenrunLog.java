@@ -12,6 +12,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicUpdate;
 
+import com.liaoliao.content.entity.Article;
 import com.liaoliao.user.entity.Users;
 
 @Entity

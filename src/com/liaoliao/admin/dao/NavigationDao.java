@@ -7,7 +7,6 @@ import com.liaoliao.admin.entity.Navigation;
 
 public interface NavigationDao {
 
-
 	List<Navigation> findByGroup(AdminGroup ag);
 
 	List<Navigation> findParent();
@@ -16,7 +15,7 @@ public interface NavigationDao {
 
 	Navigation findById(Integer parentId);
 
-	 void saveNa(Navigation na);
+	void saveNa(Navigation na);
 
 	List<Navigation> findByParentId(Integer id);
 

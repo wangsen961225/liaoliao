@@ -3,10 +3,13 @@ package com.liaoliao.content.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.liaoliao.content.entity.Article;
 import com.liaoliao.content.entity.Video;
 
 public interface VideoDao {
 
+	List<Video> findByStatus(Integer status);
+	
 	List<Video> findAll(Integer pageNo,Map<String,Object> map);
 
 	Video findByRand();

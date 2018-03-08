@@ -14,11 +14,15 @@ public abstract class StaticKey {
 	
 	public static final Integer ArticleStatusFalse = 0;//文章状态禁用
 	
+	public static final Integer ArticleStatusTui = 100;//文章状态推荐
+	
 	public static final Integer ArticleStatusTrue = 1;//文章状态正常
 	
 	public static final Integer ArticleStatusLoding = 2;//文章等待审核
 	
 	public static final Integer VideoStatusFalse = 0;//视频状态禁用
+	
+	public static final Integer VideoStatusTui= 100;//视频状态推荐
 	
 	public static final Integer VideoStatusTrue = 1;//视频状态正常
 	
@@ -86,8 +90,13 @@ public abstract class StaticKey {
 	 * 视频分页
 	 * @return 15
 	 */
-	public static final Integer VideoPageNum=15;//视频分页
+	public static final Integer VideoPageNum=5;//视频分页
 	
+	/**
+	 * 打赏
+	 */
+	public static final Integer PlayTourYes=0;//打赏
+	public static final Integer PlayTourNo=1;//未打赏
 	/**
 	 * 分润
 	 */
@@ -141,6 +150,7 @@ public abstract class StaticKey {
 	public static final Integer FenrunWorldRedPackage=16;//分润日志来源种类-土豪世界发红包
 	
 	public static final Integer FenrunLookUser=17;//分润日志来源种类-查看用户详情(约她)
+	public static final Integer FenrunPlayTour=22;//打赏
 	/**
 	 * 分润日志来源种类-退款
 	 * @return 18
@@ -246,9 +256,10 @@ public abstract class StaticKey {
 	
 	public static final String notify_url = "http://app.127120.com:8080/api/notifyUrlWeixin";//微信支付回调函数
 	
-	public static final Integer WeixinPayFail = 0 ;
 	
-	public static final Integer WeixinPaySuccess = 1 ;
+	public static final Integer WeixinPayFail = 1;
+	
+	public static final Integer WeixinPaySuccess = 0 ;
 	
 	public static final String  Attach = "1";//附加参数
 	
@@ -262,8 +273,9 @@ public abstract class StaticKey {
 	
 	public static final Double TestRate=0.35;//推广人员扣量百分比
 	
+	public static final String notify_recharge_url = "http://app.127120.com:8080/api/notifyUrlWeixinRecharge";//微信充值回调函数
 	
-	
+	public static final String recharge = "充值";
 	/**
 	 * 返回值
 	 */
@@ -358,7 +370,17 @@ public abstract class StaticKey {
 	 * @return 710
 	 */
 	public static final Integer ReturnCooldownTimeError = 710;
-	
+	//移动推送
+	/**
+	 * 移动推送 消息
+	 * @return "1"
+	 */
+	public static final String AliPushMessage = "1";
+	/**
+	 * 移动推送 NOTICE 通知
+	 * @return "0"
+	 */
+	public static final String AliPushNotice = "0";
 	//极光推送额外透传类型
 	/**
 	 * 极光推送额外透传类型-霸屏登录
@@ -460,6 +482,10 @@ public abstract class StaticKey {
 	 * @return 10000
 	 */
 	public static final Integer BreakoutMoney=10000;
+	
+	public static final String managementMoneyStatusing="0";//收益中
+	
+	public static final String managementMoneyStatused="1";//收益已结算
 	
 	
 	
